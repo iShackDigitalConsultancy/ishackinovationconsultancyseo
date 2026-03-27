@@ -26,34 +26,22 @@ export class Home {
     
     this.funnelState.set('analyzing');
     
-    // Trigger OpenClaw agents in the backend
+    // Trigger real backend analysis (SEMRush + OpenClaw/Cheerio)
     this.http.post(`${environment.apiUrl}/openclaw/trigger`, {
       eventType: 'seo_analysis_request',
       payload: { website: this.websiteUrl() }
     }).subscribe({
-      next: () => {
-        // Mock a 3-second analysis delay
-        setTimeout(() => {
-          this.mockReport.set({
-            score: 64,
-            issuesFound: 12,
-            criticalErrors: 3,
-            suggestions: [
-              "Missing meta descriptions on 14 pages.",
-              "Canonical tags are incorrectly configured.",
-              "Images lack alt-text attributes.",
-              "H1 tags are duplicated on the homepage."
-            ]
-          });
-          this.funnelState.set('report');
-        }, 3000);
+      next: (res: any) => {
+        if (res && res.success && res.report) {
+          this.mockReport.set(res.report);
+        } else {
+          this.mockReport.set({ score: 0, issuesFound: 1, criticalErrors: 1, suggestions: ["Failed to generate valid report."] });
+        }
+        this.funnelState.set('report');
       },
-      error: () => {
-        // Fallback to mock even if server fails for demo
-        setTimeout(() => {
-          this.mockReport.set({ score: 64, issuesFound: 12, criticalErrors: 3, suggestions: ["Missing meta descriptions on 14 pages."] });
-          this.funnelState.set('report');
-        }, 2000);
+      error: (err) => {
+        this.mockReport.set({ score: 0, issuesFound: 1, criticalErrors: 1, suggestions: [`API Error: ${err.message}`] });
+        this.funnelState.set('report');
       }
     });
   }

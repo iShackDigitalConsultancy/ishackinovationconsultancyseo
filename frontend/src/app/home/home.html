@@ -68,13 +68,35 @@
       @if (funnelState() === 'report') {
         <div class="animate-fade-in space-y-6">
           <div class="flex items-center justify-between border-b border-slate-200 pb-4">
-            <h2 class="text-2xl font-bold text-slate-800">Partial Analysis Report (60%)</h2>
+            <h2 class="text-2xl font-bold text-slate-800">Partial Analysis Report</h2>
             <div class="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg font-bold shadow-sm">
-              Score: {{ mockReport()?.score }}/100
+              Optimization Score: {{ mockReport()?.score }}/100
             </div>
           </div>
           
-          <div class="space-y-4">
+          <!-- Live SEMRush Data -->
+          @if (mockReport()?.metrics && mockReport()?.metrics?.rank !== '-') {
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              <div class="bg-white/60 border border-slate-200 text-center p-4 rounded-xl shadow-sm">
+                <div class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-wider">Global Rank</div>
+                <div class="text-xl font-extrabold text-slate-800">{{ mockReport().metrics.rank }}</div>
+              </div>
+              <div class="bg-white/60 border border-slate-200 text-center p-4 rounded-xl shadow-sm">
+                <div class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-wider">Organic Traffic</div>
+                <div class="text-xl font-extrabold text-slate-800">{{ mockReport().metrics.organicTraffic }}</div>
+              </div>
+              <div class="bg-white/60 border border-slate-200 text-center p-4 rounded-xl shadow-sm">
+                <div class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-wider">Keywords</div>
+                <div class="text-xl font-extrabold text-slate-800">{{ mockReport().metrics.organicKeywords }}</div>
+              </div>
+              <div class="bg-white/60 border border-slate-200 text-center p-4 rounded-xl shadow-sm">
+                <div class="text-xs text-slate-500 font-bold mb-1 uppercase tracking-wider">Traffic Value</div>
+                <div class="text-xl font-extrabold text-slate-800">${{ mockReport().metrics.trafficCost }}</div>
+              </div>
+            </div>
+          }
+
+          <div class="space-y-4 mt-6">
             <div class="bg-red-50 text-red-800 p-4 rounded-xl border border-red-100 shadow-sm relative overflow-hidden">
               <div class="font-bold flex items-center gap-2 mb-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>

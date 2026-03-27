@@ -27,62 +27,94 @@ app.use('/api/sites', sitesRouter);
 const adminRouter = require('./admin');
 app.use('/api/admin', adminRouter);
 
-// Real OpenClaw SDK Integration
+// Real SEMRush & HTML Audit Integration
 app.post('/api/openclaw/trigger', async (req, res) => {
   const { eventType, payload } = req.body;
-  console.log(`[OpenClaw] Lead Trigger received: ${eventType}`, payload);
+  const targetUrl = payload?.website;
   
-  let scrapedContent = '';
-  if (payload && payload.website) {
+  if (!targetUrl) {
+    return res.status(400).json({ success: false, error: 'No website provided' });
+  }
+  
+  try {
+    const urlObj = new URL(targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`);
+    const domain = urlObj.hostname.replace('www.', '');
+    
+    // 1. Structural HTML Scraping
+    let score = 100;
+    const issues = [];
+    
     try {
-      console.log(`Fetching website: ${payload.website}`);
-      const response = await fetch(payload.website, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AI-SEO-Bot' }
-      });
+      const response = await fetch(urlObj.href, { headers: { 'User-Agent': 'Mozilla/5.0' } });
       const html = await response.text();
       const $ = cheerio.load(html);
       
-      // Basic scraping extraction for the prompt
-      const title = $('title').text() || 'No Title';
-      const h1s = [];
-      $('h1').each((i, el) => h1s.push($(el).text().trim()));
-      const metaDescription = $('meta[name="description"]').attr('content') || 'No Meta Description';
+      const title = $('title').text();
+      const metaDesc = $('meta[name="description"]').attr('content');
+      const h1Count = $('h1').length;
       
-      // Gather text to provide context
-      const textContent = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 3000); // Send first 3k chars
-
-      scrapedContent = `Title: ${title}\nH1s: ${h1s.join(', ')}\nMeta Description: ${metaDescription}\nText Snippet: ${textContent}`;
-      console.log(`Successfully scraped data for ${payload.website}`);
-    } catch (err) {
-      console.error('Failed to scrape site:', err.message);
-      scrapedContent = `Failed to scrape website: ${err.message}. Please rely on general knowledge or assume typical missing SEO elements for the simulation.`;
+      if (!title || title.length < 10) { issues.push('Title tag is missing or too short.'); score -= 15; }
+      if (!metaDesc || metaDesc.length < 50) { issues.push('Meta description is missing or too short.'); score -= 20; }
+      if (h1Count === 0) { issues.push('No H1 tag detected.'); score -= 15; }
+      else if (h1Count > 1) { issues.push('Multiple H1 tags detected (should be unique per page).'); score -= 10; }
+      
+      $('img').each((i, el) => {
+        if (!$(el).attr('alt')) {
+          if (i === 0) { issues.push('Images are missing alt-text descriptions.'); score -= 10; }
+        }
+      });
+    } catch (scrapeErr) {
+      issues.push(`Failed to analyze HTML structure: ${scrapeErr.message}`);
+      score -= 30;
     }
-  }
 
-  try {
-    // OpenClaw is an ESM module, requiring dynamic import in CommonJS
-    const openclaw = await import('openclaw');
+    // 2. Fetch Live SEMRush Data
+    let semrushData = null;
+    const semrushKey = process.env.SEMRUSH_API_KEY || '77a0242d2998078e52b1a2d4ec514613';
     
-    // Simulate API delay for dramatic effect
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    if (openclaw && process.env.OPENCLAW_TOKEN) {
-      console.log('OpenClaw SDK loaded successfully. Dispatching to agent network...');
-      const client = new openclaw.Client({ token: process.env.OPENCLAW_TOKEN });
-      // Example dispatch payload matching what the agent expects
-      // await client.dispatch({ type: eventType, data: { ...payload, scrapedContent } });
-    } else {
-      console.log('No OPENCLAW_TOKEN found. Simulating successful trigger for demo purposes.');
+    try {
+      // Domain Ranks API gives traffic, rank, and keywords
+      const srUrl = `https://api.semrush.com/?type=domain_ranks&key=${semrushKey}&export_columns=Dn,Rk,Or,Ot,Oc&domain=${domain}&database=us`;
+      const srRes = await fetch(srUrl);
+      const csvData = await srRes.text();
+      
+      if (csvData && !csvData.startsWith('ERROR')) {
+        const lines = csvData.trim().split('\n');
+        if (lines.length > 1) {
+          const values = lines[1].split(';');
+          semrushData = {
+            rank: values[1] || 'N/A',
+            organicKeywords: values[2] || '0',
+            organicTraffic: values[3] || '0',
+            trafficCost: values[4] || '0'
+          };
+        }
+      }
+    } catch (semErr) {
+      console.error('SEMRush fetch error:', semErr.message);
     }
+    
+    // If SEMRush returned no traffic, deduct score
+    if (semrushData && semrushData.organicTraffic === '0') {
+      issues.push('SEMRush reports zero organic traffic. Major SEO campaign required.');
+      score -= 15;
+    }
+    if (score < 15) score = 15; // floor
 
     res.status(200).json({ 
       success: true, 
-      message: 'Agent team activated via OpenClaw SDK',
-      timestamp: new Date().toISOString()
+      report: {
+        domain,
+        score,
+        issuesFound: issues.length,
+        criticalErrors: issues.length > 2 ? 2 : issues.length,
+        suggestions: issues.length > 0 ? issues : ['Your website is well optimized!'],
+        metrics: semrushData || { rank: '-', organicKeywords: '-', organicTraffic: '-', trafficCost: '-' }
+      }
     });
   } catch (error) {
-    console.error("[OpenClaw Error]", error);
-    res.status(500).json({ success: false, error: 'Failed to communicate with OpenClaw SDK' });
+    console.error("[Analysis Error]", error);
+    res.status(500).json({ success: false, error: 'Failed to analyze website' });
   }
 });
 
