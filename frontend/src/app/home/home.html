@@ -1,0 +1,149 @@
+<main class="min-h-screen bg-slate-50 text-slate-800 font-sans relative overflow-x-hidden">
+  <!-- Navigation -->
+  <nav class="fixed w-full z-50 glass-panel py-4 px-6 lg:px-12 flex justify-between items-center transition-all duration-300">
+    <div class="flex items-center gap-2">
+      <div class="h-10 w-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">IS</div>
+      <span class="text-xl font-bold tracking-tight">iShack <span class="text-primary">Innovation.</span></span>
+    </div>
+    <div class="hidden md:flex gap-8 font-medium text-slate-600">
+      <a href="#services" class="hover:text-primary transition-colors">Services</a>
+      <a href="#agency" class="hover:text-primary transition-colors">For Agencies</a>
+      <a href="#results" class="hover:text-primary transition-colors">Results</a>
+    </div>
+    <button routerLink="/login" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-xl transform hover:-translate-y-0.5">
+      Partner With Us
+    </button>
+  </nav>
+
+  <!-- Hero & Funnel Container -->
+  <section class="pt-32 pb-20 px-6 lg:px-12 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-screen">
+    <div class="text-center space-y-6 z-10 max-w-4xl mx-auto mb-12">
+      <div class="inline-block px-4 py-1.5 rounded-full bg-blue-100 text-primary font-semibold text-sm tracking-wide mb-2 border border-blue-200 shadow-sm animate-pulse">
+        👑 The Agency's Secret Weapon
+      </div>
+      <h1 class="text-5xl lg:text-7xl font-extrabold leading-tight tracking-tight text-slate-900">
+        Your Technical Back-Office for <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">AI & SEO.</span>
+      </h1>
+      <p class="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        iShack Innovation Consultancy partners with digital agencies and businesses to handle the heavy technical lifting. We are your silent, expert back-office. Put a client's URL through our Engine below to see it in action.
+      </p>
+    </div>
+    
+    <!-- Abstract Background glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl mix-blend-multiply filter -z-10"></div>
+
+    <!-- Funnel Interactive Box -->
+    <div class="w-full max-w-2xl glass-panel rounded-3xl p-8 lg:p-12 shadow-2xl relative transition-all duration-500 min-h-[400px]">
+      
+      <!-- State 1: Input -->
+      @if (funnelState() === 'input') {
+        <div class="animate-fade-in text-center space-y-6">
+          <h2 class="text-2xl font-bold text-slate-800">Add your URL to our Website SEO Analysis Engine</h2>
+          <div class="relative mt-8">
+            <input type="url" [(ngModel)]="websiteUrl" placeholder="https://your-client-website.com" class="w-full px-6 py-4 lg:py-5 text-lg rounded-xl border border-slate-300 focus:ring-4 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner bg-white/70 backdrop-blur-sm pr-36">
+            <button (click)="startAnalysis()" [disabled]="!websiteUrl()" class="absolute right-2 top-2 bottom-2 bg-primary hover:bg-blue-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 rounded-lg font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+              Analyze
+            </button>
+          </div>
+          <p class="text-sm text-slate-500 font-medium">Powered by OpenClaw AI Agents • 100% Free initial scan</p>
+        </div>
+      }
+
+      <!-- State 2: Analyzing -->
+      @if (funnelState() === 'analyzing') {
+        <div class="animate-fade-in text-center space-y-8 py-8 flex flex-col items-center justify-center">
+          <div class="relative w-24 h-24 mx-auto mb-4">
+            <div class="absolute inset-0 border-4 border-slate-100 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center text-primary font-bold">AI</div>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Analyzing {{ websiteUrl() }}...</h2>
+            <p class="text-slate-500">Our agents are crawling the site structure and AI Engine readiness.</p>
+          </div>
+        </div>
+      }
+
+      <!-- State 3: Report Teaser -->
+      @if (funnelState() === 'report') {
+        <div class="animate-fade-in space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+            <h2 class="text-2xl font-bold text-slate-800">Partial Analysis Report (60%)</h2>
+            <div class="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg font-bold shadow-sm">
+              Score: {{ mockReport()?.score }}/100
+            </div>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="bg-red-50 text-red-800 p-4 rounded-xl border border-red-100 shadow-sm relative overflow-hidden">
+              <div class="font-bold flex items-center gap-2 mb-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Critical Issues ({{ mockReport()?.criticalErrors }} found)
+              </div>
+              <ul class="list-disc pl-5 space-y-2 text-sm font-medium relative z-10">
+                @for (suggestion of mockReport()?.suggestions; track $index) {
+                  <li>{{ suggestion }}</li>
+                }
+                <!-- Teaser Blurs -->
+                <li class="blur-[4px] select-none text-slate-400">Schema markup is missing entirely from product pages.</li>
+                <li class="blur-[4px] select-none text-slate-400">Core Web Vitals are failing on mobile rendering.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-6 text-center text-white shadow-xl relative overflow-hidden mt-8">
+            <div class="relative z-10">
+              <h3 class="text-xl font-bold mb-2">Unlock the Full Report & Premium Strategy</h3>
+              <p class="text-slate-300 text-sm mb-6 max-w-md mx-auto">Get the remaining 40% of the data, deep-dive competitor analysis, and access to our whitelabel client packages.</p>
+              <button routerLink="/register" class="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white px-8 py-3 rounded-full font-bold transition-all shadow-lg hover:-translate-y-1 w-full sm:w-auto">
+                Upgrade to Premium
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- State 4: Upgrade / Premium Packages -->
+      @if (funnelState() === 'upgrade') {
+        <div class="animate-fade-in space-y-6">
+          <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Agency Partner Packages</h2>
+            <p class="text-slate-500 font-medium">Fully unbranded, whitelabel reports you can share directly with your clients.</p>
+          </div>
+          
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="border-2 border-slate-200 rounded-2xl p-6 hover:border-slate-300 transition-colors bg-white shadow-sm flex flex-col items-center text-center">
+              <div class="font-bold text-xl text-slate-800 mb-1">Single Site Report</div>
+              <div class="text-3xl font-extrabold text-slate-900 mb-4">$49<span class="text-sm font-medium text-slate-500">/one-time</span></div>
+              <ul class="text-sm text-slate-600 space-y-2 mb-6 text-left w-full pl-4 font-medium">
+                <li>✓ Full 100% SEO Audit</li>
+                <li>✓ Whitelabel PDF Export</li>
+                <li>✓ AI Action Plan</li>
+              </ul>
+              <button class="mt-auto w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl transition-colors">Select Plan</button>
+            </div>
+            
+            <div class="border-2 border-primary rounded-2xl p-6 bg-blue-50 relative shadow-xl transform sm:-translate-y-2 flex flex-col items-center text-center">
+              <div class="absolute top-0 right-1/2 transform translate-x-1/2 -translate-y-1/2 bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">Most Popular</div>
+              <div class="font-bold text-xl text-slate-800 mb-1 mt-2">Agency Monthly</div>
+              <div class="text-3xl font-extrabold text-primary mb-4">$299<span class="text-sm font-medium text-blue-400">/mo</span></div>
+              <ul class="text-sm text-slate-700 space-y-2 mb-6 text-left w-full pl-4 font-medium">
+                <li>✓ Unlimited Site Audits</li>
+                <li>✓ Whitelabel Dashboard</li>
+                <li>✓ Dedicated OpenClaw Agent</li>
+                <li>✓ Unlimited PDF Exports</li>
+              </ul>
+              <button routerLink="/register" class="mt-auto w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md">Start Agency Plan</button>
+            </div>
+          </div>
+          
+          <button (click)="reset()" class="block w-full text-center text-sm font-medium text-slate-500 hover:text-slate-800 mt-6 transition-colors underline">
+            Start over with a different URL
+          </button>
+        </div>
+      }
+
+    </div>
+  </section>
+  <router-outlet></router-outlet>
+</main>
