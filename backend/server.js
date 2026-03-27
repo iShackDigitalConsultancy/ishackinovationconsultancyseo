@@ -45,6 +45,8 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     const issues = [];
     let loadSpeedMs = 0;
     let wordCount = 0;
+    let hasViewport = false;
+    let hasOpenGraph = false;
     
     try {
       const startTime = Date.now();
@@ -58,6 +60,9 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       const metaDesc = $('meta[name="description"]').attr('content');
       const h1Count = $('h1').length;
       
+      hasViewport = $('meta[name="viewport"]').length > 0;
+      hasOpenGraph = $('meta[property^="og:"]').length > 0;
+      
       const pageText = $('body').text().replace(/\s+/g, ' ').trim();
       wordCount = pageText.split(' ').length;
       
@@ -65,6 +70,8 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       if (!metaDesc || metaDesc.length < 50) { issues.push('Meta description is missing or too short.'); score -= 20; }
       if (h1Count === 0) { issues.push('No H1 tag detected.'); score -= 15; }
       else if (h1Count > 1) { issues.push('Multiple H1 tags detected (should be unique per page).'); score -= 10; }
+      if (!hasViewport) { issues.push('Missing Mobile Viewport meta tag. Site is not mobile-responsive.'); score -= 15; }
+      if (!hasOpenGraph) { issues.push('Missing Social OpenGraph tags. Links shared on LinkedIn/Twitter will look broken.'); score -= 10; }
       
       $('img').each((i, el) => {
         if (!$(el).attr('alt')) {
@@ -130,6 +137,15 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     }
     if (score < 15) score = 15; // floor
 
+    // Link Deficit Projector Algorithm
+    let linkDeficit = 45; // baseline High-DR links needed to move needles
+    let primaryTarget = 'Niche Keyword';
+    if (semrushData.topKeywords.length > 0) {
+      primaryTarget = semrushData.topKeywords[0].phrase;
+      let topVol = parseInt(semrushData.topKeywords[0].volume) || 1000;
+      linkDeficit = Math.max(15, Math.floor(topVol / 400)); // Dynamic heuristic: 1 high-DR link per 400 search volume
+    }
+
     // 3. AI Consulting Advice Synthesis
     const advice = [];
     if (parseInt(semrushData.organicTraffic) > 1000) {
@@ -139,7 +155,7 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     }
 
     if (semrushData.topKeywords.length > 0) {
-      advice.push(`Based on your top performing keyword cluster ("${semrushData.topKeywords[0].phrase}"), we strongly recommend architecting 3 authoritative pillar pages. Since your homepage exhibits a structural density of ${wordCount} words, ensure all new pillar guides exceed 1,500+ words to dominate search engine topical graphs.`);
+      advice.push(`Based on your top performing keyword cluster ("${primaryTarget}"), we strongly recommend architecting 3 authoritative pillar pages. Since your homepage exhibits a structural density of ${wordCount} words, ensure all new pillar guides exceed 1,500+ words to dominate search engine topical graphs.`);
     } else {
       advice.push(`Without organic keyword leverage, your immediate strategy should be producing localized or highly-niche blog hubs. Google heavily punishes "Thin Content" (under 1,000 words). Your scanned page came in at ${wordCount} words.`);
     }
@@ -162,6 +178,10 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         technicalValuation: {
           loadSpeedMs,
           wordCount,
+          hasViewport,
+          hasOpenGraph,
+          linkDeficit,
+          primaryTarget,
           adCost: semrushData.adCost,
           adKeywords: semrushData.adKeywords
         },
