@@ -68,8 +68,8 @@
       @if (funnelState() === 'report') {
         <div class="animate-fade-in space-y-6">
           <div class="flex items-center justify-between border-b border-slate-200 pb-4">
-            <h2 class="text-2xl font-bold text-slate-800">Partial Analysis Report</h2>
-            <div class="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg font-bold shadow-sm">
+            <h2 class="text-2xl font-bold text-slate-800">Complete AI SEO Audit</h2>
+            <div class="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-bold shadow-sm">
               Optimization Score: {{ mockReport()?.score }}/100
             </div>
           </div>
@@ -96,6 +96,44 @@
             </div>
           }
 
+          <!-- Top Organic Keywords Table -->
+          @if (mockReport()?.metrics?.topKeywords && mockReport()?.metrics?.topKeywords.length > 0) {
+            <div class="mt-8 bg-white/60 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                  Top Ranking Keywords
+                </h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-600">
+                  <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500 border-b border-slate-200">
+                    <tr>
+                      <th class="px-6 py-3">Keyword Phrase</th>
+                      <th class="px-6 py-3">Google Position</th>
+                      <th class="px-6 py-3">Search Volume</th>
+                      <th class="px-6 py-3">Est. CPC</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    @for (kw of mockReport()?.metrics?.topKeywords; track $index) {
+                      <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 font-medium text-slate-800">{{ kw.phrase }}</td>
+                        <td class="px-6 py-4">
+                          <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-xs">
+                            #{{ kw.position }}
+                          </span>
+                        </td>
+                        <td class="px-6 py-4">{{ kw.volume | number }}</td>
+                        <td class="px-6 py-4">${{ kw.cpc }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+
           <div class="space-y-4 mt-6">
             <div class="bg-red-50 text-red-800 p-4 rounded-xl border border-red-100 shadow-sm relative overflow-hidden">
               <div class="font-bold flex items-center gap-2 mb-2">
@@ -106,20 +144,7 @@
                 @for (suggestion of mockReport()?.suggestions; track $index) {
                   <li>{{ suggestion }}</li>
                 }
-                <!-- Teaser Blurs -->
-                <li class="blur-[4px] select-none text-slate-400">Schema markup is missing entirely from product pages.</li>
-                <li class="blur-[4px] select-none text-slate-400">Core Web Vitals are failing on mobile rendering.</li>
               </ul>
-            </div>
-          </div>
-
-          <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-6 text-center text-white shadow-xl relative overflow-hidden mt-8">
-            <div class="relative z-10">
-              <h3 class="text-xl font-bold mb-2">Unlock the Full Report & Premium Strategy</h3>
-              <p class="text-slate-300 text-sm mb-6 max-w-md mx-auto">Get the remaining 40% of the data, deep-dive competitor analysis, and access to our whitelabel client packages.</p>
-              <button routerLink="/register" class="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white px-8 py-3 rounded-full font-bold transition-all shadow-lg hover:-translate-y-1 w-full sm:w-auto">
-                Upgrade to Premium
-              </button>
             </div>
           </div>
         </div>

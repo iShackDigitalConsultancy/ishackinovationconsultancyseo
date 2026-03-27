@@ -69,7 +69,7 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     }
 
     // 2. Fetch Live SEMRush Data
-    let semrushData = null;
+    let semrushData = { rank: '-', organicKeywords: '-', organicTraffic: '-', trafficCost: '-', topKeywords: [] };
     const semrushKey = process.env.SEMRUSH_API_KEY || '77a0242d2998078e52b1a2d4ec514613';
     
     try {
@@ -82,12 +82,30 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         const lines = csvData.trim().split('\n');
         if (lines.length > 1) {
           const values = lines[1].split(';');
-          semrushData = {
-            rank: values[1] || 'N/A',
-            organicKeywords: values[2] || '0',
-            organicTraffic: values[3] || '0',
-            trafficCost: values[4] || '0'
-          };
+          semrushData.rank = values[1] || 'N/A';
+          semrushData.organicKeywords = values[2] || '0';
+          semrushData.organicTraffic = values[3] || '0';
+          semrushData.trafficCost = values[4] || '0';
+        }
+      }
+
+      // Domain Organic Keywords API gives top 5 keywords
+      const kwUrl = `https://api.semrush.com/?type=domain_organic&key=${semrushKey}&display_limit=5&export_columns=Ph,Po,Nq,Cp&domain=${domain}&database=us`;
+      const kwRes = await fetch(kwUrl);
+      const kwCsv = await kwRes.text();
+
+      if (kwCsv && !kwCsv.startsWith('ERROR')) {
+        const kwLines = kwCsv.trim().split('\n');
+        for (let i = 1; i < kwLines.length; i++) {
+          if (kwLines[i]) {
+            const vals = kwLines[i].split(';');
+            semrushData.topKeywords.push({
+              phrase: vals[0],
+              position: vals[1],
+              volume: vals[2],
+              cpc: vals[3]
+            });
+          }
         }
       }
     } catch (semErr) {
@@ -95,8 +113,8 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     }
     
     // If SEMRush returned no traffic, deduct score
-    if (semrushData && semrushData.organicTraffic === '0') {
-      issues.push('SEMRush reports zero organic traffic. Major SEO campaign required.');
+    if (semrushData.organicTraffic === '0' || semrushData.organicTraffic === '-') {
+      issues.push('SEMRush reports practically zero organic traffic. Major SEO campaign required.');
       score -= 15;
     }
     if (score < 15) score = 15; // floor
