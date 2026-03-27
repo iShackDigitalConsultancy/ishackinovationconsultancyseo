@@ -40,18 +40,26 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     const urlObj = new URL(targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`);
     const domain = urlObj.hostname.replace('www.', '');
     
-    // 1. Structural HTML Scraping
+    // 1. Structural HTML Scraping & Value Areas
     let score = 100;
     const issues = [];
+    let loadSpeedMs = 0;
+    let wordCount = 0;
     
     try {
+      const startTime = Date.now();
       const response = await fetch(urlObj.href, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      loadSpeedMs = Date.now() - startTime;
+      
       const html = await response.text();
       const $ = cheerio.load(html);
       
       const title = $('title').text();
       const metaDesc = $('meta[name="description"]').attr('content');
       const h1Count = $('h1').length;
+      
+      const pageText = $('body').text().replace(/\s+/g, ' ').trim();
+      wordCount = pageText.split(' ').length;
       
       if (!title || title.length < 10) { issues.push('Title tag is missing or too short.'); score -= 15; }
       if (!metaDesc || metaDesc.length < 50) { issues.push('Meta description is missing or too short.'); score -= 20; }
@@ -63,17 +71,20 @@ app.post('/api/openclaw/trigger', async (req, res) => {
           if (i === 0) { issues.push('Images are missing alt-text descriptions.'); score -= 10; }
         }
       });
+      
+      if (loadSpeedMs > 2000) { issues.push(`Poor server response time (${loadSpeedMs}ms). Goal is < 800ms.`); score -= 10; }
+      if (wordCount < 400) { issues.push(`Thin Content detected (${wordCount} words). Minimum viable lengths range from 1,200+ words.`); score -= 10; }
     } catch (scrapeErr) {
       issues.push(`Failed to analyze HTML structure: ${scrapeErr.message}`);
       score -= 30;
     }
 
     // 2. Fetch Live SEMRush Data
-    let semrushData = { rank: '-', organicKeywords: '-', organicTraffic: '-', trafficCost: '-', topKeywords: [] };
+    let semrushData = { rank: '-', organicKeywords: '-', organicTraffic: '-', trafficCost: '-', adKeywords: '-', adTraffic: '-', adCost: '-', topKeywords: [] };
     const semrushKey = process.env.SEMRUSH_API_KEY || '77a0242d2998078e52b1a2d4ec514613';
     
     try {
-      const srUrl = `https://api.semrush.com/?type=domain_ranks&key=${semrushKey}&export_columns=Dn,Rk,Or,Ot,Oc&domain=${domain}&database=us`;
+      const srUrl = `https://api.semrush.com/?type=domain_ranks&key=${semrushKey}&export_columns=Dn,Rk,Or,Ot,Oc,Ad,At,Ac&domain=${domain}&database=us`;
       const srRes = await fetch(srUrl);
       const csvData = await srRes.text();
       
@@ -85,6 +96,9 @@ app.post('/api/openclaw/trigger', async (req, res) => {
           semrushData.organicKeywords = values[2] ? values[2].trim() : '0';
           semrushData.organicTraffic = values[3] ? values[3].trim() : '0';
           semrushData.trafficCost = values[4] ? values[4].trim() : '0';
+          semrushData.adKeywords = values[5] ? values[5].trim() : '0';
+          semrushData.adTraffic = values[6] ? values[6].trim() : '0';
+          semrushData.adCost = values[7] ? values[7].trim() : '0';
         }
       }
 
@@ -116,6 +130,26 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     }
     if (score < 15) score = 15; // floor
 
+    // 3. AI Consulting Advice Synthesis
+    const advice = [];
+    if (parseInt(semrushData.organicTraffic) > 1000) {
+      advice.push(`Your organic traffic is estimated at ${semrushData.organicTraffic}/mo holding a commercial value of $${semrushData.trafficCost}. To scale this sustainably to a $100k asset, identify your pages ranking #11-#20 and inject thematic LSI semantic clusters to push them to Page 1.`);
+    } else {
+      advice.push(`Your domain lacks a strong establishing organic footprint. You must initiate a foundational Link Building and Content Marketing campaign targeting low-competition, high-intent keywords immediately.`);
+    }
+
+    if (semrushData.topKeywords.length > 0) {
+      advice.push(`Based on your top performing keyword cluster ("${semrushData.topKeywords[0].phrase}"), we strongly recommend architecting 3 authoritative pillar pages. Since your homepage exhibits a structural density of ${wordCount} words, ensure all new pillar guides exceed 1,500+ words to dominate search engine topical graphs.`);
+    } else {
+      advice.push(`Without organic keyword leverage, your immediate strategy should be producing localized or highly-niche blog hubs. Google heavily punishes "Thin Content" (under 1,000 words). Your scanned page came in at ${wordCount} words.`);
+    }
+
+    if (parseInt(semrushData.adTraffic) > 0) {
+      advice.push(`We detected your competitors or you are heavily investing ~$${semrushData.adCost}/mo acquiring ${semrushData.adTraffic} ad clicks. We can consult on reallocating 20% of this budget into equivalent organic assets to permanently lower your Blended Customer Acquisition Cost.`);
+    } else {
+      advice.push(`We found zero Paid Search (AdWords) momentum surrounding this domain profile. This is highly risky as competitors can easily bid on your exact brand terms. Expanding into a dual Organic & Paid SEO strategy is advised.`);
+    }
+
     res.status(200).json({ 
       success: true, 
       report: {
@@ -124,7 +158,14 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         issuesFound: issues.length,
         criticalErrors: issues.length > 2 ? 2 : issues.length,
         suggestions: issues.length > 0 ? issues : ['Your website is well optimized!'],
-        metrics: semrushData || { rank: '-', organicKeywords: '-', organicTraffic: '-', trafficCost: '-' }
+        metrics: semrushData,
+        technicalValuation: {
+          loadSpeedMs,
+          wordCount,
+          adCost: semrushData.adCost,
+          adKeywords: semrushData.adKeywords
+        },
+        consultingAdvice: advice
       }
     });
   } catch (error) {
