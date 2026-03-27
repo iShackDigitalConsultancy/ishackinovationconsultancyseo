@@ -101,7 +101,7 @@ export class Login {
       password: this.password
     }).subscribe({
       next: (response) => {
-        if (response.token) {
+        if (response.token && typeof window !== 'undefined') {
           localStorage.setItem('auth_token', response.token);
         }
 

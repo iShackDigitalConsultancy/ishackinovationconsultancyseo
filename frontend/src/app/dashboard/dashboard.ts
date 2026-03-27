@@ -119,7 +119,10 @@ export class Dashboard implements OnInit {
   }
 
   getHeaders() {
-    const token = localStorage.getItem('auth_token');
+    let token = '';
+    if (typeof window !== 'undefined') {
+      token = localStorage.getItem('auth_token') || '';
+    }
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
@@ -150,7 +153,9 @@ export class Dashboard implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('auth_token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth_token');
+    }
     this.router.navigate(['/']);
   }
 }

@@ -1,12 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-admin',
-  imports: [RouterLink, CommonModule],
+  imports: [CommonModule],
   template: `
     <div class="min-h-screen bg-slate-950 font-sans text-slate-100 p-8">
       <div class="max-w-7xl mx-auto">
@@ -105,7 +105,10 @@ export class AdminDashboard implements OnInit {
   }
 
   fetchMetrics() {
-    const token = localStorage.getItem('auth_token');
+    let token = '';
+    if (typeof window !== 'undefined') {
+      token = localStorage.getItem('auth_token') || '';
+    }
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     this.http.get<any>(`${environment.apiUrl}/admin/metrics`, { headers }).subscribe({
@@ -124,7 +127,9 @@ export class AdminDashboard implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('auth_token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth_token');
+    }
     this.router.navigate(['/']);
   }
 }
