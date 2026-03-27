@@ -73,7 +73,6 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     const semrushKey = process.env.SEMRUSH_API_KEY || '77a0242d2998078e52b1a2d4ec514613';
     
     try {
-      // Domain Ranks API gives traffic, rank, and keywords
       const srUrl = `https://api.semrush.com/?type=domain_ranks&key=${semrushKey}&export_columns=Dn,Rk,Or,Ot,Oc&domain=${domain}&database=us`;
       const srRes = await fetch(srUrl);
       const csvData = await srRes.text();
@@ -82,14 +81,13 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         const lines = csvData.trim().split('\n');
         if (lines.length > 1) {
           const values = lines[1].split(';');
-          semrushData.rank = values[1] || 'N/A';
-          semrushData.organicKeywords = values[2] || '0';
-          semrushData.organicTraffic = values[3] || '0';
-          semrushData.trafficCost = values[4] || '0';
+          semrushData.rank = values[1] ? values[1].trim() : 'N/A';
+          semrushData.organicKeywords = values[2] ? values[2].trim() : '0';
+          semrushData.organicTraffic = values[3] ? values[3].trim() : '0';
+          semrushData.trafficCost = values[4] ? values[4].trim() : '0';
         }
       }
 
-      // Domain Organic Keywords API gives top 5 keywords
       const kwUrl = `https://api.semrush.com/?type=domain_organic&key=${semrushKey}&display_limit=5&export_columns=Ph,Po,Nq,Cp&domain=${domain}&database=us`;
       const kwRes = await fetch(kwUrl);
       const kwCsv = await kwRes.text();
@@ -100,10 +98,10 @@ app.post('/api/openclaw/trigger', async (req, res) => {
           if (kwLines[i]) {
             const vals = kwLines[i].split(';');
             semrushData.topKeywords.push({
-              phrase: vals[0],
-              position: vals[1],
-              volume: vals[2],
-              cpc: vals[3]
+              phrase: vals[0] ? vals[0].trim() : '',
+              position: vals[1] ? vals[1].trim() : '',
+              volume: vals[2] ? vals[2].trim() : '',
+              cpc: vals[3] ? vals[3].trim() : ''
             });
           }
         }
@@ -112,7 +110,6 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       console.error('SEMRush fetch error:', semErr.message);
     }
     
-    // If SEMRush returned no traffic, deduct score
     if (semrushData.organicTraffic === '0' || semrushData.organicTraffic === '-') {
       issues.push('SEMRush reports practically zero organic traffic. Major SEO campaign required.');
       score -= 15;

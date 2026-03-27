@@ -46,6 +46,12 @@ export class Home {
     });
   }
 
+  printPDF() {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  }
+
   showUpgradePackages() {
     this.funnelState.set('upgrade');
   }
