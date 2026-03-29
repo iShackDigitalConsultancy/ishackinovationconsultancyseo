@@ -118,11 +118,18 @@ import { environment } from '../../environments/environment';
           <!-- Left Column: Campaigns & Tasks -->
           <div class="col-span-1 space-y-6">
             <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl">
-              <div class="p-5 border-b border-white/5 bg-slate-900/50 flex justify-between items-center">
-                <h2 class="text-white font-bold flex items-center gap-2">
-                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                  Active AI Campaigns
-                </h2>
+              <div class="p-5 border-b border-white/5 bg-slate-900/50 flex flex-col gap-3">
+                <div class="flex justify-between items-center">
+                  <h2 class="text-white font-bold flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    Active AI Campaigns
+                  </h2>
+                </div>
+                <!-- Launch Input -->
+                <div class="flex gap-2">
+                  <input #campDomain type="text" placeholder="e.g. ishack.co.za" class="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary transition-colors">
+                  <button (click)="startCampaign(campDomain.value); campDomain.value=''" class="bg-primary hover:bg-blue-600 px-3 py-1.5 rounded-lg text-white font-bold text-sm shadow-md transition-colors whitespace-nowrap">Deploy</button>
+                </div>
               </div>
               <div class="p-5 space-y-4">
                 <div *ngIf="campaigns.length === 0" class="text-slate-500 text-sm italic">No active campaigns running.</div>
@@ -292,6 +299,18 @@ export class AdminDashboard implements OnInit {
         error: (err) => alert('Failed to trigger Vera Sharp.')
       });
     }
+  }
+
+  startCampaign(domain: string) {
+    if (!domain) return alert("Please enter a domain");
+    
+    this.http.post(`${environment.apiUrl}/admin/sandbox/start-campaign`, { domain }, { headers: this.getHeaders() }).subscribe({
+      next: (res: any) => {
+        alert(res.message);
+        this.fetchAgentData();
+      },
+      error: (err) => alert('Failed to deploy campaign.')
+    });
   }
 
   logout() {
