@@ -211,20 +211,21 @@ router.post('/sandbox/trigger-vera', authenticateSuperadmin, async (req, res) =>
 
 router.post('/sandbox/start-campaign', authenticateSuperadmin, async (req, res) => {
   try {
-    const { domain, tier } = req.body;
+    const { domain, tier, agencyId } = req.body;
     if (!domain) return res.status(400).json({ error: 'Domain is required.' });
     
     const packageTier = tier || 'basic';
+    const finalAgencyId = agencyId ? parseInt(agencyId, 10) : req.user.agencyId;
     
-    // Assign to the currently authenticated Superadmin's agency umbrella
-    await db.query("INSERT INTO campaigns (agency_id, client_domain, package_tier) VALUES ($1, $2, $3)", [req.user.agencyId, domain, packageTier]);
+    // Assign to the selected child agency (or fallback to Superadmin umbrella)
+    await db.query("INSERT INTO campaigns (agency_id, client_domain, package_tier) VALUES ($1, $2, $3)", [finalAgencyId, domain, packageTier]);
     
     // Automatically trigger the PM agent heartbeat to pick up the brand new campaign immediately!
     await pmAgent.tick();
     
-    res.json({ success: true, message: `The PM Agent has officially picked up the SEO campaign for ${domain}.` });
+    res.json({ success: true, message: `The PM Agent has officially picked up the SEO targeted URL for ${domain}.` });
   } catch (error) {
-    res.status(500).json({ error: 'Campaign start failed.', details: error.message });
+    res.status(500).json({ error: 'Campaign targeting failed.', details: error.message });
   }
 });
 

@@ -336,13 +336,17 @@ import { environment } from '../../environments/environment';
               </div>
               
               <div class="flex gap-3 bg-slate-950 p-2 rounded-xl border border-white/5 shadow-inner">
+                <select #newCampAgency class="w-48 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary transition-colors">
+                  <option value="">-- Master Umbrella --</option>
+                  <option *ngFor="let ag of recentAgencies" [value]="ag.id">{{ ag.agency_name }}</option>
+                </select>
                 <input #newCampDomain type="text" placeholder="Target Domain URL" class="w-full lg:w-56 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-primary transition-colors">
                 <select #newCampTier class="bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary transition-colors">
                   <option value="basic">Growth Start ($499)</option>
                   <option value="pro" selected>Domination Pro ($899)</option>
                   <option value="enterprise">Enterprise Elite ($1499)</option>
                 </select>
-                <button (click)="startCampaign(newCampDomain.value, newCampTier.value); newCampDomain.value=''" class="bg-primary hover:bg-blue-600 px-6 py-2 rounded-lg text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
+                <button (click)="startCampaign(newCampDomain.value, newCampTier.value, newCampAgency.value); newCampDomain.value=''" class="bg-primary hover:bg-blue-600 px-6 py-2 rounded-lg text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                   Deploy AI Campaign
                 </button>
@@ -463,6 +467,26 @@ import { environment } from '../../environments/environment';
               Global Targeted URIs
             </h2>
             <p class="text-sm text-slate-400 font-medium ml-13 mb-6">Aggregate execution logs and overarching active configurations across every internet zone the AI is maneuvering inside.</p>
+
+            <!-- Global Target URL Injector -->
+            <div class="bg-slate-950 p-4 border border-white/5 rounded-xl mb-6 flex flex-col md:flex-row gap-4 items-center shadow-inner">
+              <div class="w-full flex-1">
+                <input #globalCampDomain type="text" placeholder="https://new-target-domain.com" class="w-full bg-slate-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500 transition-colors">
+              </div>
+              <select #globalCampAgency class="w-full md:w-56 bg-slate-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-pink-500 transition-colors">
+                <option value="">-- Master Umbrella --</option>
+                <option *ngFor="let ag of recentAgencies" [value]="ag.id">{{ ag.agency_name }}</option>
+              </select>
+              <select #globalCampTier class="w-full md:w-48 bg-slate-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-pink-500 transition-colors">
+                <option value="basic">Growth Start ($499)</option>
+                <option value="pro" selected>Domination Pro ($899)</option>
+                <option value="enterprise">Enterprise Elite ($1499)</option>
+              </select>
+              <button (click)="startCampaign(globalCampDomain.value, globalCampTier.value, globalCampAgency.value); globalCampDomain.value=''" class="w-full md:w-auto bg-pink-600 hover:bg-pink-500 px-8 py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                Track Target URL
+              </button>
+            </div>
             
             <div class="overflow-x-auto rounded-xl border border-white/5">
               <table class="w-full text-left text-sm text-slate-300">
@@ -666,15 +690,16 @@ export class AdminDashboard implements OnInit {
     }
   }
 
-  startCampaign(domain: string, tier: string) {
+  startCampaign(domain: string, tier: string, agencyId: string = '') {
     if (!domain) return alert("Please enter a domain");
     
-    this.http.post(`${environment.apiUrl}/admin/sandbox/start-campaign`, { domain, tier }, { headers: this.getHeaders() }).subscribe({
+    this.http.post(`${environment.apiUrl}/admin/sandbox/start-campaign`, { domain, tier, agencyId }, { headers: this.getHeaders() }).subscribe({
       next: (res: any) => {
         alert(res.message);
         this.fetchAgentData();
+        if (this.activeTab === 'urls') this.fetchTargetedUrls();
       },
-      error: (err) => alert('Failed to deploy campaign.')
+      error: (err) => alert('Failed to target URL.')
     });
   }
 
