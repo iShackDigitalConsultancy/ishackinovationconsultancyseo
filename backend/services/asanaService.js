@@ -65,6 +65,25 @@ const asanaService = {
       console.error("Failed to create Asana Task", e);
       return null;
     }
+  },
+
+  updateTaskCompletion: async (taskGid, completionNotes) => {
+    const client = getClient();
+    if (!client) {
+      console.log(`[MOCK ASANA] Completed Task -> Task ID: ${taskGid} | Notes: ${completionNotes.substring(0, 50)}...`);
+      return true;
+    }
+    try {
+      if (!taskGid || taskGid.startsWith('mock-') || taskGid === 'sandbox_test_task') return true;
+      await client.tasks.updateTask(taskGid, {
+        completed: true,
+        html_notes: `<body>${completionNotes.replace(/\\n/g, '<br>')}</body>`
+      });
+      return true;
+    } catch (e) {
+      console.error("Failed to update Asana Task completion", e);
+      return false;
+    }
   }
 };
 
