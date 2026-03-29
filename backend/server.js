@@ -36,6 +36,8 @@ app.post('/api/openclaw/trigger', async (req, res) => {
   const region = payload?.region || 'us';
   const targetKeyword = payload?.targetKeyword || '';
   
+  let keywordOpt = { provided: false, inTitle: false, inH1: false, inMeta: false, inBody: false };
+
   if (!targetUrl) {
     return res.status(400).json({ success: false, error: 'No website provided' });
   }
@@ -121,9 +123,8 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         issues.push(`Thin Content detected (${wordCount} words). Minimum viable lengths range from 1,200+ words.`); 
         score -= 10; 
       }
-      // 1B. Target Keyword Optimization Analysis
-      let keywordOpt = { provided: false, inTitle: false, inH1: false, inMeta: false, inBody: false };
       
+      // 1B. Target Keyword Optimization Analysis
       if (targetKeyword) {
         keywordOpt.provided = true;
         const kw = targetKeyword.toLowerCase().trim();
