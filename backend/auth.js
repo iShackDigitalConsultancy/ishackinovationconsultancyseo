@@ -73,11 +73,11 @@ router.post('/register', async (req, res) => {
       message: 'Registration successful',
       token,
       authorizationUrl,
-      agency: { id: agencyId, agencyName, email, role: selectedPlan, brandColor: safeBrandColor, brandLogoUrl: safeBrandLogoUrl }
+      agency: { id: agencyId, agencyName, email, role: selectedPlan, brandColor: finalColor, brandLogoUrl: brandLogoUrl || '' }
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
 });
 
