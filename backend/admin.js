@@ -147,10 +147,9 @@ router.post('/sandbox/start-campaign', authenticateSuperadmin, async (req, res) 
     if (!domain) return res.status(400).json({ error: 'Domain is required.' });
     
     const packageTier = tier || 'basic';
-    const { rows } = await db.query('SELECT id FROM agencies LIMIT 1');
-    if (rows.length === 0) return res.status(400).json({ error: 'No agencies found in database.' });
     
-    await db.query("INSERT INTO campaigns (agency_id, client_domain, package_tier) VALUES ($1, $2, $3)", [rows[0].id, domain, packageTier]);
+    // Assign to the currently authenticated Superadmin's agency umbrella
+    await db.query("INSERT INTO campaigns (agency_id, client_domain, package_tier) VALUES ($1, $2, $3)", [req.user.agencyId, domain, packageTier]);
     
     // Automatically trigger the PM agent heartbeat to pick up the brand new campaign immediately!
     await pmAgent.tick();
@@ -158,6 +157,36 @@ router.post('/sandbox/start-campaign', authenticateSuperadmin, async (req, res) 
     res.json({ success: true, message: `The PM Agent has officially picked up the SEO campaign for ${domain}.` });
   } catch (error) {
     res.status(500).json({ error: 'Campaign start failed.', details: error.message });
+  }
+});
+
+// Dynamic Promo Code Engine
+router.get('/promo-codes', authenticateSuperadmin, async (req, res) => {
+  try {
+    const codes = await db.query('SELECT * FROM promo_codes ORDER BY created_at DESC');
+    res.json(codes.rows);
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to fetch promo codes' });
+  }
+});
+
+router.post('/promo-codes', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) return res.status(400).json({ error: 'Promo code string required' });
+    await db.query('INSERT INTO promo_codes (code) VALUES ($1)', [code.toUpperCase()]);
+    res.json({ success: true });
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to create promo code. It might already exist.' });
+  }
+});
+
+router.delete('/promo-codes/:id', authenticateSuperadmin, async (req, res) => {
+  try {
+    await db.query('DELETE FROM promo_codes WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to delete promo code' });
   }
 });
 

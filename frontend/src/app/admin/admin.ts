@@ -54,6 +54,15 @@ import { environment } from '../../environments/environment';
                 Campaign Portfolio CRM
               </span>
             </button>
+            <button 
+              (click)="setActiveTab('settings')" 
+              [ngClass]="activeTab === 'settings' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                System & Billing
+              </span>
+            </button>
           </div>
 
         <!-- Metrics View -->
@@ -133,16 +142,6 @@ import { environment } from '../../environments/environment';
                     <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     Active AI Campaigns
                   </h2>
-                </div>
-                <!-- Launch Input -->
-                <div class="flex gap-2">
-                  <input #campDomain type="text" placeholder="e.g. ishack.co.za" class="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary transition-colors">
-                  <select #campTier class="bg-slate-900 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-slate-300 focus:outline-none focus:border-primary transition-colors">
-                    <option value="basic">Growth Start ($499)</option>
-                    <option value="pro" selected>Domination Pro ($899)</option>
-                    <option value="enterprise">Enterprise Elite ($1499)</option>
-                  </select>
-                  <button (click)="startCampaign(campDomain.value, campTier.value); campDomain.value=''" class="bg-primary hover:bg-blue-600 px-3 py-1.5 rounded-lg text-white font-bold text-sm shadow-md transition-colors whitespace-nowrap">Deploy</button>
                 </div>
               </div>
               <div class="p-5 space-y-4">
@@ -232,7 +231,7 @@ import { environment } from '../../environments/environment';
         <!-- Campaign CRM Portfolio View -->
         <div *ngIf="activeTab === 'crm'" class="animate-fade-in">
           <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-            <div class="p-6 border-b border-white/5 bg-slate-900/50 flex justify-between items-center">
+            <div class="p-6 border-b border-white/5 bg-slate-900/50 flex flex-col lg:flex-row justify-between lg:items-center gap-6">
               <div>
                 <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
                   <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
@@ -241,6 +240,19 @@ import { environment } from '../../environments/environment';
                   Client Portfolio CRM
                 </h2>
                 <p class="text-sm text-slate-400 mt-1 font-medium ml-13">Manage MRR, view historical SERP ranking updates, and preview upcoming AI execution hooks.</p>
+              </div>
+              
+              <div class="flex gap-3 bg-slate-950 p-2 rounded-xl border border-white/5 shadow-inner">
+                <input #newCampDomain type="text" placeholder="Target Domain URL" class="w-full lg:w-56 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-primary transition-colors">
+                <select #newCampTier class="bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-primary transition-colors">
+                  <option value="basic">Growth Start ($499)</option>
+                  <option value="pro" selected>Domination Pro ($899)</option>
+                  <option value="enterprise">Enterprise Elite ($1499)</option>
+                </select>
+                <button (click)="startCampaign(newCampDomain.value, newCampTier.value); newCampDomain.value=''" class="bg-primary hover:bg-blue-600 px-6 py-2 rounded-lg text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                  Deploy AI Campaign
+                </button>
               </div>
             </div>
             
@@ -346,6 +358,46 @@ import { environment } from '../../environments/environment';
           </div>
         </div>
 
+        </div>
+
+        <!-- System & Billing Settings View -->
+        <div *ngIf="activeTab === 'settings'" class="animate-fade-in grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-white/5 bg-slate-900/50">
+              <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                </div>
+                Discount & Promo Codes
+              </h2>
+              <p class="text-sm text-slate-400 mt-1 font-medium ml-13">Generate free-tier bypass execution codes for VIP clients or internal testing networks.</p>
+            </div>
+            
+            <div class="p-6">
+              <div class="flex gap-3 mb-6">
+                <input #newPromo type="text" placeholder="e.g. VIP-AGENCY-2027" class="flex-1 bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors uppercase font-mono tracking-wider">
+                <button (click)="createPromoCode(newPromo.value); newPromo.value=''" class="bg-purple-600 hover:bg-purple-500 px-6 py-3 rounded-xl text-white font-bold shadow-md transition-colors flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                  Generate Free Key
+                </button>
+              </div>
+
+              <div class="bg-slate-950 rounded-xl border border-white/5 overflow-hidden">
+                <div *ngIf="promoCodes.length === 0" class="p-6 text-center text-slate-500 italic">No active promo codes available.</div>
+                <div *ngFor="let promo of promoCodes" class="p-4 border-b border-white/5 last:border-b-0 flex justify-between items-center hover:bg-white/[0.02] transition-colors">
+                  <div class="flex items-center gap-3">
+                    <div class="bg-purple-500/10 text-purple-400 font-mono font-bold tracking-widest px-3 py-1.5 rounded-lg border border-purple-500/20 shadow-sm">{{ promo.code }}</div>
+                    <div class="text-xs text-slate-500">Created: {{ promo.created_at | date:'shortDate' }}</div>
+                  </div>
+                  <button (click)="deletePromoCode(promo.id)" class="text-red-400 hover:text-red-300 transition-colors p-2 hover:bg-red-500/10 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   `
@@ -364,8 +416,9 @@ export class AdminDashboard implements OnInit {
   agentTasks: any[] = [];
   agentLogs: any[] = [];
   
-  // CRM State
+  // Settings & CRM State
   expandedCampaign: number | null = null;
+  promoCodes: any[] = [];
 
   ngOnInit() {
     this.fetchMetrics();
@@ -383,6 +436,9 @@ export class AdminDashboard implements OnInit {
     this.activeTab = tab;
     if (tab === 'agents' || tab === 'crm') {
       this.fetchAgentData();
+    }
+    if (tab === 'settings') {
+      this.fetchPromoCodes();
     }
   }
 
@@ -455,6 +511,30 @@ export class AdminDashboard implements OnInit {
       },
       error: (err) => alert('Failed to deploy campaign.')
     });
+  }
+
+  fetchPromoCodes() {
+    this.http.get<any[]>(`${environment.apiUrl}/admin/promo-codes`, { headers: this.getHeaders() }).subscribe({
+      next: (data) => this.promoCodes = data,
+      error: (err) => console.error(err)
+    });
+  }
+
+  createPromoCode(code: string) {
+    if (!code) return;
+    this.http.post(`${environment.apiUrl}/admin/promo-codes`, { code }, { headers: this.getHeaders() }).subscribe({
+      next: () => this.fetchPromoCodes(),
+      error: () => alert('Failed to create promo code. It might already exist.')
+    });
+  }
+
+  deletePromoCode(id: number) {
+    if (confirm('Are you sure you want to delete this promo code?')) {
+      this.http.delete(`${environment.apiUrl}/admin/promo-codes/${id}`, { headers: this.getHeaders() }).subscribe({
+        next: () => this.fetchPromoCodes(),
+        error: () => alert('Failed to delete promo code.')
+      });
+    }
   }
 
   logout() {

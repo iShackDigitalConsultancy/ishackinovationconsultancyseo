@@ -45,7 +45,18 @@ router.post('/register', async (req, res) => {
 
     // Initialize Paystack Checkout
     let authorizationUrl = '';
-    const isTestingPromo = promoCode && promoCode.toLowerCase() === 'evertonfc';
+    let isTestingPromo = false;
+
+    if (promoCode) {
+      if (promoCode.toLowerCase() === 'evertonfc') {
+        isTestingPromo = true;
+      } else {
+        const promoRes = await db.query('SELECT id FROM promo_codes WHERE LOWER(code) = $1', [promoCode.toLowerCase()]);
+        if (promoRes.rows.length > 0) {
+          isTestingPromo = true;
+        }
+      }
+    }
 
     if (PAYSTACK_SECRET && !isTestingPromo) {
       try {
