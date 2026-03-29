@@ -359,7 +359,7 @@ export class AdminDashboard implements OnInit {
   error = '';
   
   // Observation Deck State
-  activeTab: 'metrics' | 'agents' | 'crm' = 'metrics';
+  activeTab: string = 'metrics';
   campaigns: any[] = [];
   agentTasks: any[] = [];
   agentLogs: any[] = [];
@@ -377,7 +377,7 @@ export class AdminDashboard implements OnInit {
     }, 15000);
   }
 
-  setActiveTab(tab: 'metrics' | 'agents' | 'crm') {
+  setActiveTab(tab: string) {
     this.activeTab = tab;
     if (tab === 'agents' || tab === 'crm') {
       this.fetchAgentData();

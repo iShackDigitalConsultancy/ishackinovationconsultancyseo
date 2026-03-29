@@ -159,7 +159,7 @@ import { environment } from '../../../environments/environment';
                 <span *ngIf="!loading && (!promoCode || promoCode.toLowerCase() !== 'evertonfc')">
                   Register & Pay ({{ planType === 'agency' ? '$299/mo' : '$49' }})
                 </span>
-                <span *ngIf="!loading && promoCode?.toLowerCase() === 'evertonfc'">
+                <span *ngIf="!loading && promoCode.toLowerCase() === 'evertonfc'">
                   Create Free Testing Account
                 </span>
                 <span *ngIf="loading">Processing...</span>
