@@ -19,11 +19,19 @@ class PMAgent {
     for (const campaign of campaigns) {
       console.log(`👔 [PM Agent] Evaluating Campaign: ${campaign.client_domain}`);
       
-      // 2. Fetch pending tasks for this campaign
-      const { rows: pendingTasks } = await db.query("SELECT * FROM agent_tasks WHERE campaign_id = $1 AND status = 'pending' ORDER BY created_at ASC", [campaign.id]);
+      // 2. Fetch all tasks for this campaign to determine historic status
+      const { rows: allTasks } = await db.query("SELECT * FROM agent_tasks WHERE campaign_id = $1 ORDER BY created_at ASC", [campaign.id]);
+      const pendingTasks = allTasks.filter(t => t.status === 'pending');
       
       if (pendingTasks.length === 0) {
-        // No tasks exist? This is a NEW campaign. Kick off Phase 1 (Research).
+        if (allTasks.length > 0) {
+          // All tasks are completed! Mark the campaign as finished to prevent an infinite loop.
+          console.log(`👔 [PM Agent] Campaign for ${campaign.client_domain} is fully operational and completed. Marking status as finished.`);
+          await db.query("UPDATE campaigns SET status = 'completed' WHERE id = $1", [campaign.id]);
+          continue; // Skip this campaign in future heartbeats
+        }
+        
+        // No tasks exist at all? This is a NEW campaign. Kick off Phase 1 (Research).
         console.log(`👔 [PM Agent] Campaign empty. Initiating Phase 1: Research.`);
         
         // Log to Asana Global Server Project

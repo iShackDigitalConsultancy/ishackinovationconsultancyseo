@@ -39,7 +39,8 @@ class BaseAgent {
         messages: [
           { role: "system", content: this.systemPrompt },
           { role: "user", content: `Context Payload: ${JSON.stringify(payload)}\n\nCommand: ${prompt}` }
-        ]
+        ],
+        timeout: 45000 // Strict 45-second bounds to prevent system lockups
       });
       return response.choices[0].message.content;
     } catch (e) {
