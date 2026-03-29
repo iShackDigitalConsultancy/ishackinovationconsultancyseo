@@ -359,7 +359,7 @@ export class AdminDashboard implements OnInit {
   error = '';
   
   // Observation Deck State
-  activeTab: string = 'metrics';
+  activeTab: any = 'metrics';
   campaigns: any[] = [];
   agentTasks: any[] = [];
   agentLogs: any[] = [];
@@ -370,11 +370,13 @@ export class AdminDashboard implements OnInit {
   ngOnInit() {
     this.fetchMetrics();
     // Poll logs every 15s to make it feel alive
-    setInterval(() => {
-      if (this.activeTab === 'agents' || this.activeTab === 'crm') {
-        this.fetchAgentData();
-      }
-    }, 15000);
+    if (typeof window !== 'undefined') {
+      setInterval(() => {
+        if (this.activeTab === 'agents' || this.activeTab === 'crm') {
+          this.fetchAgentData();
+        }
+      }, 15000);
+    }
   }
 
   setActiveTab(tab: string) {
