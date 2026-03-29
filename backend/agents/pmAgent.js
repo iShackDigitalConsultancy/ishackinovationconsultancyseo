@@ -4,6 +4,7 @@ const researchAgent = require('./researchAgent');
 const implementationAgent = require('./implementationAgent');
 const backlinkAgent = require('./backlinkAgent');
 const guruAgent = require('./guruAgent');
+const autoResearchAgent = require('./autoResearchAgent');
 
 /**
  * The Orchestrator - Manages the State Machine
@@ -89,7 +90,18 @@ class PMAgent {
           
         } else if (activeTask.assigned_agent === 'GuruAgent') {
           await guruAgent.executeTask(activeTask.id, campaign.id, activeTask.payload);
-          console.log(`👔 [PM Agent] Enterprise Tier officially completed for ${campaign.client_domain}.`);
+          
+          const targetAsanaProject = process.env.ASANA_PROJECT_GID || campaign.asana_project_id;
+          console.log(`👔 [PM Agent] Escalating to Phase 5: Autonomous ML Optimization for ${campaign.client_domain}.`);
+          await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] PyTorch Model Optimization (AutoResearch)`, 'Spawn Karpathy AutoResearch loop for 5-minute training epoch analysis.', 'AutoResearchAgent');
+          await db.query(`
+            INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type)
+            VALUES ($1, $2, $3)
+          `, [campaign.id, 'AutoResearchAgent', 'Phase 5: Autonomous ML Parameter Iteration']);
+          
+        } else if (activeTask.assigned_agent === 'AutoResearchAgent') {
+          await autoResearchAgent.executeTask(activeTask.id, campaign.id, activeTask.payload);
+          console.log(`👔 [PM Agent] Enterprise Tier + ML Optimization officially completed for ${campaign.client_domain}.`);
         }
       }
     }
