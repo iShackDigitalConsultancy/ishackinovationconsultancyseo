@@ -18,3 +18,27 @@ html {
 .glass-panel {
   @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
 }
+
+/* Print PDF Isolation */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #report-container, #report-container * {
+    visibility: visible;
+  }
+  #report-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Ensure backgrounds render on PDF */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
