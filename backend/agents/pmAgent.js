@@ -2,6 +2,8 @@ const db = require('../db');
 const asanaService = require('../services/asanaService');
 const researchAgent = require('./researchAgent');
 const implementationAgent = require('./implementationAgent');
+const backlinkAgent = require('./backlinkAgent');
+const guruAgent = require('./guruAgent');
 
 /**
  * The Orchestrator - Manages the State Machine
@@ -41,7 +43,6 @@ class PMAgent {
         if (activeTask.assigned_agent === 'ResearchAgent') {
           await researchAgent.executeTask(activeTask.id, campaign.id, activeTask.payload);
           
-          // Next State: When Research is done, assign Implementation
           console.log(`👔 [PM Agent] Assigning Phase 2 to ImplementationAgent.`);
           const targetAsanaProject = process.env.ASANA_PROJECT_GID || campaign.asana_project_id;
           await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Write Onsite Tags`, 'Using the new keywords, write the title tags.', 'ImplementationAgent');
@@ -53,8 +54,42 @@ class PMAgent {
           
         } else if (activeTask.assigned_agent === 'ImplementationAgent') {
           await implementationAgent.executeTask(activeTask.id, campaign.id, activeTask.payload);
-          // Here, we would transition to BacklinkAgent or GuruAgent...
-          console.log(`👔 [PM Agent] Implementation complete. Next step: Guru Review.`);
+          
+          // Next phase depends on Package Tier!
+          const tier = campaign.package_tier || 'basic';
+          const targetAsanaProject = process.env.ASANA_PROJECT_GID || campaign.asana_project_id;
+
+          if (tier === 'basic') {
+            console.log(`👔 [PM Agent] Basic Tier complete for ${campaign.client_domain}. Halting execution.`);
+          } else {
+            console.log(`👔 [PM Agent] Escalating to Phase 3 (Pro Tier) Backlinking for ${campaign.client_domain}.`);
+            await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Backlink Procurement`, 'Generate 5 high DR link targets and an outreach email.', 'BacklinkAgent');
+            await db.query(`
+              INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type)
+              VALUES ($1, $2, $3)
+            `, [campaign.id, 'BacklinkAgent', 'Phase 3: Offsite Link Building Outreach']);
+          }
+
+        } else if (activeTask.assigned_agent === 'BacklinkAgent') {
+          await backlinkAgent.executeTask(activeTask.id, campaign.id, activeTask.payload);
+          
+          const tier = campaign.package_tier || 'pro';
+          const targetAsanaProject = process.env.ASANA_PROJECT_GID || campaign.asana_project_id;
+
+          if (tier === 'enterprise') {
+            console.log(`👔 [PM Agent] Escalating to Phase 4 (Enterprise Tier) Guru Audit for ${campaign.client_domain}.`);
+            await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Enterprise Guru Audit`, 'Perform historical RAG audit against iShack guidelines.', 'GuruAgent');
+            await db.query(`
+              INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type)
+              VALUES ($1, $2, $3)
+            `, [campaign.id, 'GuruAgent', 'Phase 4: RAG Expert Audit']);
+          } else {
+            console.log(`👔 [PM Agent] Pro Tier complete for ${campaign.client_domain}. Halting execution.`);
+          }
+          
+        } else if (activeTask.assigned_agent === 'GuruAgent') {
+          await guruAgent.executeTask(activeTask.id, campaign.id, activeTask.payload);
+          console.log(`👔 [PM Agent] Enterprise Tier officially completed for ${campaign.client_domain}.`);
         }
       }
     }

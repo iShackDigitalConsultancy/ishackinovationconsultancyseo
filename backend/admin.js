@@ -117,13 +117,14 @@ router.post('/sandbox/trigger-vera', authenticateSuperadmin, async (req, res) =>
 
 router.post('/sandbox/start-campaign', authenticateSuperadmin, async (req, res) => {
   try {
-    const { domain } = req.body;
+    const { domain, tier } = req.body;
     if (!domain) return res.status(400).json({ error: 'Domain is required.' });
     
+    const packageTier = tier || 'basic';
     const { rows } = await db.query('SELECT id FROM agencies LIMIT 1');
     if (rows.length === 0) return res.status(400).json({ error: 'No agencies found in database.' });
     
-    await db.query("INSERT INTO campaigns (agency_id, client_domain) VALUES ($1, $2)", [rows[0].id, domain]);
+    await db.query("INSERT INTO campaigns (agency_id, client_domain, package_tier) VALUES ($1, $2, $3)", [rows[0].id, domain, packageTier]);
     
     // Automatically trigger the PM agent heartbeat to pick up the brand new campaign immediately!
     await pmAgent.tick();

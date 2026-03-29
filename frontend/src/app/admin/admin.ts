@@ -128,7 +128,12 @@ import { environment } from '../../environments/environment';
                 <!-- Launch Input -->
                 <div class="flex gap-2">
                   <input #campDomain type="text" placeholder="e.g. ishack.co.za" class="w-full bg-slate-950 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-primary transition-colors">
-                  <button (click)="startCampaign(campDomain.value); campDomain.value=''" class="bg-primary hover:bg-blue-600 px-3 py-1.5 rounded-lg text-white font-bold text-sm shadow-md transition-colors whitespace-nowrap">Deploy</button>
+                  <select #campTier class="bg-slate-900 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-slate-300 focus:outline-none focus:border-primary transition-colors">
+                    <option value="basic">Growth Start ($499)</option>
+                    <option value="pro" selected>Domination Pro ($899)</option>
+                    <option value="enterprise">Enterprise Elite ($1499)</option>
+                  </select>
+                  <button (click)="startCampaign(campDomain.value, campTier.value); campDomain.value=''" class="bg-primary hover:bg-blue-600 px-3 py-1.5 rounded-lg text-white font-bold text-sm shadow-md transition-colors whitespace-nowrap">Deploy</button>
                 </div>
               </div>
               <div class="p-5 space-y-4">
@@ -301,10 +306,10 @@ export class AdminDashboard implements OnInit {
     }
   }
 
-  startCampaign(domain: string) {
+  startCampaign(domain: string, tier: string) {
     if (!domain) return alert("Please enter a domain");
     
-    this.http.post(`${environment.apiUrl}/admin/sandbox/start-campaign`, { domain }, { headers: this.getHeaders() }).subscribe({
+    this.http.post(`${environment.apiUrl}/admin/sandbox/start-campaign`, { domain, tier }, { headers: this.getHeaders() }).subscribe({
       next: (res: any) => {
         alert(res.message);
         this.fetchAgentData();

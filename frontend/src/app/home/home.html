@@ -481,35 +481,55 @@
       <!-- State 4: Upgrade / Premium Packages -->
       @if (funnelState() === 'upgrade') {
         <div class="animate-fade-in space-y-6">
-          <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-slate-800 mb-2">Agency Partner Packages</h2>
-            <p class="text-slate-500 font-medium">Fully unbranded, whitelabel reports you can share directly with your clients.</p>
+          <div class="text-center mb-10">
+            <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-800 mb-2">Hire Your Autonomous AI Agency</h2>
+            <p class="text-lg text-slate-500 font-medium">Select your execution tier. Our AI Agents work 24/7 to scale your organic ranking safely.</p>
           </div>
           
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div class="border-2 border-slate-200 rounded-2xl p-6 hover:border-slate-300 transition-colors bg-white shadow-sm flex flex-col items-center text-center">
-              <div class="font-bold text-xl text-slate-800 mb-1">Single Site Report</div>
-              <div class="text-3xl font-extrabold text-slate-900 mb-4">$49<span class="text-sm font-medium text-slate-500">/one-time</span></div>
-              <ul class="text-sm text-slate-600 space-y-2 mb-6 text-left w-full pl-4 font-medium">
-                <li>✓ Full 100% SEO Audit</li>
-                <li>✓ Whitelabel PDF Export</li>
-                <li>✓ AI Action Plan</li>
+          <div class="grid lg:grid-cols-3 gap-6 items-center">
+            
+            <!-- Basic Tier -->
+            <div class="border border-slate-200 rounded-3xl p-8 bg-white shadow-sm hover:shadow-xl transition-all relative flex flex-col h-[500px]">
+              <div class="font-bold text-xl text-slate-800 mb-2">Growth Start</div>
+              <div class="text-4xl font-extrabold text-slate-900 mb-1">$499<span class="text-lg font-medium text-slate-500">/mo</span></div>
+              <p class="text-sm text-slate-500 mb-6 font-medium">Perfect for local businesses needing perfect structural SEO.</p>
+              <ul class="text-sm text-slate-600 space-y-3 mb-8 w-full font-medium flex-1">
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <b>Research Agent:</b> Keyword Maps</li>
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <b>Implementation Agent:</b> Meta/Tags/Schema</li>
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Asana Kanban Board Access</li>
               </ul>
-              <button class="mt-auto w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl transition-colors">Select Plan</button>
+              <button routerLink="/register" [queryParams]="{tier: 'basic'}" class="mt-auto w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl transition-colors">Start Growth Campaign</button>
             </div>
             
-            <div class="border-2 border-primary rounded-2xl p-6 bg-blue-50 relative shadow-xl transform sm:-translate-y-2 flex flex-col items-center text-center">
-              <div class="absolute top-0 right-1/2 transform translate-x-1/2 -translate-y-1/2 bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">Most Popular</div>
-              <div class="font-bold text-xl text-slate-800 mb-1 mt-2">Agency Monthly</div>
-              <div class="text-3xl font-extrabold text-primary mb-4">$299<span class="text-sm font-medium text-blue-400">/mo</span></div>
-              <ul class="text-sm text-slate-700 space-y-2 mb-6 text-left w-full pl-4 font-medium">
-                <li>✓ Unlimited Site Audits</li>
-                <li>✓ Whitelabel Dashboard</li>
-                <li>✓ Dedicated OpenClaw Agent</li>
-                <li>✓ Unlimited PDF Exports</li>
+            <!-- Pro Tier (Most Popular) -->
+            <div class="border-2 border-primary rounded-3xl p-8 bg-gradient-to-br from-blue-50 to-white relative shadow-2xl transform lg:-translate-y-4 flex flex-col h-[540px] z-10">
+              <div class="absolute -top-4 right-1/2 transform translate-x-1/2 bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md whitespace-nowrap">Recommended</div>
+              <div class="font-bold text-xl text-slate-800 mb-2 mt-2">Domination Pro</div>
+              <div class="text-4xl font-extrabold text-primary mb-1">$899<span class="text-lg font-medium text-blue-400">/mo</span></div>
+              <p class="text-sm text-slate-600 mb-6 font-medium">Aggressive off-site link building and competitor interception.</p>
+              <ul class="text-sm text-slate-700 space-y-3 mb-8 w-full font-medium flex-1">
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span class="text-slate-500">Everything in Growth Start</span></li>
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <b>Backlink Agent:</b> High DR Outreach</li>
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Competitor Link Gap Interception</li>
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Guaranteed 5 Whitehat Placements</li>
               </ul>
-              <button routerLink="/register" class="mt-auto w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md">Start Agency Plan</button>
+              <button routerLink="/register" [queryParams]="{tier: 'pro'}" class="mt-auto w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all shadow-md transform hover:-translate-y-0.5 tracking-wide">Dominate The SERPs</button>
             </div>
+
+            <!-- Enterprise Tier -->
+            <div class="border border-slate-800/10 rounded-3xl p-8 bg-slate-900 text-white shadow-xl hover:shadow-2xl transition-all relative flex flex-col h-[500px]">
+              <div class="font-bold text-xl text-blue-400 mb-2">Enterprise Elite</div>
+              <div class="text-4xl font-extrabold text-white mb-1">$1499<span class="text-lg font-medium text-slate-400">/mo</span></div>
+              <p class="text-sm text-slate-400 mb-6 font-medium">Fully managed RAG-audited workflow with automated reporting.</p>
+              <ul class="text-sm text-slate-300 space-y-3 mb-8 w-full font-medium flex-1">
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span class="text-slate-500">Everything in Domination Pro</span></li>
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <b>Guru Agent:</b> Historical Playbook Audit</li>
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <b>Vera Sharp:</b> Daily White-Labeled Reports</li>
+                <li class="flex items-center gap-2"><svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Infinite Revisions</li>
+              </ul>
+              <button routerLink="/register" [queryParams]="{tier: 'enterprise'}" class="mt-auto w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3.5 rounded-xl transition-colors border border-white/20">Hire Executive Swarm</button>
+            </div>
+            
           </div>
           
           <button (click)="reset()" class="block w-full text-center text-sm font-medium text-slate-500 hover:text-slate-800 mt-6 transition-colors underline">

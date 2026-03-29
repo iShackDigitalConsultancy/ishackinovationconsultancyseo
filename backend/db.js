@@ -40,6 +40,7 @@ const initSchema = async () => {
         id SERIAL PRIMARY KEY,
         agency_id INTEGER NOT NULL REFERENCES agencies(id),
         client_domain VARCHAR(255) NOT NULL,
+        package_tier VARCHAR(50) DEFAULT 'basic',
         status VARCHAR(50) DEFAULT 'active',
         asana_project_id VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -82,6 +83,10 @@ const initSchema = async () => {
     
     try {
       await client.query("ALTER TABLE agencies ADD COLUMN contact_person VARCHAR(255)");
+    } catch(e) {}
+
+    try {
+      await client.query("ALTER TABLE campaigns ADD COLUMN package_tier VARCHAR(50) DEFAULT 'basic'");
     } catch(e) {}
 
     console.log('PostgreSQL Database schema initialized');
