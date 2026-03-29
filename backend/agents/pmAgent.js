@@ -23,8 +23,9 @@ class PMAgent {
         // No tasks exist? This is a NEW campaign. Kick off Phase 1 (Research).
         console.log(`👔 [PM Agent] Campaign empty. Initiating Phase 1: Research.`);
         
-        // Log to Asana
-        const asanaTaskGid = await asanaService.assignTaskToAgent(campaign.asana_project_id, 'Keyword Research Mapping', 'Analyze competitors and map keywords', 'ResearchAgent');
+        // Log to Asana Global Server Project
+        const targetAsanaProject = process.env.ASANA_PROJECT_GID || campaign.asana_project_id;
+        const asanaTaskGid = await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Keyword Research Mapping`, 'Analyze competitors and map keywords', 'ResearchAgent');
         
         // Log to Database
         await db.query(`
@@ -42,7 +43,8 @@ class PMAgent {
           
           // Next State: When Research is done, assign Implementation
           console.log(`👔 [PM Agent] Assigning Phase 2 to ImplementationAgent.`);
-          await asanaService.assignTaskToAgent(campaign.asana_project_id, 'Write Onsite Tags', 'Using the new keywords, write the title tags.', 'ImplementationAgent');
+          const targetAsanaProject = process.env.ASANA_PROJECT_GID || campaign.asana_project_id;
+          await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Write Onsite Tags`, 'Using the new keywords, write the title tags.', 'ImplementationAgent');
           
           await db.query(`
             INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type)
