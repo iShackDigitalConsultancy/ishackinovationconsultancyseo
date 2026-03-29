@@ -60,6 +60,39 @@ router.get('/metrics', authenticateSuperadmin, async (req, res) => {
   }
 });
 
+// AI Observation Deck Endpoints
+router.get('/agent-logs', authenticateSuperadmin, async (req, res) => {
+  try {
+    const logs = await db.query("SELECT * FROM agent_logs ORDER BY created_at DESC LIMIT 100");
+    res.json(logs.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch agent logs' });
+  }
+});
+
+router.get('/campaigns', authenticateSuperadmin, async (req, res) => {
+  try {
+    const campaigns = await db.query(`
+      SELECT c.*, a.agency_name 
+      FROM campaigns c 
+      JOIN agencies a ON c.agency_id = a.id 
+      ORDER BY c.created_at DESC
+    `);
+    res.json(campaigns.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch campaigns' });
+  }
+});
+
+router.get('/agent-tasks', authenticateSuperadmin, async (req, res) => {
+  try {
+    const tasks = await db.query("SELECT * FROM agent_tasks ORDER BY created_at DESC LIMIT 50");
+    res.json(tasks.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch agent tasks' });
+  }
+});
+
 const pmAgent = require('./agents/pmAgent');
 const veraAgent = require('./agents/veraAgent');
 
