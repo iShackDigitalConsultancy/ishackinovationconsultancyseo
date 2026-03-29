@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_for_dev';
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY || '';
 
 router.post('/register', async (req, res) => {
-  const { agencyName, email, password, planType, brandColor, brandLogoUrl } = req.body;
+  const { agencyName, email, password, planType, brandColor, brandLogoUrl, promoCode } = req.body;
 
   if (!agencyName || !email || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
@@ -44,7 +44,9 @@ router.post('/register', async (req, res) => {
 
     // Initialize Paystack Checkout
     let authorizationUrl = '';
-    if (PAYSTACK_SECRET) {
+    const isTestingPromo = promoCode && promoCode.toLowerCase() === 'evertonfc';
+
+    if (PAYSTACK_SECRET && !isTestingPromo) {
       try {
         const response = await axios.post(
           'https://api.paystack.co/transaction/initialize',

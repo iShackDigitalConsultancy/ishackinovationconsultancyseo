@@ -117,9 +117,19 @@ import { environment } from '../../../environments/environment';
             </div>
 
             <div>
+              <label for="promoCode" class="block text-sm font-medium text-slate-700"> Promo Code (Optional) </label>
+              <div class="mt-1">
+                <input id="promoCode" name="promoCode" type="text" [(ngModel)]="promoCode" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white/70 transition-all disabled:opacity-50" placeholder="e.g. EARLYBIRD">
+              </div>
+            </div>
+
+            <div>
               <button type="submit" [disabled]="loading" class="relative overflow-hidden w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
-                <span *ngIf="!loading">
+                <span *ngIf="!loading && (!promoCode || promoCode.toLowerCase() !== 'evertonfc')">
                   Register & Pay ({{ planType === 'agency' ? '$299/mo' : '$49' }})
+                </span>
+                <span *ngIf="!loading && promoCode?.toLowerCase() === 'evertonfc'">
+                  Create Free Testing Account
                 </span>
                 <span *ngIf="loading">Processing...</span>
               </button>
@@ -139,6 +149,7 @@ export class Register {
   agencyName = '';
   email = '';
   password = '';
+  promoCode = '';
   loading = false;
   error = '';
 
@@ -158,7 +169,8 @@ export class Register {
       brandLogoUrl: this.brandLogoUrl,
       agencyName: this.agencyName,
       email: this.email,
-      password: this.password
+      password: this.password,
+      promoCode: this.promoCode
     }).subscribe({
       next: (response) => {
         // Store token locally if you are using it right away
