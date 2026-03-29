@@ -20,7 +20,7 @@ import { environment } from '../../../environments/environment';
         <div class="flex justify-center flex-col items-center">
           <div class="h-12 w-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg mb-4 cursor-pointer" routerLink="/">IS</div>
           <h2 class="mt-2 text-center text-3xl font-extrabold text-slate-900">
-            Create an agency account
+            Create your account
           </h2>
           <p class="mt-2 text-center text-sm text-slate-600">
             Or
@@ -40,8 +40,45 @@ import { environment } from '../../../environments/environment';
           
           <form class="space-y-6" (ngSubmit)="onSubmit()">
             
+            <!-- Plan Selection -->
+            <div class="space-y-3 mb-6">
+              <label class="block text-sm font-bold text-slate-800 mb-2">Select Package</label>
+              
+              <label class="relative flex cursor-pointer rounded-xl border bg-white p-4 shadow-sm focus:outline-none"
+                     [ngClass]="{'border-primary bg-blue-50': planType === 'agency', 'border-slate-300': planType !== 'agency'}">
+                <input type="radio" name="planType" value="agency" [(ngModel)]="planType" class="sr-only">
+                <span class="flex flex-1">
+                  <span class="flex flex-col">
+                    <span class="block text-sm font-bold text-slate-900">Digital Agency Partner</span>
+                    <span class="mt-1 flex items-center text-sm text-slate-500">Unlimited Audits & Whitelabel</span>
+                  </span>
+                </span>
+                <span class="text-xl font-bold text-primary">$299<span class="text-xs text-slate-500 font-normal">/mo</span></span>
+                <!-- Active Indicator Border -->
+                <span class="pointer-events-none absolute -inset-px rounded-xl border-2" aria-hidden="true"
+                      [ngClass]="{'border-primary': planType === 'agency', 'border-transparent': planType !== 'agency'}"></span>
+              </label>
+
+              <label class="relative flex cursor-pointer rounded-xl border bg-white p-4 shadow-sm focus:outline-none"
+                     [ngClass]="{'border-primary bg-blue-50': planType === 'business', 'border-slate-300': planType !== 'business'}">
+                <input type="radio" name="planType" value="business" [(ngModel)]="planType" class="sr-only">
+                <span class="flex flex-1">
+                  <span class="flex flex-col">
+                    <span class="block text-sm font-bold text-slate-900">Business Owner</span>
+                    <span class="mt-1 flex items-center text-sm text-slate-500">Full Audit for 1 Site</span>
+                  </span>
+                </span>
+                <span class="text-xl font-bold text-slate-800">$49<span class="text-xs text-slate-500 font-normal"> once</span></span>
+                <!-- Active Indicator Border -->
+                <span class="pointer-events-none absolute -inset-px rounded-xl border-2" aria-hidden="true"
+                      [ngClass]="{'border-primary': planType === 'business', 'border-transparent': planType !== 'business'}"></span>
+              </label>
+            </div>
+
             <div>
-              <label for="agencyName" class="block text-sm font-medium text-slate-700"> Agency Name </label>
+              <label for="agencyName" class="block text-sm font-medium text-slate-700"> 
+                {{ planType === 'agency' ? 'Agency Name' : 'Business Name' }} 
+              </label>
               <div class="mt-1">
                 <input id="agencyName" name="agencyName" type="text" required [(ngModel)]="agencyName" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white/70 transition-all disabled:opacity-50">
               </div>
@@ -63,7 +100,9 @@ import { environment } from '../../../environments/environment';
 
             <div>
               <button type="submit" [disabled]="loading" class="relative overflow-hidden w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
-                <span *ngIf="!loading">Register & Pay ($299/mo)</span>
+                <span *ngIf="!loading">
+                  Register & Pay ({{ planType === 'agency' ? '$299/mo' : '$49' }})
+                </span>
                 <span *ngIf="loading">Processing...</span>
               </button>
             </div>
@@ -76,6 +115,7 @@ import { environment } from '../../../environments/environment';
 export class Register {
   private http = inject(HttpClient);
   
+  planType: 'agency' | 'business' = 'agency';
   agencyName = '';
   email = '';
   password = '';
@@ -93,6 +133,7 @@ export class Register {
     this.loading = true;
 
     this.http.post<any>(`${environment.apiUrl}/auth/register`, {
+      planType: this.planType,
       agencyName: this.agencyName,
       email: this.email,
       password: this.password

@@ -9,11 +9,16 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_for_dev';
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY || '';
 
 router.post('/register', async (req, res) => {
-  const { agencyName, email, password } = req.body;
+  const { agencyName, email, password, planType } = req.body;
 
   if (!agencyName || !email || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
+
+  // default to agency if not specified
+  const selectedPlan = planType === 'business' ? 'business' : 'agency';
+  // $299 -> 29900, $49 -> 4900
+  const billingAmount = selectedPlan === 'business' ? 4900 : 29900; 
 
   try {
     const checkEmail = await db.query('SELECT id FROM agencies WHERE email = $1', [email]);
@@ -40,7 +45,7 @@ router.post('/register', async (req, res) => {
           'https://api.paystack.co/transaction/initialize',
           {
             email: email,
-            amount: 29900, // ZAR 299.00
+            amount: billingAmount,
             callback_url: 'http://localhost:4200/dashboard'
           },
           {
@@ -60,7 +65,7 @@ router.post('/register', async (req, res) => {
       message: 'Registration successful',
       token,
       authorizationUrl,
-      agency: { id: agencyId, agencyName, email, role: 'free' } // defaults to free
+      agency: { id: agencyId, agencyName, email, role: selectedPlan }
     });
   } catch (error) {
     console.error('Registration error:', error);

@@ -16,6 +16,14 @@ export class Home {
   // Funnel State: 'input' | 'analyzing' | 'report' | 'upgrade'
   funnelState = signal<'input' | 'analyzing' | 'report' | 'upgrade'>('input');
   
+  isLoggedIn = signal(false);
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      this.isLoggedIn.set(!!localStorage.getItem('auth_token'));
+    }
+  }
+
   websiteUrl = signal('');
   email = signal('');
   

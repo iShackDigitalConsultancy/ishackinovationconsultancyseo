@@ -102,6 +102,7 @@
             </div>
           }
 
+          @if (isLoggedIn()) {
           <!-- Top Organic Keywords Table -->
           @if (mockReport()?.metrics?.topKeywords && mockReport()?.metrics?.topKeywords.length > 0) {
             <div class="mt-8 bg-white/60 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -262,6 +263,29 @@
               </div>
             </div>
           </div>
+          } @else {
+            <!-- Freemium Unlock CTA -->
+            <div class="mt-12 bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 lg:p-12 text-center text-white shadow-2xl relative overflow-hidden print:hidden">
+              <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
+              <div class="relative z-10 space-y-6 max-w-2xl mx-auto">
+                <div class="mx-auto w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-2">
+                  <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-extrabold tracking-tight text-white">Unlock Your Full Site Audit</h2>
+                <p class="text-lg text-slate-300">
+                  Sign up for an account to instantly reveal your Top Keyword Rankings, complete Critical SEO Issues, Expert Consulting Advice, and Link Building strategy packages.
+                </p>
+                <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
+                  <button routerLink="/register" class="bg-primary hover:bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    Unlock Full Report
+                  </button>
+                  <button routerLink="/login" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg transition-all">
+                    Sign In
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
         </div>
       }
 
