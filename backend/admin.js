@@ -33,12 +33,12 @@ const authenticateSuperadmin = async (req, res, next) => {
 // SuperAdmin Agency CRUD
 router.post('/agencies', authenticateSuperadmin, async (req, res) => {
   try {
-    const { agencyName, email, role } = req.body;
+    const { agencyName, email, role, contactPerson, address, brandColor, brandLogoUrl } = req.body;
     const bcrypt = require('bcrypt');
     const hash = await bcrypt.hash('admin_generated', 10);
     const result = await db.query(
-      'INSERT INTO agencies (agency_name, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id',
-      [agencyName, email, hash, role || 'free']
+      'INSERT INTO agencies (agency_name, email, password_hash, role, contact_person, address, brand_color, brand_logo_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+      [agencyName, email, hash, role || 'free', contactPerson || '', address || '', brandColor || '#007bff', brandLogoUrl || '']
     );
     res.json({ success: true, agencyId: result.rows[0].id });
   } catch (err) {
@@ -48,10 +48,10 @@ router.post('/agencies', authenticateSuperadmin, async (req, res) => {
 
 router.put('/agencies/:id', authenticateSuperadmin, async (req, res) => {
   try {
-    const { agencyName, email, role } = req.body;
+    const { agencyName, email, role, contactPerson, address, brandColor, brandLogoUrl } = req.body;
     await db.query(
-      'UPDATE agencies SET agency_name = $1, email = $2, role = $3 WHERE id = $4',
-      [agencyName, email, role, req.params.id]
+      'UPDATE agencies SET agency_name = $1, email = $2, role = $3, contact_person = $4, address = $5, brand_color = $6, brand_logo_url = $7 WHERE id = $8',
+      [agencyName, email, role, contactPerson || '', address || '', brandColor || '#007bff', brandLogoUrl || '', req.params.id]
     );
     res.json({ success: true });
   } catch (err) {
@@ -92,7 +92,7 @@ router.get('/metrics', authenticateSuperadmin, async (req, res) => {
     
     const mrr = paidAgencies * 299;
 
-    const recentAgenciesResult = await db.query("SELECT id, agency_name, email, role, created_at FROM agencies WHERE role != 'superadmin' ORDER BY created_at DESC");
+    const recentAgenciesResult = await db.query("SELECT id, agency_name, email, role, contact_person, address, brand_color, brand_logo_url, created_at FROM agencies WHERE role != 'superadmin' ORDER BY created_at DESC");
 
     res.json({
       metrics: {
@@ -156,6 +156,25 @@ router.get('/campaigns', authenticateSuperadmin, async (req, res) => {
     res.json(campaigns);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch campaigns' });
+  }
+});
+
+// Global Targeted URLs Mapping Endpoint
+router.get('/targeted-urls', authenticateSuperadmin, async (req, res) => {
+  try {
+    const query = `
+      SELECT c.id as campaign_id, c.client_domain as url, c.package_tier, c.status as campaign_status, a.agency_name, a.id as agency_id,
+             (SELECT COUNT(*) FROM agent_tasks t WHERE t.campaign_id = c.id) as task_count,
+             (SELECT COUNT(*) FROM agent_tasks t WHERE t.campaign_id = c.id AND t.status = 'completed') as task_completed,
+             (SELECT COUNT(*) FROM agent_logs l WHERE l.campaign_id = c.id) as active_hooks
+      FROM campaigns c
+      JOIN agencies a ON c.agency_id = a.id
+      ORDER BY c.created_at DESC
+    `;
+    const urls = await db.query(query);
+    res.json(urls.rows);
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to aggregate targeted URLs' });
   }
 });
 

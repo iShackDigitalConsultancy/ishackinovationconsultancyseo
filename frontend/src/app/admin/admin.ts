@@ -65,6 +65,15 @@ import { environment } from '../../environments/environment';
               </span>
             </button>
             <button 
+              (click)="setActiveTab('urls')" 
+              [ngClass]="activeTab === 'urls' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                Targeted URLs
+              </span>
+            </button>
+            <button 
               (click)="setActiveTab('settings')" 
               [ngClass]="activeTab === 'settings' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
               class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
@@ -120,17 +129,23 @@ import { environment } from '../../environments/environment';
                 <p class="text-sm text-slate-400 mt-1 font-medium ml-13">Create, modify, and delete comprehensive client profiles underneath the SuperAdmin umbrella.</p>
               </div>
               
-              <div class="flex gap-3 bg-slate-950 p-2 rounded-xl border border-white/5 shadow-inner">
-                <input #newClientName type="text" placeholder="Client/Agency Name" class="w-48 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
-                <input #newClientEmail type="email" placeholder="Email Address" class="w-48 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
-                <select #newClientRole class="bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-emerald-500 transition-colors">
-                  <option value="free">Free Tier</option>
-                  <option value="paid" selected>Paid Subscription</option>
-                </select>
-                <button (click)="createClient(newClientName.value, newClientEmail.value, newClientRole.value); newClientName.value=''; newClientEmail.value=''" class="bg-emerald-600 hover:bg-emerald-500 px-6 py-2 rounded-lg text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                  Add Client
-                </button>
+              <div class="flex flex-col gap-3 bg-slate-950 p-4 rounded-xl border border-white/5 shadow-inner">
+                <div class="flex gap-3">
+                  <input #newClientName type="text" placeholder="Agency/Business Name" class="flex-1 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                  <input #newClientEmail type="email" placeholder="Master Login Email" class="flex-1 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                  <select #newClientRole class="w-40 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-emerald-500 transition-colors">
+                    <option value="free">Free Tier</option>
+                    <option value="paid" selected>Paid Subscription</option>
+                  </select>
+                </div>
+                <div class="flex gap-3">
+                  <input #newContact type="text" placeholder="POC Name (e.g. John Doe)" class="flex-1 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                  <input #newAddress type="text" placeholder="Physical/Billing Address" class="flex-1 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                  <button (click)="createClient(newClientName.value, newClientEmail.value, newClientRole.value, newContact.value, newAddress.value); newClientName.value=''; newClientEmail.value=''; newContact.value=''; newAddress.value=''" class="w-40 bg-emerald-600 hover:bg-emerald-500 px-6 py-2 rounded-lg text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add Client
+                  </button>
+                </div>
               </div>
           </div>
 
@@ -139,8 +154,8 @@ import { environment } from '../../environments/environment';
               <table class="w-full text-left text-sm text-slate-300">
                 <thead class="text-xs text-slate-500 uppercase bg-slate-950 border-b border-white/5 font-bold">
                   <tr>
-                    <th scope="col" class="px-6 py-4">Agency / Client Name</th>
-                    <th scope="col" class="px-6 py-4">Contact Email</th>
+                    <th scope="col" class="px-6 py-4">Agency / Business Profile</th>
+                    <th scope="col" class="px-6 py-4">Contact Person & Info</th>
                     <th scope="col" class="px-6 py-4">Billing Status</th>
                     <th scope="col" class="px-6 py-4">Joined</th>
                     <th scope="col" class="px-6 py-4 text-right">Actions</th>
@@ -150,8 +165,14 @@ import { environment } from '../../environments/environment';
                   <tr *ngFor="let agency of recentAgencies" class="hover:bg-white/[0.02] transition-colors group">
                     <!-- Read Mode -->
                     <ng-container *ngIf="editAgencyId !== agency.id">
-                      <td class="px-6 py-4 font-bold text-white text-base">{{ agency.agency_name }}</td>
-                      <td class="px-6 py-4 font-mono text-slate-400">{{ agency.email }}</td>
+                      <td class="px-6 py-4">
+                        <div class="font-bold text-white text-base">{{ agency.agency_name }}</div>
+                        <div class="text-xs text-slate-500 mt-0.5 truncate max-w-xs" title="{{ agency.address }}">{{ agency.address || 'No physical address' }}</div>
+                      </td>
+                      <td class="px-6 py-4">
+                        <div class="text-slate-200 font-medium">{{ agency.contact_person || 'No POC' }}</div>
+                        <div class="font-mono text-slate-400 text-xs mt-0.5">{{ agency.email }}</div>
+                      </td>
                       <td class="px-6 py-4">
                         <span *ngIf="agency.role === 'paid'" class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Paid ($299/mo)</span>
                         <span *ngIf="agency.role === 'free'" class="bg-slate-500/10 text-slate-400 border border-white/10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Free Tier</span>
@@ -171,11 +192,13 @@ import { environment } from '../../environments/environment';
                     
                     <!-- Edit Mode -->
                     <ng-container *ngIf="editAgencyId === agency.id">
-                      <td class="px-6 py-4">
-                        <input [(ngModel)]="agency.agency_name" class="w-full bg-slate-950 border border-white/20 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                      <td class="px-6 py-4 space-y-2">
+                        <input [(ngModel)]="agency.agency_name" placeholder="Business Name" class="w-full bg-slate-950 border border-white/20 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input [(ngModel)]="agency.address" placeholder="HQ Address" class="w-full bg-slate-950 border border-white/20 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500">
                       </td>
-                      <td class="px-6 py-4">
-                        <input [(ngModel)]="agency.email" type="email" class="w-full bg-slate-950 border border-white/20 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                      <td class="px-6 py-4 space-y-2">
+                        <input [(ngModel)]="agency.contact_person" placeholder="Contact Person" class="w-full bg-slate-950 border border-white/20 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <input [(ngModel)]="agency.email" type="email" placeholder="Login Email" class="w-full bg-slate-950 border border-white/20 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500">
                       </td>
                       <td class="px-6 py-4">
                         <select [(ngModel)]="agency.role" class="w-full bg-slate-950 border border-white/20 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -430,6 +453,66 @@ import { environment } from '../../environments/environment';
 
         </div>
 
+        <!-- Targeted URLs Master View -->
+        <div *ngIf="activeTab === 'urls'" class="animate-fade-in space-y-6">
+          <div class="bg-slate-900 border border-white/5 rounded-2xl p-6 shadow-2xl">
+            <h2 class="text-2xl font-extrabold text-white flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center border border-pink-500/30">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+              </div>
+              Global Targeted URIs
+            </h2>
+            <p class="text-sm text-slate-400 font-medium ml-13 mb-6">Aggregate execution logs and overarching active configurations across every internet zone the AI is maneuvering inside.</p>
+            
+            <div class="overflow-x-auto rounded-xl border border-white/5">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead class="bg-slate-950 text-xs uppercase tracking-wider font-bold text-slate-500 border-b border-white/5">
+                  <tr>
+                    <th class="px-6 py-4">Targeted URL / Domain</th>
+                    <th class="px-6 py-4">Linked Agency</th>
+                    <th class="px-6 py-4">Package Scope</th>
+                    <th class="px-6 py-4 text-center">Executed Tasks</th>
+                    <th class="px-6 py-4 text-right">Target Active Hooks</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr *ngFor="let target of targetedUrls" class="hover:bg-white/[0.02] transition-colors">
+                    <td class="px-6 py-5 font-bold text-white text-base">
+                      <a href="https://{{ target.url }}" target="_blank" class="text-white hover:text-pink-400 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                        {{ target.url }}
+                      </a>
+                    </td>
+                    <td class="px-6 py-5">
+                      <div class="text-sm text-slate-300 font-medium">{{ target.agency_name }}</div>
+                      <div class="text-[10px] text-slate-500 font-mono">ID: {{ target.agency_id }}</div>
+                    </td>
+                    <td class="px-6 py-5">
+                      <span class="inline-flex items-center px-2.5 py-1 rounded bg-slate-800 text-xs font-bold capitalize border border-white/10"
+                            [ngClass]="{'text-blue-400 border-blue-500/30': target.package_tier === 'pro', 'text-yellow-400 border-yellow-500/30': target.package_tier === 'enterprise', 'text-slate-300': target.package_tier === 'basic'}">
+                        {{ target.package_tier }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-5 text-center">
+                      <div class="inline-flex items-center justify-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-white/5">
+                        <span class="text-green-400 font-bold">{{ target.task_completed || 0 }}</span>
+                        <span class="text-slate-600">/</span>
+                        <span class="text-slate-400 font-bold">{{ target.task_count || 0 }}</span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-5 text-right font-mono text-pink-400 font-bold">
+                      <span class="bg-pink-500/10 px-2.5 py-1 rounded border border-pink-500/20">{{ target.active_hooks || 0 }} hooked</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="targetedUrls.length === 0">
+                    <td colspan="5" class="px-6 py-12 text-center text-slate-500 font-medium italic">No active domains mapped.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- System & Billing Settings View -->
         <div *ngIf="activeTab === 'settings'" class="animate-fade-in grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
@@ -490,6 +573,7 @@ export class AdminDashboard implements OnInit {
   expandedCampaign: number | null = null;
   promoCodes: any[] = [];
   editAgencyId: number | null = null;
+  targetedUrls: any[] = [];
 
   ngOnInit() {
     this.fetchMetrics();
@@ -511,6 +595,16 @@ export class AdminDashboard implements OnInit {
     if (tab === 'settings') {
       this.fetchPromoCodes();
     }
+    if (tab === 'urls') {
+      this.fetchTargetedUrls();
+    }
+  }
+
+  fetchTargetedUrls() {
+    this.http.get<any[]>(`${environment.apiUrl}/admin/targeted-urls`, { headers: this.getHeaders() }).subscribe({
+      next: (data) => this.targetedUrls = data,
+      error: (err) => console.error(err)
+    });
   }
 
   toggleExpand(id: number) {
@@ -584,9 +678,9 @@ export class AdminDashboard implements OnInit {
     });
   }
 
-  createClient(agencyName: string, email: string, role: string) {
+  createClient(agencyName: string, email: string, role: string, contactPerson: string, address: string) {
     if (!agencyName || !email) return alert('Name and email required');
-    this.http.post(`${environment.apiUrl}/admin/agencies`, { agencyName, email, role }, { headers: this.getHeaders() }).subscribe({
+    this.http.post(`${environment.apiUrl}/admin/agencies`, { agencyName, email, role, contactPerson, address }, { headers: this.getHeaders() }).subscribe({
       next: () => {
         alert('Client Profile Created!');
         this.fetchMetrics();
@@ -596,7 +690,7 @@ export class AdminDashboard implements OnInit {
   }
 
   saveClientEdit(agency: any) {
-    this.http.put(`${environment.apiUrl}/admin/agencies/${agency.id}`, { agencyName: agency.agency_name, email: agency.email, role: agency.role }, { headers: this.getHeaders() }).subscribe({
+    this.http.put(`${environment.apiUrl}/admin/agencies/${agency.id}`, { agencyName: agency.agency_name, email: agency.email, role: agency.role, contactPerson: agency.contact_person, address: agency.address }, { headers: this.getHeaders() }).subscribe({
       next: () => {
         this.editAgencyId = null;
         this.fetchMetrics();
