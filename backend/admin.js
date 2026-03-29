@@ -30,6 +30,55 @@ const authenticateSuperadmin = async (req, res, next) => {
   });
 };
 
+// SuperAdmin Agency CRUD
+router.post('/agencies', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { agencyName, email, role } = req.body;
+    const bcrypt = require('bcrypt');
+    const hash = await bcrypt.hash('admin_generated', 10);
+    const result = await db.query(
+      'INSERT INTO agencies (agency_name, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id',
+      [agencyName, email, hash, role || 'free']
+    );
+    res.json({ success: true, agencyId: result.rows[0].id });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create agency client. Email might already exist.' });
+  }
+});
+
+router.put('/agencies/:id', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { agencyName, email, role } = req.body;
+    await db.query(
+      'UPDATE agencies SET agency_name = $1, email = $2, role = $3 WHERE id = $4',
+      [agencyName, email, role, req.params.id]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update client profile.' });
+  }
+});
+
+router.delete('/agencies/:id', authenticateSuperadmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    // Cascade delete safety block (Inproduction, foreign keys on delete cascade handles this, but manually doing basics here)
+    const camps = await db.query('SELECT id FROM campaigns WHERE agency_id = $1', [id]);
+    for (let c of camps.rows) {
+      await db.query('DELETE FROM agent_logs WHERE campaign_id = $1', [c.id]);
+      await db.query('DELETE FROM agent_tasks WHERE campaign_id = $1', [c.id]);
+    }
+    await db.query('DELETE FROM campaigns WHERE agency_id = $1', [id]);
+    await db.query('DELETE FROM client_sites WHERE agency_id = $1', [id]);
+    await db.query('DELETE FROM agencies WHERE id = $1', [id]);
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete client. Check foreign key boundaries.' });
+  }
+});
+
+// Analytics & Metrics Loop
 router.get('/metrics', authenticateSuperadmin, async (req, res) => {
   try {
     const totalAgenciesResult = await db.query("SELECT COUNT(*) as count FROM agencies WHERE role != 'superadmin'");
@@ -43,7 +92,7 @@ router.get('/metrics', authenticateSuperadmin, async (req, res) => {
     
     const mrr = paidAgencies * 299;
 
-    const recentAgenciesResult = await db.query("SELECT id, agency_name, email, role, created_at FROM agencies WHERE role != 'superadmin' ORDER BY created_at DESC LIMIT 10");
+    const recentAgenciesResult = await db.query("SELECT id, agency_name, email, role, created_at FROM agencies WHERE role != 'superadmin' ORDER BY created_at DESC");
 
     res.json({
       metrics: {

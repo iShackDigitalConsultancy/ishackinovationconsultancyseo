@@ -1,12 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-admin',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="min-h-screen bg-slate-950 font-sans text-slate-100 p-8">
       <div class="max-w-7xl mx-auto">
@@ -34,6 +35,15 @@ import { environment } from '../../environments/environment';
               <span class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
                 Financial Metrics
+              </span>
+            </button>
+            <button 
+              (click)="setActiveTab('clients')" 
+              [ngClass]="activeTab === 'clients' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Client OS
               </span>
             </button>
             <button 
@@ -95,40 +105,100 @@ import { environment } from '../../environments/environment';
 
         </div>
 
-        <!-- Agencies Table -->
-        <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
-          <div class="p-6 border-b border-white/5">
-            <h2 class="text-xl font-bold text-white">Registered Digital Agencies</h2>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-              <thead class="text-xs text-slate-500 uppercase bg-slate-950 border-b border-white/5">
-                <tr>
-                  <th scope="col" class="px-6 py-4">Agency Name</th>
-                  <th scope="col" class="px-6 py-4">Email</th>
-                  <th scope="col" class="px-6 py-4">Status</th>
-                  <th scope="col" class="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-white/5">
-                <tr *ngFor="let agency of recentAgencies" class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-6 py-4 font-medium text-white">{{ agency.agency_name }}</td>
-                  <td class="px-6 py-4">{{ agency.email }}</td>
-                  <td class="px-6 py-4">
-                    <span *ngIf="agency.role === 'paid'" class="bg-green-500/10 text-green-500 border border-green-500/20 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider">Paid ($299/mo)</span>
-                    <span *ngIf="agency.role === 'free'" class="bg-slate-500/10 text-slate-400 border border-white/10 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider">Free Tier</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:text-blue-400 font-medium font-bold transition-colors">Manage</button>
-                  </td>
-                </tr>
-                <tr *ngIf="!recentAgencies || recentAgencies.length === 0">
-                  <td colspan="4" class="px-6 py-12 text-center text-slate-500 font-medium">No agencies registered yet.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
+
+        <!-- Client OS View -->
+        <div *ngIf="activeTab === 'clients'" class="animate-fade-in space-y-6">
+          <div class="bg-slate-900 border border-white/5 rounded-2xl p-6 flex flex-col lg:flex-row justify-between lg:items-center gap-6 shadow-2xl">
+              <div>
+                <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                  </div>
+                  Client OS Data Center
+                </h2>
+                <p class="text-sm text-slate-400 mt-1 font-medium ml-13">Create, modify, and delete comprehensive client profiles underneath the SuperAdmin umbrella.</p>
+              </div>
+              
+              <div class="flex gap-3 bg-slate-950 p-2 rounded-xl border border-white/5 shadow-inner">
+                <input #newClientName type="text" placeholder="Client/Agency Name" class="w-48 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                <input #newClientEmail type="email" placeholder="Email Address" class="w-48 bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                <select #newClientRole class="bg-slate-900 border border-white/10 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-emerald-500 transition-colors">
+                  <option value="free">Free Tier</option>
+                  <option value="paid" selected>Paid Subscription</option>
+                </select>
+                <button (click)="createClient(newClientName.value, newClientEmail.value, newClientRole.value); newClientName.value=''; newClientEmail.value=''" class="bg-emerald-600 hover:bg-emerald-500 px-6 py-2 rounded-lg text-white font-bold text-sm shadow-md transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                  Add Client
+                </button>
+              </div>
+          </div>
+
+          <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead class="text-xs text-slate-500 uppercase bg-slate-950 border-b border-white/5 font-bold">
+                  <tr>
+                    <th scope="col" class="px-6 py-4">Agency / Client Name</th>
+                    <th scope="col" class="px-6 py-4">Contact Email</th>
+                    <th scope="col" class="px-6 py-4">Billing Status</th>
+                    <th scope="col" class="px-6 py-4">Joined</th>
+                    <th scope="col" class="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr *ngFor="let agency of recentAgencies" class="hover:bg-white/[0.02] transition-colors group">
+                    <!-- Read Mode -->
+                    <ng-container *ngIf="editAgencyId !== agency.id">
+                      <td class="px-6 py-4 font-bold text-white text-base">{{ agency.agency_name }}</td>
+                      <td class="px-6 py-4 font-mono text-slate-400">{{ agency.email }}</td>
+                      <td class="px-6 py-4">
+                        <span *ngIf="agency.role === 'paid'" class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Paid ($299/mo)</span>
+                        <span *ngIf="agency.role === 'free'" class="bg-slate-500/10 text-slate-400 border border-white/10 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Free Tier</span>
+                      </td>
+                      <td class="px-6 py-4 text-slate-500 text-xs font-medium">{{ agency.created_at | date:'MMM dd, yyyy' }}</td>
+                      <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button (click)="editAgencyId = agency.id" class="text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg" title="Edit Profile">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                          </button>
+                          <button (click)="deleteClient(agency.id)" class="text-red-400 hover:text-red-300 transition-colors bg-red-400/10 hover:bg-red-400/20 p-2 rounded-lg" title="Delete Client">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                          </button>
+                        </div>
+                      </td>
+                    </ng-container>
+                    
+                    <!-- Edit Mode -->
+                    <ng-container *ngIf="editAgencyId === agency.id">
+                      <td class="px-6 py-4">
+                        <input [(ngModel)]="agency.agency_name" class="w-full bg-slate-950 border border-white/20 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                      </td>
+                      <td class="px-6 py-4">
+                        <input [(ngModel)]="agency.email" type="email" class="w-full bg-slate-950 border border-white/20 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                      </td>
+                      <td class="px-6 py-4">
+                        <select [(ngModel)]="agency.role" class="w-full bg-slate-950 border border-white/20 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                          <option value="free">Free Tier</option>
+                          <option value="paid">Paid</option>
+                        </select>
+                      </td>
+                      <td class="px-6 py-4 text-slate-500 text-xs font-medium">{{ agency.created_at | date:'MMM dd, yyyy' }}</td>
+                      <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                          <button (click)="saveClientEdit(agency)" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded transition-colors shadow">Save</button>
+                          <button (click)="editAgencyId = null; fetchMetrics()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded transition-colors">Cancel</button>
+                        </div>
+                      </td>
+                    </ng-container>
+                  </tr>
+                  <tr *ngIf="!recentAgencies || recentAgencies.length === 0">
+                    <td colspan="5" class="px-6 py-12 text-center text-slate-500 font-medium italic">No client profiles registered yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
         <!-- AI Agent War Room View -->
         <div *ngIf="activeTab === 'agents'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -419,6 +489,7 @@ export class AdminDashboard implements OnInit {
   // Settings & CRM State
   expandedCampaign: number | null = null;
   promoCodes: any[] = [];
+  editAgencyId: number | null = null;
 
   ngOnInit() {
     this.fetchMetrics();
@@ -511,6 +582,36 @@ export class AdminDashboard implements OnInit {
       },
       error: (err) => alert('Failed to deploy campaign.')
     });
+  }
+
+  createClient(agencyName: string, email: string, role: string) {
+    if (!agencyName || !email) return alert('Name and email required');
+    this.http.post(`${environment.apiUrl}/admin/agencies`, { agencyName, email, role }, { headers: this.getHeaders() }).subscribe({
+      next: () => {
+        alert('Client Profile Created!');
+        this.fetchMetrics();
+      },
+      error: (err: any) => alert(err.error?.error || 'Failed to create client')
+    });
+  }
+
+  saveClientEdit(agency: any) {
+    this.http.put(`${environment.apiUrl}/admin/agencies/${agency.id}`, { agencyName: agency.agency_name, email: agency.email, role: agency.role }, { headers: this.getHeaders() }).subscribe({
+      next: () => {
+        this.editAgencyId = null;
+        this.fetchMetrics();
+      },
+      error: (err: any) => alert(err.error?.error || 'Failed to update client')
+    });
+  }
+
+  deleteClient(id: number) {
+    if (confirm('CRITICAL WARNING: This will permanently delete the client, ALL their campaigns, and ALL their AI agent execution logs. Proceed?')) {
+      this.http.delete(`${environment.apiUrl}/admin/agencies/${id}`, { headers: this.getHeaders() }).subscribe({
+        next: () => this.fetchMetrics(),
+        error: (err: any) => alert(err.error?.error || 'Failed to delete client')
+      });
+    }
   }
 
   fetchPromoCodes() {
