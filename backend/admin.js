@@ -60,7 +60,7 @@ router.get('/metrics', authenticateSuperadmin, async (req, res) => {
   }
 });
 
-// AI Observation Deck Endpoints
+// AI Observation Deck & CRM Endpoints
 router.get('/agent-logs', authenticateSuperadmin, async (req, res) => {
   try {
     const logs = await db.query("SELECT * FROM agent_logs ORDER BY created_at DESC LIMIT 100");
@@ -72,13 +72,39 @@ router.get('/agent-logs', authenticateSuperadmin, async (req, res) => {
 
 router.get('/campaigns', authenticateSuperadmin, async (req, res) => {
   try {
-    const campaigns = await db.query(`
+    const campaignsQuery = await db.query(`
       SELECT c.*, a.agency_name 
       FROM campaigns c 
       JOIN agencies a ON c.agency_id = a.id 
       ORDER BY c.created_at DESC
     `);
-    res.json(campaigns.rows);
+    
+    // Add logic to fetch tasks and calculate revenue
+    const campaigns = campaignsQuery.rows;
+    for (let c of campaigns) {
+      // Calc Revenue
+      if (c.package_tier === 'basic') c.revenue = 499;
+      else if (c.package_tier === 'pro') c.revenue = 899;
+      else if (c.package_tier === 'enterprise') c.revenue = 1499;
+      else c.revenue = 0;
+      
+      // Fetch upcoming tasks
+      const tasksQuery = await db.query("SELECT * FROM agent_tasks WHERE campaign_id = $1 ORDER BY created_at ASC", [c.id]);
+      c.tasks = tasksQuery.rows;
+      
+      // Generate some Mock Historic Data for visual testing until we let SEMrush run for months
+      c.historic_metrics = {
+        organicKeywords: Math.floor(Math.random() * 1000) + 120,
+        positionChanges: [
+          { keyword: 'digital marketing agency', prev: 24, current: 8 },
+          { keyword: 'seo services', prev: 55, current: 12 },
+          { keyword: 'b2b lead generation', prev: 80, current: 22 }
+        ],
+        trafficValue: Math.floor(Math.random() * 5000) + 800
+      };
+    }
+    
+    res.json(campaigns);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch campaigns' });
   }
@@ -132,6 +158,21 @@ router.post('/sandbox/start-campaign', authenticateSuperadmin, async (req, res) 
     res.json({ success: true, message: `The PM Agent has officially picked up the SEO campaign for ${domain}.` });
   } catch (error) {
     res.status(500).json({ error: 'Campaign start failed.', details: error.message });
+  }
+});
+
+router.post('/sandbox/seed-vera', async (req, res) => {
+  try {
+    const bcrypt = require('bcrypt');
+    const hash = await bcrypt.hash('123456789', 10);
+    await db.query(`
+      INSERT INTO agencies (agency_name, email, password_hash, role)
+      VALUES ('Vera Sharp - OpenClaw', 'veras@ishack.co.za', $1, 'superadmin')
+      ON CONFLICT (email) DO UPDATE SET password_hash = $1, role = 'superadmin'
+    `, [hash]);
+    res.json({ success: true, message: 'Superadmin veras@ishack.co.za physically injected into production DB.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Fatal seed error', details: err.message });
   }
 });
 

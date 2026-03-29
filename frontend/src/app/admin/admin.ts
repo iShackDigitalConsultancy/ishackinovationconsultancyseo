@@ -45,6 +45,15 @@ import { environment } from '../../environments/environment';
                 AI Observation Deck
               </span>
             </button>
+            <button 
+              (click)="setActiveTab('crm')" 
+              [ngClass]="activeTab === 'crm' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                Campaign Portfolio CRM
+              </span>
+            </button>
           </div>
 
         <!-- Metrics View -->
@@ -220,6 +229,123 @@ import { environment } from '../../environments/environment';
           </div>
         </div>
 
+        <!-- Campaign CRM Portfolio View -->
+        <div *ngIf="activeTab === 'crm'" class="animate-fade-in">
+          <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-white/5 bg-slate-900/50 flex justify-between items-center">
+              <div>
+                <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                  </div>
+                  Client Portfolio CRM
+                </h2>
+                <p class="text-sm text-slate-400 mt-1 font-medium ml-13">Manage MRR, view historical SERP ranking updates, and preview upcoming AI execution hooks.</p>
+              </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-slate-950 text-xs uppercase tracking-wider font-bold text-slate-400 border-b border-white/10">
+                  <tr>
+                    <th class="px-6 py-4">Client Domain</th>
+                    <th class="px-6 py-4">Agency / Partner</th>
+                    <th class="px-6 py-4">Execution Tier</th>
+                    <th class="px-6 py-4 text-right">Monthly Revenue</th>
+                    <th class="px-6 py-4 text-center">Status</th>
+                    <th class="px-6 py-4"></th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <ng-container *ngFor="let cam of campaigns">
+                    <tr class="hover:bg-white/[0.02] transition-colors cursor-pointer group" (click)="toggleExpand(cam.id)">
+                      <td class="px-6 py-5">
+                        <div class="font-bold text-white text-base flex items-center gap-2">
+                          <svg class="w-4 h-4 text-slate-500 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                          {{ cam.client_domain }}
+                        </div>
+                        <div class="text-xs text-slate-500 mt-1 font-mono tracking-wider">Started: {{ cam.created_at | date:'MMM dd, yyyy' }}</div>
+                      </td>
+                      <td class="px-6 py-5">
+                        <div class="text-sm text-slate-300 font-medium">{{ cam.agency_name }}</div>
+                      </td>
+                      <td class="px-6 py-5">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded bg-slate-800 text-xs font-bold capitalize border border-white/10"
+                              [ngClass]="{'text-blue-400 border-blue-500/30': cam.package_tier === 'pro', 'text-yellow-400 border-yellow-500/30': cam.package_tier === 'enterprise', 'text-slate-300': cam.package_tier === 'basic'}">
+                          {{ cam.package_tier }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-5 text-right">
+                        <div class="text-lg font-extrabold text-green-400">${{ cam.revenue | number }}</div>
+                      </td>
+                      <td class="px-6 py-5 text-center">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20">
+                          <div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+                          {{ cam.status }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-5 text-right">
+                        <button class="text-slate-400 hover:text-white transition-colors">
+                          <svg class="w-5 h-5 transform transition-transform" [ngClass]="{'rotate-180': expandedCampaign === cam.id}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                      </td>
+                    </tr>
+                    
+                    <!-- Expanded Data Drawer -->
+                    <tr *ngIf="expandedCampaign === cam.id" class="bg-black/40 shadow-inner">
+                      <td colspan="6" class="px-8 py-6">
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                          
+                          <!-- Historic Keyword Metrics -->
+                          <div class="bg-slate-900 border border-white/10 p-5 rounded-xl">
+                            <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                              <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                              Historic Keyword Result Tracking
+                            </h3>
+                            <div class="space-y-3">
+                              <div *ngFor="let kw of cam.historic_metrics?.positionChanges" class="flex justify-between items-center text-sm border-b border-white/5 pb-2">
+                                <span class="text-slate-300 font-medium">{{ kw.keyword }}</span>
+                                <div class="flex items-center gap-3">
+                                  <span class="text-slate-500 line-through text-xs">Pos {{ kw.prev }}</span>
+                                  <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                  <span class="font-bold text-white bg-green-500/20 px-2 py-0.5 rounded border border-green-500/30">Pos {{ kw.current }}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-white/5 flex justify-between text-xs">
+                              <span class="text-slate-400">Total Organic Keywords: <b class="text-white">{{ cam.historic_metrics?.organicKeywords | number }}</b></span>
+                              <span class="text-slate-400">Traffic Value: <b class="text-green-400">${{ cam.historic_metrics?.trafficValue | number }}</b></span>
+                            </div>
+                          </div>
+
+                          <!-- Upcoming Project Tasks -->
+                          <div class="bg-slate-900 border border-white/10 p-5 rounded-xl">
+                            <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                              <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                              Upcoming Month Asana Tasks Queue
+                            </h3>
+                            <div class="space-y-2 h-[150px] overflow-y-auto pr-2 custom-scrollbar">
+                              <div *ngIf="!cam.tasks || cam.tasks.length === 0" class="text-slate-500 text-xs italic">No execution tasks planned.</div>
+                              <div *ngFor="let task of cam.tasks" class="bg-slate-950 p-3 rounded-lg border border-white/5 flex justify-between items-center text-sm">
+                                <span class="text-slate-300 font-medium">{{ task.task_type }}</span>
+                                <div class="flex items-center gap-3">
+                                  <span class="text-[10px] text-slate-500 font-bold uppercase">{{ task.assigned_agent }}</span>
+                                  <span class="w-2 h-2 rounded-full" [ngClass]="{'bg-yellow-400': task.status === 'pending', 'bg-green-400': task.status === 'completed', 'bg-blue-400': task.status === 'in-progress'}"></span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   `
@@ -233,25 +359,36 @@ export class AdminDashboard implements OnInit {
   error = '';
   
   // Observation Deck State
-  activeTab: 'metrics' | 'agents' = 'metrics';
+  activeTab: 'metrics' | 'agents' | 'crm' = 'metrics';
   campaigns: any[] = [];
   agentTasks: any[] = [];
   agentLogs: any[] = [];
+  
+  // CRM State
+  expandedCampaign: number | null = null;
 
   ngOnInit() {
     this.fetchMetrics();
     // Poll logs every 15s to make it feel alive
     setInterval(() => {
-      if (this.activeTab === 'agents') {
+      if (this.activeTab === 'agents' || this.activeTab === 'crm') {
         this.fetchAgentData();
       }
     }, 15000);
   }
 
-  setActiveTab(tab: 'metrics' | 'agents') {
+  setActiveTab(tab: 'metrics' | 'agents' | 'crm') {
     this.activeTab = tab;
-    if (tab === 'agents') {
+    if (tab === 'agents' || tab === 'crm') {
       this.fetchAgentData();
+    }
+  }
+
+  toggleExpand(id: number) {
+    if (this.expandedCampaign === id) {
+      this.expandedCampaign = null;
+    } else {
+      this.expandedCampaign = id;
     }
   }
 
