@@ -1,0 +1,17 @@
+{
+  "updated_at": "2026-03-29T00:00:00.000Z",
+  "perplexity_optimization_tactics": [
+    "Prioritize extreme factual accuracy with verifiable citations.",
+    "Structure content using highly scannable Markdown formats (Headers, Bullet points).",
+    "Focus on answering direct 'Zero-Click' search intents in the first 100 words."
+  ],
+  "google_sge_parameters": [
+    "Optimize for conversational long-tail conversational phrasing (e.g. 'How does X compare to Y').",
+    "Ensure robust Organization JSON-LD Schema to build entity authority.",
+    "Increase information gain by providing unique expert perspectives not found elsewhere."
+  ],
+  "semantic_keyword_density_targets": {
+    "primary_term_density": "0.5% - 1%",
+    "lsi_term_distribution": "High. Scatter logically related entities naturally throughout the text."
+  }
+}

@@ -1,4 +1,6 @@
 const BaseAgent = require('./baseAgent');
+const fs = require('fs');
+const path = require('path');
 
 class ResearchAgent extends BaseAgent {
   constructor() {
@@ -9,10 +11,28 @@ class ResearchAgent extends BaseAgent {
   }
 
   async executeTask(taskId, campaignId, payload) {
-    await this.logThought(campaignId, 'Reviewing primary campaign domain and assigning high-intent keyword clusters.', 'Pinging SEMrush equivalent databases...');
+    // 1. Read Global AEO Algorithm Rules 
+    const aeoRulesPath = path.join(__dirname, 'knowledge', 'aeo_rules.json');
+    let aeoContext = "No AEO rules currently loaded.";
+    try {
+      if (fs.existsSync(aeoRulesPath)) {
+        aeoContext = fs.readFileSync(aeoRulesPath, 'utf-8');
+      }
+    } catch(e) { }
+
+    await this.logThought(campaignId, 'Reviewing primary campaign domain and applying Global AEO (Search Generative Experience) parameters.', 'Pinging SEMrush databases...');
     
     // In production, this would ping DataForSEO/SEMrush APIs
-    const prompt = `Analyze this target client domain and provide 3 high-priority keywords with intent mappings. Return ONLY JSON array of top keywords.`;
+    const prompt = `
+      Analyze this target client domain and provide 3 high-priority keywords with intent mappings. 
+      CRITICAL REQUIREMENT: You must structurally adopt the following active AEO (AI Engine Optimization) rules to ensure rankability on Perplexity and Google SGE:
+      
+      === GLOBAL AEO PARAMETERS ===
+      ${aeoContext}
+      =============================
+      
+      Return ONLY a JSON array of top keywords.
+    `;
     
     const result = await this.think(prompt, payload);
     

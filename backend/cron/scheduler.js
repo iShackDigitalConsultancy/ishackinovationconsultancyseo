@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const pmAgent = require('../agents/pmAgent');
 const veraAgent = require('../agents/veraAgent');
+const autoSeoAgent = require('../agents/autoSeoAgent');
 
 let isPmTickRunning = false;
 
@@ -31,6 +32,16 @@ function initSchedulers() {
       await veraAgent.runDailyReport();
     } catch (e) {
       console.error("VeraAgent Failed on Schedule", e);
+    }
+  });
+
+  // Auto SEO Agent runs weekly on Sunday at Midnight Server Time
+  cron.schedule('0 0 * * 0', async () => {
+    try {
+      console.log("⏰ Task Fired: autoSeoAgent.runWeeklyResearch()");
+      await autoSeoAgent.runWeeklyResearch();
+    } catch (e) {
+      console.error("AutoSeoAgent Failed on Schedule", e);
     }
   });
 
