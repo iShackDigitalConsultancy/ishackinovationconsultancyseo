@@ -238,7 +238,13 @@ import { environment } from '../../environments/environment';
                 </div>
               </div>
               <div class="p-5 space-y-4">
-                <div *ngIf="campaigns.length === 0" class="text-slate-500 text-sm italic">No active campaigns running.</div>
+                <div *ngIf="campaigns.length === 0" class="text-center p-6 bg-slate-900 border border-dashed border-white/20 rounded-xl my-2">
+                  <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  </div>
+                  <h3 class="text-white font-bold mb-1 text-sm">No Active Campaigns</h3>
+                  <p class="text-slate-400 text-xs">To activate this War Room, you must deploy a Target Domain in the <span class="text-blue-400 font-bold">'Client Portfolio CRM'</span> tab.</p>
+                </div>
                 <div *ngFor="let cam of campaigns" class="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-blue-500/30 transition-colors">
                   <div class="flex justify-between">
                     <div class="font-bold text-white">{{ cam.client_domain }}</div>
@@ -257,7 +263,10 @@ import { environment } from '../../environments/environment';
                 </h2>
               </div>
               <div class="p-5 space-y-3 h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                <div *ngIf="agentTasks.length === 0" class="text-slate-500 text-sm italic">Task queue is empty.</div>
+                <div *ngIf="agentTasks.length === 0" class="text-center p-6 bg-slate-950 border border-dashed border-white/10 rounded-xl mt-2">
+                  <svg class="w-8 h-8 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                  <p class="text-slate-400 text-xs leading-relaxed">Once a campaign is deployed, the <strong>PM Agent</strong> will automatically populate this queue with continuous algorithmic SEO tasks.</p>
+                </div>
                 <div *ngFor="let task of agentTasks" class="bg-slate-950 rounded-xl p-3 border border-white/5">
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-bold px-2 py-1 rounded bg-slate-800 text-slate-300 border border-white/10">{{ task.assigned_agent }}</span>
@@ -285,7 +294,34 @@ import { environment } from '../../environments/environment';
 
               <!-- Live Memory Stream -->
               <div class="p-6 font-mono text-sm overflow-y-auto flex-1 space-y-5 custom-scrollbar bg-gradient-to-b from-[#0D1117] to-[#0A0D12]">
-                <div *ngIf="agentLogs.length === 0" class="text-slate-500 italic">Waiting for agent network to initialize...</div>
+                
+                <!-- Blank State Tutorial -->
+                <div *ngIf="agentLogs.length === 0" class="flex flex-col items-center justify-center h-full text-center p-8 animate-fade-in font-sans">
+                  <div class="w-16 h-16 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center mb-6 shadow-2xl">
+                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                  </div>
+                  <h3 class="text-xl font-bold text-slate-200 mb-3 tracking-wide">Observation Deck is Blank</h3>
+                  <p class="text-slate-400 text-sm max-w-md mx-auto mb-8 leading-relaxed">You are currently looking at the raw neural stream of your AI SEO Agency. To make this terminal come alive, you need to push a target URL into the autonomous network.</p>
+                  
+                  <div class="bg-[#161B22] border border-white/10 p-5 rounded-2xl text-left text-sm text-slate-400 space-y-4 w-full max-w-md shadow-xl">
+                    <div class="flex items-start gap-3">
+                      <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 border border-blue-500/20">1</div>
+                      <p>Navigate to the <strong class="text-white">Client Portfolio CRM</strong> tab.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 border border-blue-500/20">2</div>
+                      <p>Select a Client Agency from the dropdown and type in their <strong class="text-white">Target Domain URL</strong>.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <div class="w-6 h-6 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 border border-blue-500/20">3</div>
+                      <p>Click <strong class="text-primary">Deploy AI Campaign</strong> to ingest the URL.</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                      <div class="w-6 h-6 rounded bg-green-500/10 text-green-400 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 border border-green-500/20">4</div>
+                      <p>Return to this Deck to watch the <strong class="text-white">Agents begin crawling, researching, and executing their objectives live.</strong></p>
+                    </div>
+                  </div>
+                </div>
                 
                 <div *ngFor="let log of agentLogs" class="animate-fade-in group">
                   <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
@@ -366,6 +402,46 @@ import { environment } from '../../environments/environment';
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
+                  <tr *ngIf="campaigns.length === 0">
+                    <td colspan="6" class="px-6 py-16">
+                      <div class="max-w-3xl mx-auto text-center">
+                        <div class="w-20 h-20 rounded-full bg-slate-900 border-2 border-slate-800 shadow-2xl flex items-center justify-center mx-auto mb-6">
+                          <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-white mb-3">Portfolio is Blank</h3>
+                        <p class="text-slate-400 text-base mb-10 max-w-xl mx-auto">This is your Master CRM. Any autonomous AI Campaigns your clients pay for (or that you manually trigger above) will permanently exist here for global monitoring. <strong class="text-white">Let's trigger your first one:</strong></p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                          <div class="bg-slate-900 border border-white/5 p-5 rounded-2xl shadow-lg relative group overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-blue-500/50"></div>
+                            <div class="flex items-center gap-3 mb-3">
+                              <div class="w-8 h-8 rounded bg-slate-800 text-slate-300 font-bold flex items-center justify-center font-mono">1</div>
+                              <h4 class="text-white font-bold text-sm">Select Target</h4>
+                            </div>
+                            <p class="text-slate-400 text-xs leading-relaxed">Use the deployment bar above. Type in a URL like <strong class="text-slate-200">ishackinnovationconsultancy.com</strong>.</p>
+                          </div>
+                          
+                          <div class="bg-slate-900 border border-white/5 p-5 rounded-2xl shadow-lg relative group overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-purple-500/50"></div>
+                            <div class="flex items-center gap-3 mb-3">
+                              <div class="w-8 h-8 rounded bg-slate-800 text-slate-300 font-bold flex items-center justify-center font-mono">2</div>
+                              <h4 class="text-white font-bold text-sm">Bind Umbrella</h4>
+                            </div>
+                            <p class="text-slate-400 text-xs leading-relaxed">Map the URL to a specific Agency Client from your <strong class="text-slate-200">'Agencies'</strong> dropdown so billing routes correctly.</p>
+                          </div>
+                          
+                          <div class="bg-slate-900 border border-white/5 p-5 rounded-2xl shadow-lg relative group overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+                            <div class="flex items-center gap-3 mb-3">
+                              <div class="w-8 h-8 rounded bg-slate-800 text-slate-300 font-bold flex items-center justify-center font-mono">3</div>
+                              <h4 class="text-white font-bold text-sm">Deploy Engine</h4>
+                            </div>
+                            <p class="text-slate-400 text-xs leading-relaxed">Click Deploy. The system will ingest the domain and instantly strike the autonomous agent workforce natively.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
                   <ng-container *ngFor="let cam of campaigns">
                     <tr class="hover:bg-white/[0.02] transition-colors cursor-pointer group" (click)="toggleExpand(cam.id)">
                       <td class="px-6 py-5">
