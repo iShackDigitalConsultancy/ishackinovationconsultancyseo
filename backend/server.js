@@ -64,7 +64,8 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       hasOpenGraph = $('meta[property^="og:"]').length > 0;
       
       const pageText = $('body').text().replace(/\s+/g, ' ').trim();
-      wordCount = pageText.split(' ').length;
+      wordCount = pageText ? pageText.split(' ').length : 0;
+
       
       if (!title || title.length < 10) { issues.push('Title tag is missing or too short.'); score -= 15; }
       if (!metaDesc || metaDesc.length < 50) { issues.push('Meta description is missing or too short.'); score -= 20; }
@@ -80,7 +81,15 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       });
       
       if (loadSpeedMs > 2000) { issues.push(`Poor server response time (${loadSpeedMs}ms). Goal is < 800ms.`); score -= 10; }
-      if (wordCount < 400) { issues.push(`Thin Content detected (${wordCount} words). Minimum viable lengths range from 1,200+ words.`); score -= 10; }
+      
+      const isSPA = wordCount < 50 && $('script[src]').length > 0;
+      if (isSPA) {
+        issues.push(`This website appears to be a Client-Side Rendered app (e.g. Angular/React). Without Server-Side Rendering (SSR), search engines will struggle to index your content, which explains the 0 content depth.`);
+        score -= 25;
+      } else if (wordCount < 400) { 
+        issues.push(`Thin Content detected (${wordCount} words). Minimum viable lengths range from 1,200+ words.`); 
+        score -= 10; 
+      }
     } catch (scrapeErr) {
       issues.push(`Failed to analyze HTML structure: ${scrapeErr.message}`);
       score -= 30;
@@ -172,7 +181,7 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         domain,
         score,
         issuesFound: issues.length,
-        criticalErrors: issues.length > 2 ? 2 : issues.length,
+        criticalErrors: issues.length,
         suggestions: issues.length > 0 ? issues : ['Your website is well optimized!'],
         metrics: semrushData,
         technicalValuation: {
