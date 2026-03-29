@@ -33,7 +33,8 @@ const authenticateToken = async (req, res, next) => {
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const sitesResult = await db.query('SELECT * FROM client_sites WHERE agency_id = $1 ORDER BY created_at DESC', [req.user.agencyId]);
-    res.json(sitesResult.rows);
+    const campaignsResult = await db.query('SELECT * FROM campaigns WHERE agency_id = $1 ORDER BY created_at DESC', [req.user.agencyId]);
+    res.json({ sites: sitesResult.rows, campaigns: campaignsResult.rows });
   } catch (error) {
     console.error('Fetch sites error:', error);
     res.status(500).json({ error: 'Failed to fetch sites' });

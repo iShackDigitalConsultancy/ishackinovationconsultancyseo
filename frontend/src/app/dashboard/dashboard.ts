@@ -59,7 +59,7 @@ import { environment } from '../../environments/environment';
                     </div>
                     <div class="ml-5 w-0 flex-1">
                       <dl>
-                        <dt class="text-sm font-medium text-slate-500 truncate">Active Sites</dt>
+                        <dt class="text-sm font-medium text-slate-500 truncate">Total Active Domains</dt>
                         <dd class="flex items-baseline">
                           <div class="text-2xl font-bold text-slate-900">{{ sites.length }}</div>
                         </dd>
@@ -68,14 +68,50 @@ import { environment } from '../../environments/environment';
                   </div>
                 </div>
               </div>
+
+              <div class="bg-white overflow-hidden shadow-sm border border-slate-200 rounded-2xl">
+                <div class="p-5">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
+                      <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                      <dl>
+                        <dt class="text-sm font-medium text-slate-500 truncate">SaaS Orchestrations</dt>
+                        <dd class="flex items-baseline">
+                          <div class="text-2xl font-bold text-slate-900">{{ campaigns.length }} Active</div>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Add Site Form -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-8 flex gap-4">
-              <input type="url" [(ngModel)]="newSiteUrl" placeholder="https://client-website.com" class="flex-1 px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-slate-50 transition-all">
-              <button (click)="addSite()" [disabled]="!newSiteUrl" class="bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md truncate">
-                + Add Client Site
-              </button>
+            <!-- Deploy Checkout System -->
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm mb-8">
+              <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+                <h3 class="text-lg font-bold text-slate-900">Deploy Target Campaign</h3>
+                <p class="text-sm text-slate-500">Inject a domain and securely checkout via Paystack to activate our autonomous agents.</p>
+              </div>
+              <div class="p-6 flex flex-col md:flex-row gap-4 items-center bg-white">
+                <div class="w-full flex-1">
+                  <input type="url" [(ngModel)]="checkoutUrl" placeholder="https://client-website.com" class="w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-slate-50 transition-all font-mono">
+                </div>
+                <select [(ngModel)]="checkoutTier" class="w-full md:w-56 px-4 py-3 border border-slate-300 rounded-xl shadow-sm text-slate-700 font-medium focus:outline-none focus:ring-primary sm:text-sm bg-slate-50 transition-all">
+                  <option value="basic">Growth Start ($499)</option>
+                  <option value="pro">Domination Pro ($899)</option>
+                  <option value="enterprise">Enterprise Elite ($1499)</option>
+                </select>
+                <input type="text" [(ngModel)]="promoCode" placeholder="Promo Code (Optional)" class="w-full md:w-48 px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-slate-50 transition-all uppercase">
+                <button (click)="deployCampaign()" [disabled]="!checkoutUrl || isProcessing" class="w-full md:w-auto bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md truncate flex items-center justify-center gap-2">
+                  <span *ngIf="isProcessing">
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  </span>
+                  <span *ngIf="!isProcessing && !promoCode">Paystack Checkout &rarr;</span>
+                  <span *ngIf="!isProcessing && promoCode" class="text-pink-400">Redeem VIP Bypass</span>
+                </button>
+              </div>
             </div>
 
             <!-- Empty State -->
@@ -85,15 +121,36 @@ import { environment } from '../../environments/environment';
               <p class="mt-2 text-sm text-slate-500 max-w-sm mx-auto">Get started by connecting your first client website so our AI can begin the continuous SEO audit process.</p>
             </div>
 
-            <!-- List State -->
-            <div *ngIf="sites.length > 0" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <!-- Combined Matrix State -->
+            <div *ngIf="sites.length > 0 || campaigns.length > 0" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mb-12">
+              <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-slate-800">Targeted Tracking Matrix</h3>
+              </div>
               <ul class="divide-y divide-slate-200">
-                <li *ngFor="let site of sites" class="p-6 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                <!-- Campaigns Loop -->
+                <li *ngFor="let cam of campaigns" class="p-6 hover:bg-slate-50 transition-colors flex items-center justify-between">
                    <div>
-                     <p class="font-bold text-slate-900 text-lg">{{ site.url }}</p>
-                     <p class="text-sm text-slate-500 mt-1">Status: <span class="capitalize font-semibold" [ngClass]="{'text-orange-500': site.status === 'pending', 'text-green-600': site.status === 'completed'}">{{ site.status }}</span></p>
+                     <p class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                       <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                       {{ cam.client_domain }}
+                     </p>
+                     <p class="text-xs font-mono text-slate-500 mt-1">Tier: <span class="text-blue-600 font-bold uppercase">{{ cam.package_tier }}</span> | Orchestration: <span class="text-green-600 font-bold uppercase">{{ cam.status }}</span></p>
                    </div>
-                   <button class="bg-blue-50 text-primary border border-blue-200 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-blue-100 transition-colors text-sm">
+                   <button class="bg-slate-900 text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-slate-800 transition-colors text-sm border border-slate-700" [routerLink]="['/agent', cam.client_domain]">
+                     Live AI Observation
+                   </button>
+                </li>
+                
+                <!-- Sub-Sites OpenClaw loop -->
+                <li *ngFor="let site of sites" class="p-6 hover:bg-slate-50 transition-colors flex items-center justify-between bg-slate-50/30">
+                   <div>
+                     <p class="font-bold text-slate-700 text-base flex items-center gap-2">
+                       <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                       {{ site.url }}
+                     </p>
+                     <p class="text-xs font-medium text-slate-400 mt-1">Free Tier SEO Scan | Status: <span class="capitalize" [ngClass]="{'text-orange-500 font-bold': site.status === 'pending', 'text-green-500 font-bold': site.status === 'completed'}">{{ site.status }}</span></p>
+                   </div>
+                   <button class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-emerald-100 transition-colors text-sm">
                      View SEO Report
                    </button>
                 </li>
@@ -111,7 +168,13 @@ export class Dashboard implements OnInit {
   private router = inject(Router);
 
   sites: any[] = [];
-  newSiteUrl = '';
+  campaigns: any[] = [];
+  
+  checkoutUrl = '';
+  checkoutTier = 'pro';
+  promoCode = '';
+  isProcessing = false;
+  
   error = '';
 
   ngOnInit() {
@@ -127,8 +190,11 @@ export class Dashboard implements OnInit {
   }
 
   fetchSites() {
-    this.http.get<any[]>(`${environment.apiUrl}/sites`, { headers: this.getHeaders() }).subscribe({
-      next: (data) => this.sites = data,
+    this.http.get<any>(`${environment.apiUrl}/sites`, { headers: this.getHeaders() }).subscribe({
+      next: (data) => {
+        this.sites = data.sites || [];
+        this.campaigns = data.campaigns || [];
+      },
       error: (err) => {
         if (err.status === 401 || err.status === 403) {
           this.router.navigate(['/login']);
@@ -137,19 +203,49 @@ export class Dashboard implements OnInit {
     });
   }
 
-  addSite() {
-    if(!this.newSiteUrl) return;
+  deployCampaign() {
+    if (!this.checkoutUrl) return;
     this.error = '';
+    this.isProcessing = true;
 
-    this.http.post<any>(`${environment.apiUrl}/sites`, { url: this.newSiteUrl }, { headers: this.getHeaders() }).subscribe({
-      next: (res) => {
-        this.sites.unshift(res.site);
-        this.newSiteUrl = '';
-      },
-      error: (err) => {
-        this.error = err.error?.error || 'Failed to add site.';
-      }
-    });
+    if (this.promoCode && this.promoCode.trim().length > 0) {
+      // Promo Override Engine
+      this.http.post<any>(`${environment.apiUrl}/payments/promo-redeem`, { 
+        domain: this.checkoutUrl, 
+        tier: this.checkoutTier, 
+        promoCode: this.promoCode 
+      }, { headers: this.getHeaders() }).subscribe({
+        next: (res) => {
+          this.isProcessing = false;
+          alert('Promo Redeemed! VIP Target URL Deployed.');
+          this.checkoutUrl = '';
+          this.promoCode = '';
+          this.fetchSites(); // Reload matrices
+        },
+        error: (err) => {
+          this.isProcessing = false;
+          this.error = err.error?.error || 'Invalid Promo Code.';
+        }
+      });
+    } else {
+      // Native Paystack Checkout Matrix
+      this.http.post<any>(`${environment.apiUrl}/payments/initialize`, { 
+        domain: this.checkoutUrl, 
+        tier: this.checkoutTier 
+      }, { headers: this.getHeaders() }).subscribe({
+        next: (res) => {
+          this.isProcessing = false;
+          // HTTP Redirect Window strictly to the Paystack Payment Gateway Tunnel
+          if (res.authorization_url && typeof window !== 'undefined') {
+             window.location.href = res.authorization_url;
+          }
+        },
+        error: (err) => {
+          this.isProcessing = false;
+          this.error = err.error?.error || 'Paystack Gateway Error.';
+        }
+      });
+    }
   }
 
   logout() {

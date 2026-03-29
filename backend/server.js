@@ -28,6 +28,10 @@ app.use('/api/sites', sitesRouter);
 const adminRouter = require('./admin');
 app.use('/api/admin', adminRouter);
 
+// Payment Gateways & Promos
+const paymentsRouter = require('./payments');
+app.use('/api/payments', paymentsRouter);
+
 // Real SEMRush & HTML Audit Integration
 app.post('/api/openclaw/trigger', async (req, res) => {
   const { eventType, payload } = req.body;
