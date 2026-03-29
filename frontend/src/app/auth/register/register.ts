@@ -93,33 +93,64 @@ import { environment } from '../../../environments/environment';
               </div>
             </div>
 
-            <div>
-              <label for="agencyName" class="block text-sm font-medium text-slate-700"> 
-                {{ planType === 'agency' ? 'Agency Name' : 'Business Name' }} 
-              </label>
-              <div class="mt-1">
-                <input id="agencyName" name="agencyName" type="text" required [(ngModel)]="agencyName" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white/70 transition-all disabled:opacity-50">
+            <!-- Entity Details -->
+            <div class="space-y-4 mb-6 p-5 bg-white border border-slate-200 rounded-xl shadow-sm">
+              <h3 class="text-xs font-extrabold text-slate-400 border-b border-slate-100 pb-2 uppercase tracking-wider">
+                Organization Details
+              </h3>
+              
+              <div>
+                <label for="agencyName" class="block text-sm font-medium text-slate-700"> 
+                  {{ planType === 'agency' ? 'Agency Name' : 'Business Name' }} 
+                </label>
+                <div class="mt-1">
+                  <input id="agencyName" name="agencyName" type="text" required [(ngModel)]="agencyName" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-slate-50 transition-all disabled:opacity-50">
+                </div>
+              </div>
+
+              <div>
+                <label for="contactPerson" class="block text-sm font-medium text-slate-700"> Primary Contact Person </label>
+                <div class="mt-1">
+                  <input id="contactPerson" name="contactPerson" type="text" required [(ngModel)]="contactPerson" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-slate-50 transition-all disabled:opacity-50" placeholder="e.g. John Doe">
+                </div>
+              </div>
+
+              <div>
+                <label for="address" class="block text-sm font-medium text-slate-700"> Physical Address </label>
+                <div class="mt-1">
+                  <input id="address" name="address" type="text" required [(ngModel)]="address" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-slate-50 transition-all disabled:opacity-50" placeholder="123 Startup Ave, NY">
+                </div>
               </div>
             </div>
 
-            <div>
-              <label for="email" class="block text-sm font-medium text-slate-700"> Email address </label>
-              <div class="mt-1">
-                <input id="email" name="email" type="email" autocomplete="email" required [(ngModel)]="email" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white/70 transition-all disabled:opacity-50">
+            <!-- Account Access -->
+            <div class="space-y-4 mb-6 p-5 bg-white border border-slate-200 rounded-xl shadow-sm">
+              <h3 class="text-xs font-extrabold text-slate-400 border-b border-slate-100 pb-2 uppercase tracking-wider">
+                Account Credentials
+              </h3>
+              
+              <div>
+                <label for="email" class="block text-sm font-medium text-slate-700"> Email address </label>
+                <div class="mt-1">
+                  <input id="email" name="email" type="email" autocomplete="email" required [(ngModel)]="email" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-slate-50 transition-all disabled:opacity-50">
+                </div>
+              </div>
+
+              <div>
+                <label for="password" class="block text-sm font-medium text-slate-700"> Password </label>
+                <div class="mt-1">
+                  <input id="password" name="password" type="password" autocomplete="new-password" required [(ngModel)]="password" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-slate-50 transition-all disabled:opacity-50">
+                </div>
               </div>
             </div>
 
-            <div>
-              <label for="password" class="block text-sm font-medium text-slate-700"> Password </label>
-              <div class="mt-1">
-                <input id="password" name="password" type="password" autocomplete="new-password" required [(ngModel)]="password" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white/70 transition-all disabled:opacity-50">
-              </div>
-            </div>
-
-            <div>
-              <label for="promoCode" class="block text-sm font-medium text-slate-700"> Promo Code (Optional) </label>
-              <div class="mt-1">
-                <input id="promoCode" name="promoCode" type="text" [(ngModel)]="promoCode" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white/70 transition-all disabled:opacity-50" placeholder="e.g. EARLYBIRD">
+            <!-- Billing -->
+            <div class="space-y-4 mb-6">
+              <div>
+                <label for="promoCode" class="block text-sm font-medium text-slate-700"> Promo Code (Optional) </label>
+                <div class="mt-1">
+                  <input id="promoCode" name="promoCode" type="text" [(ngModel)]="promoCode" [disabled]="loading" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white/70 transition-all disabled:opacity-50" placeholder="e.g. EARLYBIRD">
+                </div>
               </div>
             </div>
 
@@ -147,6 +178,8 @@ export class Register {
   brandColor = '#007bff';
   brandLogoUrl = '';
   agencyName = '';
+  contactPerson = '';
+  address = '';
   email = '';
   password = '';
   promoCode = '';
@@ -156,8 +189,8 @@ export class Register {
   onSubmit() {
     this.error = '';
     
-    if(!this.agencyName || !this.email || !this.password) {
-      this.error = 'Please fill out all fields.';
+    if (!this.agencyName || !this.email || !this.password || !this.contactPerson || !this.address) {
+      this.error = 'Please fill out all required fields.';
       return;
     }
 
@@ -168,6 +201,8 @@ export class Register {
       brandColor: this.brandColor,
       brandLogoUrl: this.brandLogoUrl,
       agencyName: this.agencyName,
+      contactPerson: this.contactPerson,
+      address: this.address,
       email: this.email,
       password: this.password,
       promoCode: this.promoCode

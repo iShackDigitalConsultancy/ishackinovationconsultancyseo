@@ -33,6 +33,8 @@ app.post('/api/openclaw/trigger', async (req, res) => {
   const { eventType, payload } = req.body;
   const targetUrl = payload?.website;
   const competitorUrl = payload?.competitor;
+  const region = payload?.region || 'us';
+  const targetKeyword = payload?.targetKeyword || '';
   
   if (!targetUrl) {
     return res.status(400).json({ success: false, error: 'No website provided' });
@@ -119,6 +121,28 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         issues.push(`Thin Content detected (${wordCount} words). Minimum viable lengths range from 1,200+ words.`); 
         score -= 10; 
       }
+      // 1B. Target Keyword Optimization Analysis
+      let keywordOpt = { provided: false, inTitle: false, inH1: false, inMeta: false, inBody: false };
+      
+      if (targetKeyword) {
+        keywordOpt.provided = true;
+        const kw = targetKeyword.toLowerCase().trim();
+        
+        keywordOpt.inTitle = title.toLowerCase().includes(kw);
+        keywordOpt.inMeta = metaDesc ? metaDesc.toLowerCase().includes(kw) : false;
+        
+        $('h1').each((i, el) => {
+          if ($(el).text().toLowerCase().includes(kw)) keywordOpt.inH1 = true;
+        });
+        
+        keywordOpt.inBody = pageText.toLowerCase().includes(kw);
+
+        if (!keywordOpt.inTitle) { issues.push(`Your Target Keyword ("${targetKeyword}") is missing from the Title Tag! This is a severe ranking signal leak.`); score -= 15; }
+        if (!keywordOpt.inH1) { issues.push(`Target Keyword ("${targetKeyword}") is missing from your primary H1 heading.`); score -= 10; }
+        if (!keywordOpt.inMeta) { issues.push(`Consider adding your Target Keyword to the Meta Description for better Click-Through-Rate (CTR).`); }
+        if (!keywordOpt.inBody) { issues.push(`Your Target Keyword does not appear naturally in the body content!`); score -= 20; }
+      }
+
     } catch (scrapeErr) {
       issues.push(`Failed to analyze HTML structure: ${scrapeErr.message}`);
       score -= 30;
@@ -192,7 +216,7 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     const semrushKey = process.env.SEMRUSH_API_KEY || '77a0242d2998078e52b1a2d4ec514613';
     
     try {
-      const srUrl = `https://api.semrush.com/?type=domain_ranks&key=${semrushKey}&export_columns=Dn,Rk,Or,Ot,Oc,Ad,At,Ac&domain=${domain}&database=us`;
+      const srUrl = `https://api.semrush.com/?type=domain_ranks&key=${semrushKey}&export_columns=Dn,Rk,Or,Ot,Oc,Ad,At,Ac&domain=${domain}&database=${region}`;
       const srRes = await fetch(srUrl);
       const csvData = await srRes.text();
       
@@ -210,7 +234,7 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         }
       }
 
-      const kwUrl = `https://api.semrush.com/?type=domain_organic&key=${semrushKey}&display_limit=5&export_columns=Ph,Po,Nq,Cp&domain=${domain}&database=us`;
+      const kwUrl = `https://api.semrush.com/?type=domain_organic&key=${semrushKey}&display_limit=5&export_columns=Ph,Po,Nq,Cp&domain=${domain}&database=${region}`;
       const kwRes = await fetch(kwUrl);
       const kwCsv = await kwRes.text();
 
@@ -237,7 +261,7 @@ app.post('/api/openclaw/trigger', async (req, res) => {
           
           semrushData.competitorData = { domain: compDomain, keywords: [] };
           
-          const compApiUrl = `https://api.semrush.com/?type=domain_organic&key=${semrushKey}&display_limit=10&export_columns=Ph,Po,Nq,Cp,Kd&domain=${compDomain}&database=us`;
+          const compApiUrl = `https://api.semrush.com/?type=domain_organic&key=${semrushKey}&display_limit=10&export_columns=Ph,Po,Nq,Cp,Kd&domain=${compDomain}&database=${region}`;
           const compRes = await fetch(compApiUrl);
           const compCsv = await compRes.text();
           
@@ -310,6 +334,7 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         suggestions: issues.length > 0 ? issues : ['Your website is well optimized!'],
         metrics: semrushData,
         schemaAudit,
+        keywordOptimization: keywordOpt,
         technicalValuation: {
           loadSpeedMs,
           wordCount,

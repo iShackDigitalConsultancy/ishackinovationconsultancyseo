@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_for_dev';
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY || '';
 
 router.post('/register', async (req, res) => {
-  const { agencyName, email, password, planType, brandColor, brandLogoUrl, promoCode } = req.body;
+  const { agencyName, email, password, planType, brandColor, brandLogoUrl, promoCode, address, contactPerson } = req.body;
 
   if (!agencyName || !email || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
@@ -32,13 +32,14 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     const safeBrandColor = brandColor || '#007bff';
-    const safeBrandLogoUrl = brandLogoUrl || '';
+    const finalColor = brandColor || '#007bff';
 
-    const insertResult = await db.query(
-      'INSERT INTO agencies (agency_name, email, password_hash, brand_color, brand_logo_url) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [agencyName, email, passwordHash, safeBrandColor, safeBrandLogoUrl]
+    const result = await db.query(
+      'INSERT INTO agencies (agency_name, email, password_hash, role, brand_color, brand_logo_url, address, contact_person) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+      [agencyName, email, passwordHash, selectedPlan, finalColor, brandLogoUrl || '', address || '', contactPerson || '']
     );
-    const agencyId = insertResult.rows[0].id;
+
+    const agencyId = result.rows[0].id;
 
     const token = jwt.sign({ agencyId, email }, JWT_SECRET, { expiresIn: '7d' });
 

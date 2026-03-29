@@ -45,6 +45,14 @@ const initSchema = async () => {
       await client.query("ALTER TABLE agencies ADD COLUMN brand_logo_url TEXT");
     } catch(e) {}
 
+    try {
+      await client.query("ALTER TABLE agencies ADD COLUMN address VARCHAR(255)");
+    } catch(e) {}
+    
+    try {
+      await client.query("ALTER TABLE agencies ADD COLUMN contact_person VARCHAR(255)");
+    } catch(e) {}
+
     console.log('PostgreSQL Database schema initialized');
   } catch(err) {
     console.error('Error creating PostgreSQL tables:', err);

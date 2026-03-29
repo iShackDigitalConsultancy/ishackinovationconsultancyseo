@@ -51,6 +51,8 @@ export class Home {
   websiteUrl = signal('');
   competitorUrl = signal('');
   email = signal('');
+  region = signal('us');
+  targetKeyword = signal('');
   
   mockReport = signal<any>(null);
 
@@ -65,7 +67,9 @@ export class Home {
       payload: { 
         website: this.websiteUrl(),
         competitor: this.competitorUrl(),
-        email: this.email()
+        email: this.email(),
+        region: this.region(),
+        targetKeyword: this.targetKeyword()
       }
     }).subscribe({
       next: (res: any) => {
