@@ -149,29 +149,37 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       score -= 30;
     }
 
-    // AI Schema Audit (Screenshot Feature #2)
+    // AI Schema Audit & Project Manager Plan
     let schemaAudit = {
       hasSchema,
       verdict: '',
       missingPriority: [],
-      generatedJsonLd: ''
+      generatedJsonLd: '',
+      projectManagerPlan: []
     };
 
     try {
       if (process.env.OPENAI_API_KEY) {
-        const schemaPrompt = `
-          Analyze this website's current JSON-LD schema (if any exists).
+          const schemaPrompt = `
+          Analyze this website's current JSON-LD schema AND their list of critical SEO Technical Issues.
+          
           Current Schema: ${JSON.stringify(extractedSchemas)}
+          SEO Issues Detected: ${JSON.stringify(issues)}
           
           Tasks:
           1. Provide a blunt verdict on the existing schema's usefulness.
           2. List missing/weak schemas with priority (HIGH/MED/LOW). Specially check for LocalBusiness, Organization, or FAQPage.
-          3. Generate exact, clean JSON-LD code for the most HIGH priority missing schema using placeholders. 
+          3. Generate exact, clean JSON-LD code for the most HIGH priority missing schema using placeholders.
+          4. Act as a Project Manager: Create a step-by-step manual action plan to fix the "SEO Issues Detected". Provide a clear "task" name and detailed "instruction" on how a non-technical user or developer should fix it.
+          
           Respond in strict JSON format: 
           {
             "verdict": "string",
             "missingPriority": ["list of strings"],
-            "generatedJsonLd": "string containing code"
+            "generatedJsonLd": "string containing code",
+            "projectManagerPlan": [
+              { "task": "Task Name", "instruction": "Step by step manual instruction to fix the issue" }
+            ]
           }
         `;
 
@@ -192,10 +200,11 @@ app.post('/api/openclaw/trigger', async (req, res) => {
           const aiData = await aiResponse.json();
           const parsedContent = JSON.parse(aiData.choices[0].message.content);
           schemaAudit.verdict = parsedContent.verdict;
-          schemaAudit.missingPriority = parsedContent.missingPriority;
-          schemaAudit.generatedJsonLd = parsedContent.generatedJsonLd;
+          schemaAudit.missingPriority = parsedContent.missingPriority || [];
+          schemaAudit.generatedJsonLd = parsedContent.generatedJsonLd || '';
+          schemaAudit.projectManagerPlan = parsedContent.projectManagerPlan || [];
         }
-      } 
+      }
     } catch (e) {
       console.error("Schema AI generation failed", e);
     }
@@ -210,6 +219,13 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         schemaAudit.verdict = "CRITICAL: No JSON-LD schema detected. Search engines cannot easily categorize this business.";
         schemaAudit.missingPriority = ["LocalBusiness (HIGH)", "Organization (HIGH)", "WebSite (MED)"];
         schemaAudit.generatedJsonLd = "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"LocalBusiness\",\n  \"name\": \"[Your Business Name]\",\n  \"image\": \"[Your Image URL]\",\n  \"url\": \"[Your Website URL]\",\n  \"telephone\": \"[Your Phone]\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"[Street]\",\n    \"addressLocality\": \"[City]\",\n    \"addressRegion\": \"[State]\",\n    \"postalCode\": \"[Zip]\",\n    \"addressCountry\": \"[Country]\"\n  }\n}";
+      }
+      
+      if (!schemaAudit.projectManagerPlan || schemaAudit.projectManagerPlan.length === 0) {
+        schemaAudit.projectManagerPlan = issues.map(iss => ({
+          task: "Resolve Technical Flag",
+          instruction: `Manual Fix Required: ${iss}`
+        }));
       }
     }
 

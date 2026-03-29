@@ -322,6 +322,34 @@
             </div>
           }
 
+          <!-- Project Manager Action Plan -->
+          @if (mockReport()?.schemaAudit?.projectManagerPlan?.length > 0) {
+            <div class="mt-8 bg-white border-2 border-primary/20 rounded-2xl shadow-lg overflow-hidden print:break-inside-avoid">
+              <div class="bg-primary/5 px-6 py-5 border-b border-primary/10">
+                <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-md">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                  </div>
+                  Project Manager Action Plan
+                </h2>
+                <p class="text-slate-500 font-medium text-sm mt-1 ml-14">Your step-by-step roadmap to resolving the technical blockers identified above.</p>
+              </div>
+              <div class="p-6 space-y-5">
+                @for (plan of mockReport().schemaAudit.projectManagerPlan; track $index) {
+                  <div class="flex gap-4 p-5 rounded-xl bg-slate-50 border border-slate-100 hover:shadow-md transition-shadow relative">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold flex items-center justify-center border-2 border-white shadow-sm mt-1">
+                      {{ $index + 1 }}
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-slate-800 text-lg mb-1">{{ plan.task }}</h3>
+                      <p class="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{{ plan.instruction }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
           <!-- Authority & Link Deficit Analysis -->
           <div class="mt-12 border-t-2 border-slate-200 pt-8 print:break-before-page">
             <div class="mb-6">
