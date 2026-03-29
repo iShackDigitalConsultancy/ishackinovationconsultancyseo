@@ -163,10 +163,11 @@ router.get('/campaigns', authenticateSuperadmin, async (req, res) => {
 router.get('/targeted-urls', authenticateSuperadmin, async (req, res) => {
   try {
     const query = `
-      SELECT c.id as campaign_id, c.client_domain as url, c.package_tier, c.status as campaign_status, a.agency_name, a.id as agency_id,
+      SELECT c.id as campaign_id, c.client_domain as url, c.package_tier, c.status as campaign_status, c.created_at, a.agency_name, a.id as agency_id,
              (SELECT COUNT(*) FROM agent_tasks t WHERE t.campaign_id = c.id) as task_count,
              (SELECT COUNT(*) FROM agent_tasks t WHERE t.campaign_id = c.id AND t.status = 'completed') as task_completed,
-             (SELECT COUNT(*) FROM agent_logs l WHERE l.campaign_id = c.id) as active_hooks
+             (SELECT COUNT(*) FROM agent_logs l WHERE l.campaign_id = c.id) as active_hooks,
+             (SELECT task_type FROM agent_tasks t WHERE t.campaign_id = c.id ORDER BY created_at DESC LIMIT 1) as current_phase
       FROM campaigns c
       JOIN agencies a ON c.agency_id = a.id
       ORDER BY c.created_at DESC

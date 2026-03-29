@@ -571,17 +571,19 @@ import { environment } from '../../environments/environment';
                     <th class="px-6 py-4">Targeted URL / Domain</th>
                     <th class="px-6 py-4">Linked Agency</th>
                     <th class="px-6 py-4">Package Scope</th>
+                    <th class="px-6 py-4">Current AI Phase</th>
                     <th class="px-6 py-4 text-center">Executed Tasks</th>
                     <th class="px-6 py-4 text-right">Target Active Hooks</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr *ngFor="let target of targetedUrls" class="hover:bg-white/[0.02] transition-colors">
-                    <td class="px-6 py-5 font-bold text-white text-base">
-                      <a href="https://{{ target.url }}" target="_blank" class="text-white hover:text-pink-400 transition-colors flex items-center gap-2">
+                    <td class="px-6 py-5">
+                      <a href="https://{{ target.url }}" target="_blank" class="font-bold text-white text-base hover:text-pink-400 transition-colors flex items-center gap-2">
                         <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
                         {{ target.url }}
                       </a>
+                      <div class="text-xs text-slate-500 mt-1 font-mono tracking-wider">Started: {{ target.created_at | date:'MMM dd, yyyy' }}</div>
                     </td>
                     <td class="px-6 py-5">
                       <div class="text-sm text-slate-300 font-medium">{{ target.agency_name }}</div>
@@ -592,6 +594,12 @@ import { environment } from '../../environments/environment';
                             [ngClass]="{'text-blue-400 border-blue-500/30': target.package_tier === 'pro', 'text-yellow-400 border-yellow-500/30': target.package_tier === 'enterprise', 'text-slate-300': target.package_tier === 'basic'}">
                         {{ target.package_tier }}
                       </span>
+                    </td>
+                    <td class="px-6 py-5">
+                      <div class="text-xs font-bold text-slate-300 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 inline-flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full" [ngClass]="{'bg-blue-400 animate-pulse': target.campaign_status === 'active', 'bg-green-400': target.campaign_status === 'completed'}"></div>
+                        {{ target.current_phase || 'Awaiting Initialization' }}
+                      </div>
                     </td>
                     <td class="px-6 py-5 text-center">
                       <div class="inline-flex items-center justify-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-white/5">
