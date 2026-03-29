@@ -1,8 +1,9 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -10,8 +11,10 @@ import { environment } from '../../environments/environment';
   imports: [CommonModule, FormsModule, RouterLink, RouterOutlet],
   templateUrl: './home.html'
 })
-export class Home {
+export class Home implements OnInit {
   private http = inject(HttpClient);
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
   
   // Funnel State: 'input' | 'analyzing' | 'report' | 'upgrade'
   funnelState = signal<'input' | 'analyzing' | 'report' | 'upgrade'>('input');
@@ -46,6 +49,14 @@ export class Home {
         }
       }
     }
+  }
+
+  ngOnInit() {
+    this.titleService.setTitle('White-Label AI SEO Software & Technical Automation Agency | iShack');
+    this.metaService.updateTag({ 
+      name: 'description', 
+      content: 'iShack Innovation Consultancy partners with digital agencies and businesses to handle the heavy technical lifting. We provide autonomous white label search engine optimization software.' 
+    });
   }
 
   websiteUrl = signal('');
