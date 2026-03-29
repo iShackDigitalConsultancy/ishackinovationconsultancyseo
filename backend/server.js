@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 const authRouter = require('./auth');
 
 const app = express();
@@ -50,10 +51,29 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     
     try {
       const startTime = Date.now();
-      const response = await fetch(urlObj.href, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      let html = '';
+      let browser;
+      
+      try {
+        browser = await puppeteer.launch({
+          headless: 'new',
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+          executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined
+        });
+        const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0');
+        await page.goto(urlObj.href, { waitUntil: 'networkidle2', timeout: 15000 });
+        html = await page.content();
+      } catch (scrapingErr) {
+        console.warn('Puppeteer failed, falling back to fetch:', scrapingErr.message);
+        const response = await fetch(urlObj.href, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        html = await response.text();
+      } finally {
+        if (browser) await browser.close();
+      }
+      
       loadSpeedMs = Date.now() - startTime;
       
-      const html = await response.text();
       const $ = cheerio.load(html);
       
       const title = $('title').text();
