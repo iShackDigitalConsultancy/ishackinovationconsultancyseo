@@ -53,8 +53,13 @@ export class Home {
   email = signal('');
   region = signal('us');
   targetKeyword = signal('');
+  promoCode = signal('');
   
   mockReport = signal<any>(null);
+
+  canViewPremium(): boolean {
+    return this.isLoggedIn() || this.promoCode().toLowerCase() === 'evertonfc';
+  }
 
   startAnalysis() {
     if (!this.websiteUrl()) return;
