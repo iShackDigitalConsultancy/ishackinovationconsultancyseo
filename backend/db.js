@@ -35,6 +35,37 @@ const initSchema = async () => {
         report_json TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      CREATE TABLE IF NOT EXISTS campaigns (
+        id SERIAL PRIMARY KEY,
+        agency_id INTEGER NOT NULL REFERENCES agencies(id),
+        client_domain VARCHAR(255) NOT NULL,
+        status VARCHAR(50) DEFAULT 'active',
+        asana_project_id VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS agent_tasks (
+        id SERIAL PRIMARY KEY,
+        campaign_id INTEGER NOT NULL REFERENCES campaigns(id),
+        assigned_agent VARCHAR(100) NOT NULL,
+        task_type VARCHAR(100) NOT NULL,
+        payload JSONB,
+        status VARCHAR(50) DEFAULT 'pending',
+        result_payload JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS agent_logs (
+        id SERIAL PRIMARY KEY,
+        campaign_id INTEGER NOT NULL REFERENCES campaigns(id),
+        agent_name VARCHAR(100) NOT NULL,
+        thought_process TEXT,
+        action_taken TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
     
     try {

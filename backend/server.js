@@ -373,6 +373,9 @@ app.post('/api/openclaw/trigger', async (req, res) => {
   }
 });
 
+// Initialize AI CRON background agents
+require('./cron/scheduler').initSchedulers();
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

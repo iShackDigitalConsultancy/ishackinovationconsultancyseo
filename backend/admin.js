@@ -60,4 +60,26 @@ router.get('/metrics', authenticateSuperadmin, async (req, res) => {
   }
 });
 
+const pmAgent = require('./agents/pmAgent');
+const veraAgent = require('./agents/veraAgent');
+
+// Sandbox Triggers for Multi-Agent Network (Admin Only)
+router.post('/sandbox/trigger-pm', authenticateSuperadmin, async (req, res) => {
+  try {
+    await pmAgent.tick();
+    res.json({ success: true, message: 'Project Management Agent execution cycle manually triggered.' });
+  } catch (error) {
+    res.status(500).json({ error: 'PM Agent sandbox execution failed.', details: error.message });
+  }
+});
+
+router.post('/sandbox/trigger-vera', authenticateSuperadmin, async (req, res) => {
+  try {
+    await veraAgent.runDailyReport();
+    res.json({ success: true, message: 'Vera Sharp (Reporting Agent) manually forced to dispatch the daily aggregate email.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Vera Sharp sandbox execution failed.', details: error.message });
+  }
+});
+
 module.exports = router;
