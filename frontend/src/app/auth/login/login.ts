@@ -103,6 +103,9 @@ export class Login {
       next: (response) => {
         if (response.token && typeof window !== 'undefined') {
           localStorage.setItem('auth_token', response.token);
+          if (response.agency) {
+            localStorage.setItem('agency_data', JSON.stringify(response.agency));
+          }
         }
 
         if (response.agency && response.agency.role === 'superadmin') {

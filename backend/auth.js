@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_for_dev';
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY || '';
 
 router.post('/register', async (req, res) => {
-  const { agencyName, email, password, planType } = req.body;
+  const { agencyName, email, password, planType, brandColor, brandLogoUrl } = req.body;
 
   if (!agencyName || !email || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
@@ -31,9 +31,12 @@ router.post('/register', async (req, res) => {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
+    const safeBrandColor = brandColor || '#007bff';
+    const safeBrandLogoUrl = brandLogoUrl || '';
+
     const insertResult = await db.query(
-      'INSERT INTO agencies (agency_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
-      [agencyName, email, passwordHash]
+      'INSERT INTO agencies (agency_name, email, password_hash, brand_color, brand_logo_url) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [agencyName, email, passwordHash, safeBrandColor, safeBrandLogoUrl]
     );
     const agencyId = insertResult.rows[0].id;
 
@@ -67,7 +70,7 @@ router.post('/register', async (req, res) => {
       message: 'Registration successful',
       token,
       authorizationUrl,
-      agency: { id: agencyId, agencyName, email, role: selectedPlan }
+      agency: { id: agencyId, agencyName, email, role: selectedPlan, brandColor: safeBrandColor, brandLogoUrl: safeBrandLogoUrl }
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -100,7 +103,14 @@ router.post('/login', async (req, res) => {
     res.status(200).json({
       message: 'Login successful',
       token,
-      agency: { id: agency.id, agencyName: agency.agency_name, email: agency.email, role: agency.role }
+      agency: { 
+        id: agency.id, 
+        agencyName: agency.agency_name, 
+        email: agency.email, 
+        role: agency.role,
+        brandColor: agency.brand_color || '#007bff',
+        brandLogoUrl: agency.brand_logo_url || ''
+      }
     });
   } catch (error) {
     console.error('Login error:', error);

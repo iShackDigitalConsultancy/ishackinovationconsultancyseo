@@ -2,8 +2,18 @@
   <!-- Navigation -->
   <nav class="fixed w-full z-50 glass-panel py-4 px-6 lg:px-12 flex justify-between items-center transition-all duration-300">
     <div class="flex items-center gap-2">
-      <div class="h-10 w-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">IS</div>
-      <span class="text-xl font-bold tracking-tight">iShack <span class="text-primary">Innovation.</span></span>
+      @if (agencyData()?.brandLogoUrl) {
+        <img [src]="agencyData().brandLogoUrl" class="h-10 rounded-lg object-contain">
+        <span class="text-xl font-bold tracking-tight text-slate-800">{{ agencyData().agencyName }}</span>
+      } @else if (agencyData()?.agencyName) {
+        <div class="h-10 w-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+          {{ agencyData().agencyName.charAt(0).toUpperCase() }}
+        </div>
+        <span class="text-xl font-bold tracking-tight text-slate-800">{{ agencyData().agencyName }}</span>
+      } @else {
+        <div class="h-10 w-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">IS</div>
+        <span class="text-xl font-bold tracking-tight">iShack <span class="text-primary">Innovation.</span></span>
+      }
     </div>
     <div class="hidden md:flex gap-8 font-medium text-slate-600">
       <a href="#services" class="hover:text-primary transition-colors">Services</a>

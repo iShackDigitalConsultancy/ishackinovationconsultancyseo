@@ -17,10 +17,34 @@ export class Home {
   funnelState = signal<'input' | 'analyzing' | 'report' | 'upgrade'>('input');
   
   isLoggedIn = signal(false);
+  agencyData = signal<any>(null);
 
   constructor() {
     if (typeof window !== 'undefined') {
       this.isLoggedIn.set(!!localStorage.getItem('auth_token'));
+      const agencyStr = localStorage.getItem('agency_data');
+      if (agencyStr) {
+        try {
+          const agency = JSON.parse(agencyStr);
+          this.agencyData.set(agency);
+          
+          if (agency.brandColor && agency.brandColor !== '#007bff') {
+            const color = agency.brandColor;
+            const style = document.createElement('style');
+            style.innerHTML = `
+              .bg-primary { background-color: ${color} !important; }
+              .text-primary { color: ${color} !important; }
+              .border-primary { border-color: ${color} !important; }
+              .ring-primary { --tw-ring-color: ${color} !important; }
+              .from-primary { --tw-gradient-from: ${color} !important; }
+              .to-primary { --tw-gradient-to: ${color} !important; }
+            `;
+            document.head.appendChild(style);
+          }
+        } catch(e) {
+          console.error("Failed to parse agency data", e);
+        }
+      }
     }
   }
 

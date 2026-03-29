@@ -75,6 +75,24 @@ import { environment } from '../../../environments/environment';
               </label>
             </div>
 
+            <!-- Whitelabel Branding Fields (Agency Only) -->
+            <div *ngIf="planType === 'agency'" class="space-y-4 mb-6 p-4 bg-white/50 rounded-xl border border-slate-200">
+              <h3 class="text-sm font-bold text-slate-800 border-b border-slate-200 pb-2">Whitelabel Branding</h3>
+              <div>
+                <label for="brandColor" class="block text-sm font-medium text-slate-700"> Brand Color </label>
+                <div class="mt-1 flex items-center gap-3">
+                  <input id="brandColor" name="brandColor" type="color" [(ngModel)]="brandColor" class="h-10 w-16 p-1 rounded-lg border border-slate-300 cursor-pointer">
+                  <span class="text-xs text-slate-500 font-medium">This replaces the blue accents on your reports.</span>
+                </div>
+              </div>
+              <div>
+                <label for="brandLogoUrl" class="block text-sm font-medium text-slate-700"> Logo Image URL (Optional) </label>
+                <div class="mt-1">
+                  <input id="brandLogoUrl" name="brandLogoUrl" type="url" [(ngModel)]="brandLogoUrl" placeholder="https://youragency.com/logo.png" class="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white/70 transition-all">
+                </div>
+              </div>
+            </div>
+
             <div>
               <label for="agencyName" class="block text-sm font-medium text-slate-700"> 
                 {{ planType === 'agency' ? 'Agency Name' : 'Business Name' }} 
@@ -116,6 +134,8 @@ export class Register {
   private http = inject(HttpClient);
   
   planType: 'agency' | 'business' = 'agency';
+  brandColor = '#007bff';
+  brandLogoUrl = '';
   agencyName = '';
   email = '';
   password = '';
@@ -134,14 +154,19 @@ export class Register {
 
     this.http.post<any>(`${environment.apiUrl}/auth/register`, {
       planType: this.planType,
+      brandColor: this.brandColor,
+      brandLogoUrl: this.brandLogoUrl,
       agencyName: this.agencyName,
       email: this.email,
       password: this.password
     }).subscribe({
       next: (response) => {
         // Store token locally if you are using it right away
-        if(response.token) {
+        if(response.token && typeof window !== 'undefined') {
           localStorage.setItem('auth_token', response.token);
+          if (response.agency) {
+            localStorage.setItem('agency_data', JSON.stringify(response.agency));
+          }
         }
 
         if (response.authorizationUrl) {

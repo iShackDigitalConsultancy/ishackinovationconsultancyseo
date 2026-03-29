@@ -36,6 +36,15 @@ const initSchema = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    
+    try {
+      await client.query("ALTER TABLE agencies ADD COLUMN brand_color VARCHAR(20) DEFAULT '#007bff'");
+    } catch(e) {}
+    
+    try {
+      await client.query("ALTER TABLE agencies ADD COLUMN brand_logo_url TEXT");
+    } catch(e) {}
+
     console.log('PostgreSQL Database schema initialized');
   } catch(err) {
     console.error('Error creating PostgreSQL tables:', err);
