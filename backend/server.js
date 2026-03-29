@@ -199,8 +199,9 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       
       // Fallback if AI fails or no key
       if (!schemaAudit.verdict) {
+        let fallbackMsg = process.env.OPENAI_API_KEY ? "AI Generation failed." : "OPENAI_API_KEY is missing from Railway Environment Variables.";
         if (hasSchema) {
-          schemaAudit.verdict = "Schema detected but may lack specialized LocalBusiness or Organization microdata.";
+          schemaAudit.verdict = `${fallbackMsg} Fallback checking: Schema detected but lacks JSON-LD map.`;
           schemaAudit.missingPriority = ["LocalBusiness (HIGH)", "FAQPage (MED)", "BreadcrumbList (LOW)"];
         } else {
           schemaAudit.verdict = "CRITICAL: No JSON-LD schema detected. Search engines cannot easily categorize this business.";
