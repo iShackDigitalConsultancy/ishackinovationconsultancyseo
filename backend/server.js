@@ -37,6 +37,7 @@ app.post('/api/openclaw/trigger', async (req, res) => {
   const targetKeyword = payload?.targetKeyword || '';
   
   let keywordOpt = { provided: false, inTitle: false, inH1: false, inMeta: false, inBody: false };
+  let extractedSchemas = [];
 
   if (!targetUrl) {
     return res.status(400).json({ success: false, error: 'No website provided' });
@@ -92,7 +93,6 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       wordCount = pageText ? pageText.split(' ').length : 0;
 
       // Schema Extraction
-      const extractedSchemas = [];
       $('script[type="application/ld+json"]').each((i, el) => {
         try { 
           extractedSchemas.push(JSON.parse($(el).html())); 
@@ -196,21 +196,21 @@ app.post('/api/openclaw/trigger', async (req, res) => {
           schemaAudit.generatedJsonLd = parsedContent.generatedJsonLd;
         }
       } 
-      
-      // Fallback if AI fails or no key
-      if (!schemaAudit.verdict) {
-        let fallbackMsg = process.env.OPENAI_API_KEY ? "AI Generation failed." : "OPENAI_API_KEY is missing from Railway Environment Variables.";
-        if (hasSchema) {
-          schemaAudit.verdict = `${fallbackMsg} Fallback checking: Schema detected but lacks JSON-LD map.`;
-          schemaAudit.missingPriority = ["LocalBusiness (HIGH)", "FAQPage (MED)", "BreadcrumbList (LOW)"];
-        } else {
-          schemaAudit.verdict = "CRITICAL: No JSON-LD schema detected. Search engines cannot easily categorize this business.";
-          schemaAudit.missingPriority = ["LocalBusiness (HIGH)", "Organization (HIGH)", "WebSite (MED)"];
-          schemaAudit.generatedJsonLd = "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"LocalBusiness\",\n  \"name\": \"[Your Business Name]\",\n  \"image\": \"[Your Image URL]\",\n  \"url\": \"[Your Website URL]\",\n  \"telephone\": \"[Your Phone]\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"[Street]\",\n    \"addressLocality\": \"[City]\",\n    \"addressRegion\": \"[State]\",\n    \"postalCode\": \"[Zip]\",\n    \"addressCountry\": \"[Country]\"\n  }\n}";
-        }
-      }
     } catch (e) {
       console.error("Schema AI generation failed", e);
+    }
+    
+    // Fallback if AI fails or no key
+    if (!schemaAudit.verdict) {
+      let fallbackMsg = process.env.OPENAI_API_KEY ? "AI Generation API Error." : "OPENAI_API_KEY is missing.";
+      if (hasSchema) {
+        schemaAudit.verdict = `${fallbackMsg} Fallback checking: Schema detected but lacks JSON-LD map.`;
+        schemaAudit.missingPriority = ["LocalBusiness (HIGH)", "FAQPage (MED)", "BreadcrumbList (LOW)"];
+      } else {
+        schemaAudit.verdict = "CRITICAL: No JSON-LD schema detected. Search engines cannot easily categorize this business.";
+        schemaAudit.missingPriority = ["LocalBusiness (HIGH)", "Organization (HIGH)", "WebSite (MED)"];
+        schemaAudit.generatedJsonLd = "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"LocalBusiness\",\n  \"name\": \"[Your Business Name]\",\n  \"image\": \"[Your Image URL]\",\n  \"url\": \"[Your Website URL]\",\n  \"telephone\": \"[Your Phone]\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"[Street]\",\n    \"addressLocality\": \"[City]\",\n    \"addressRegion\": \"[State]\",\n    \"postalCode\": \"[Zip]\",\n    \"addressCountry\": \"[Country]\"\n  }\n}";
+      }
     }
 
     // 2. Fetch Live SEMRush Data
