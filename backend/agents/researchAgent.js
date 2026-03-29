@@ -24,7 +24,9 @@ class ResearchAgent extends BaseAgent {
     
     // In production, this would ping DataForSEO/SEMrush APIs
     const prompt = `
-      Analyze this target client domain and provide 3 high-priority keywords with intent mappings. 
+      Analyze this target client domain (${payload.domain}) and provide 3 high-priority keywords with intent mappings. 
+      CAMPAIGN CONTEXT/DIRECTIVES: ${JSON.stringify(payload)} // If any target audiences or niches are defined here, optimize exclusively for them.
+      
       CRITICAL REQUIREMENT: You must structurally adopt the following active AEO (AI Engine Optimization) rules to ensure rankability on Perplexity and Google SGE:
       
       === GLOBAL AEO PARAMETERS ===
