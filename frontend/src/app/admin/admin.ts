@@ -276,7 +276,7 @@ import { environment } from '../../environments/environment';
                         </span>
                       </td>
                       <td class="px-6 py-5 text-right">
-                        <div class="text-lg font-extrabold text-green-400">${{ cam.revenue | number }}</div>
+                        <div class="text-lg font-extrabold text-green-400">$ {{ cam.revenue | number }}</div>
                       </td>
                       <td class="px-6 py-5 text-center">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20">
@@ -314,7 +314,7 @@ import { environment } from '../../environments/environment';
                             </div>
                             <div class="mt-4 pt-4 border-t border-white/5 flex justify-between text-xs">
                               <span class="text-slate-400">Total Organic Keywords: <b class="text-white">{{ cam.historic_metrics?.organicKeywords | number }}</b></span>
-                              <span class="text-slate-400">Traffic Value: <b class="text-green-400">${{ cam.historic_metrics?.trafficValue | number }}</b></span>
+                              <span class="text-slate-400">Traffic Value: <b class="text-green-400">$ {{ cam.historic_metrics?.trafficValue | number }}</b></span>
                             </div>
                           </div>
 
