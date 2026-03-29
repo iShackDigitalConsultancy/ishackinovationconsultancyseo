@@ -32,6 +32,7 @@ app.use('/api/admin', adminRouter);
 app.post('/api/openclaw/trigger', async (req, res) => {
   const { eventType, payload } = req.body;
   const targetUrl = payload?.website;
+  const competitorUrl = payload?.competitor;
   
   if (!targetUrl) {
     return res.status(400).json({ success: false, error: 'No website provided' });
@@ -86,6 +87,14 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       const pageText = $('body').text().replace(/\s+/g, ' ').trim();
       wordCount = pageText ? pageText.split(' ').length : 0;
 
+      // Schema Extraction
+      const extractedSchemas = [];
+      $('script[type="application/ld+json"]').each((i, el) => {
+        try { 
+          extractedSchemas.push(JSON.parse($(el).html())); 
+        } catch(e) {}
+      });
+      hasSchema = extractedSchemas.length > 0;
       
       if (!title || title.length < 10) { issues.push('Title tag is missing or too short.'); score -= 15; }
       if (!metaDesc || metaDesc.length < 50) { issues.push('Meta description is missing or too short.'); score -= 20; }
@@ -113,6 +122,69 @@ app.post('/api/openclaw/trigger', async (req, res) => {
     } catch (scrapeErr) {
       issues.push(`Failed to analyze HTML structure: ${scrapeErr.message}`);
       score -= 30;
+    }
+
+    // AI Schema Audit (Screenshot Feature #2)
+    let schemaAudit = {
+      hasSchema,
+      verdict: '',
+      missingPriority: [],
+      generatedJsonLd: ''
+    };
+
+    try {
+      if (process.env.OPENAI_API_KEY) {
+        const schemaPrompt = `
+          Analyze this website's current JSON-LD schema (if any exists).
+          Current Schema: ${JSON.stringify(extractedSchemas)}
+          
+          Tasks:
+          1. Provide a blunt verdict on the existing schema's usefulness.
+          2. List missing/weak schemas with priority (HIGH/MED/LOW). Specially check for LocalBusiness, Organization, or FAQPage.
+          3. Generate exact, clean JSON-LD code for the most HIGH priority missing schema using placeholders. 
+          Respond in strict JSON format: 
+          {
+            "verdict": "string",
+            "missingPriority": ["list of strings"],
+            "generatedJsonLd": "string containing code"
+          }
+        `;
+
+        const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            response_format: { type: "json_object" },
+            messages: [{ role: 'user', content: schemaPrompt }]
+          })
+        });
+
+        if (aiResponse.ok) {
+          const aiData = await aiResponse.json();
+          const parsedContent = JSON.parse(aiData.choices[0].message.content);
+          schemaAudit.verdict = parsedContent.verdict;
+          schemaAudit.missingPriority = parsedContent.missingPriority;
+          schemaAudit.generatedJsonLd = parsedContent.generatedJsonLd;
+        }
+      } 
+      
+      // Fallback if AI fails or no key
+      if (!schemaAudit.verdict) {
+        if (hasSchema) {
+          schemaAudit.verdict = "Schema detected but may lack specialized LocalBusiness or Organization microdata.";
+          schemaAudit.missingPriority = ["LocalBusiness (HIGH)", "FAQPage (MED)", "BreadcrumbList (LOW)"];
+        } else {
+          schemaAudit.verdict = "CRITICAL: No JSON-LD schema detected. Search engines cannot easily categorize this business.";
+          schemaAudit.missingPriority = ["LocalBusiness (HIGH)", "Organization (HIGH)", "WebSite (MED)"];
+          schemaAudit.generatedJsonLd = "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"LocalBusiness\",\n  \"name\": \"[Your Business Name]\",\n  \"image\": \"[Your Image URL]\",\n  \"url\": \"[Your Website URL]\",\n  \"telephone\": \"[Your Phone]\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"[Street]\",\n    \"addressLocality\": \"[City]\",\n    \"addressRegion\": \"[State]\",\n    \"postalCode\": \"[Zip]\",\n    \"addressCountry\": \"[Country]\"\n  }\n}";
+        }
+      }
+    } catch (e) {
+      console.error("Schema AI generation failed", e);
     }
 
     // 2. Fetch Live SEMRush Data
@@ -156,6 +228,39 @@ app.post('/api/openclaw/trigger', async (req, res) => {
           }
         }
       }
+
+      // Competitor SEMrush Analysis
+      if (competitorUrl) {
+        try {
+          const compUrlObj = new URL(competitorUrl.startsWith('http') ? competitorUrl : `https://${competitorUrl}`);
+          const compDomain = compUrlObj.hostname.replace('www.', '');
+          
+          semrushData.competitorData = { domain: compDomain, keywords: [] };
+          
+          const compApiUrl = `https://api.semrush.com/?type=domain_organic&key=${semrushKey}&display_limit=10&export_columns=Ph,Po,Nq,Cp,Kd&domain=${compDomain}&database=us`;
+          const compRes = await fetch(compApiUrl);
+          const compCsv = await compRes.text();
+          
+          if (compCsv && !compCsv.startsWith('ERROR')) {
+            const compLines = compCsv.trim().split('\n');
+            for (let i = 1; i < compLines.length; i++) {
+              if (compLines[i]) {
+                const vals = compLines[i].split(';');
+                semrushData.competitorData.keywords.push({
+                  phrase: vals[0] ? vals[0].trim() : '',
+                  position: vals[1] ? vals[1].trim() : '',
+                  volume: vals[2] ? vals[2].trim() : '',
+                  cpc: vals[3] ? vals[3].trim() : '',
+                  difficulty: vals[4] ? vals[4].trim() : '-'
+                });
+              }
+            }
+          }
+        } catch (compErr) {
+          console.error('Competitor SEMRush fetch error:', compErr.message);
+        }
+      }
+      
     } catch (semErr) {
       console.error('SEMRush fetch error:', semErr.message);
     }
@@ -204,11 +309,13 @@ app.post('/api/openclaw/trigger', async (req, res) => {
         criticalErrors: issues.length,
         suggestions: issues.length > 0 ? issues : ['Your website is well optimized!'],
         metrics: semrushData,
+        schemaAudit,
         technicalValuation: {
           loadSpeedMs,
           wordCount,
           hasViewport,
           hasOpenGraph,
+          hasSchema,
           linkDeficit,
           primaryTarget,
           adCost: semrushData.adCost,

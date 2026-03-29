@@ -49,6 +49,7 @@ export class Home {
   }
 
   websiteUrl = signal('');
+  competitorUrl = signal('');
   email = signal('');
   
   mockReport = signal<any>(null);
@@ -61,7 +62,11 @@ export class Home {
     // Trigger real backend analysis (SEMRush + OpenClaw/Cheerio)
     this.http.post(`${environment.apiUrl}/openclaw/trigger`, {
       eventType: 'seo_analysis_request',
-      payload: { website: this.websiteUrl() }
+      payload: { 
+        website: this.websiteUrl(),
+        competitor: this.competitorUrl(),
+        email: this.email()
+      }
     }).subscribe({
       next: (res: any) => {
         if (res && res.success && res.report) {
