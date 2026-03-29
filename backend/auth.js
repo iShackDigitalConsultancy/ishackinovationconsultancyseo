@@ -17,8 +17,10 @@ router.post('/register', async (req, res) => {
 
   // default to agency if not specified
   const selectedPlan = planType === 'business' ? 'business' : 'agency';
-  // $299 -> 29900, $49 -> 4900
-  const billingAmount = selectedPlan === 'business' ? 4900 : 29900; 
+  // R17 to 1 USD Exchange Rate applied. Amount is in cents.
+  // Business: $49 * 17 = R833 -> 83300
+  // Agency: $299 * 17 = R5083 -> 508300
+  const billingAmount = selectedPlan === 'business' ? 83300 : 508300; 
 
   try {
     const checkEmail = await db.query('SELECT id FROM agencies WHERE email = $1', [email]);
