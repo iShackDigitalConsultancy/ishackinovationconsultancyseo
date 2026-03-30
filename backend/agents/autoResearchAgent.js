@@ -36,8 +36,11 @@ class AutoResearchAgent extends BaseAgent {
       const rawAiResponse = await this.think(prompt);
       
       // Strip potentially hallucinated markdown wrappers
-      const cleanPy = rawAiResponse.replace(/^```[a-z]*\s*/g, '').replace(/```\s*$/g, '');
-      
+      let cleanPy = rawAiResponse;
+      const codeBlockMatch = rawAiResponse.match(/```(?:python)?\n([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        cleanPy = codeBlockMatch[1];
+      }
       // Overwrite the actual repo file
       await fs.writeFile(trainPyPath, cleanPy);
       await this.logThought(campaignId, `Dynamic PyTorch architecture successfully synthesized and injected into train.py.`, `Spawning Child Process: uv run train.py`);

@@ -2,14 +2,21 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install Chromium for Puppeteer
+# Install Chromium for Puppeteer, Python for ML Agent, and curl for uv
 RUN apk add --no-cache \
       chromium \
       nss \
       freetype \
       harfbuzz \
       ca-certificates \
-      ttf-freefont
+      ttf-freefont \
+      python3 \
+      py3-pip \
+      curl
+
+# Install Astral 'uv' globally for hyper-fast Python dependency management
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
