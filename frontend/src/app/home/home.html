@@ -1,6 +1,6 @@
 <main class="min-h-screen bg-slate-50 text-slate-800 font-sans relative overflow-x-hidden print:overflow-visible print:bg-white">
   <!-- Navigation -->
-  <nav class="fixed w-full z-50 glass-panel py-4 px-6 lg:px-12 flex justify-between items-center transition-all duration-300">
+  <nav class="fixed w-full z-50 glass-panel py-4 px-6 lg:px-12 flex justify-between items-center transition-all duration-300 print:hidden">
     <div class="flex items-center gap-2">
       @if (agencyData()?.brandLogoUrl) {
         <img [src]="agencyData().brandLogoUrl" class="h-10 rounded-lg object-contain">
@@ -26,9 +26,9 @@
   </nav>
 
   <!-- Hero & Funnel Container -->
-  <section class="pt-32 pb-20 px-6 lg:px-12 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-screen">
+  <section class="pt-32 pb-20 px-6 lg:px-12 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-screen print:block print:min-h-0 print:py-0 print:px-0">
     <!-- Hero Section -->
-    <div class="relative isolate px-6 pt-14 lg:px-8">
+    <div class="relative isolate px-6 pt-14 lg:px-8 print:hidden">
       <div class="mx-auto max-w-4xl pt-24 pb-2 sm:pt-32 sm:pb-4 lg:pt-40 lg:pb-6 text-center">
         <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
           White-Label AI SEO Software & Technical Automation Agency
@@ -47,7 +47,7 @@
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl mix-blend-multiply filter -z-10"></div>
 
     <!-- Funnel Interactive Box -->
-    <div class="w-full max-w-2xl glass-panel rounded-3xl p-8 lg:p-12 shadow-2xl relative transition-all duration-500 min-h-[400px]">
+    <div class="w-full max-w-2xl glass-panel rounded-3xl p-8 lg:p-12 shadow-2xl relative transition-all duration-500 min-h-[400px] print:max-w-none print:shadow-none print:p-0 print:bg-transparent">
       
       <!-- State 1: Input -->
       @if (funnelState() === 'input') {
@@ -110,7 +110,7 @@
 
       <!-- State 3: Report Teaser -->
       @if (funnelState() === 'report') {
-        <div id="report-container" class="animate-fade-in space-y-6 bg-white print:shadow-none print:p-0">
+        <div id="report-container" class="animate-fade-in space-y-6 bg-white print:block print:shadow-none print:p-0">
           <div class="flex items-center justify-between border-b border-slate-200 pb-4">
             <h2 class="text-2xl font-bold text-slate-800">Complete AI SEO Audit</h2>
             <div class="flex items-center gap-3">
