@@ -6,7 +6,7 @@ class QAAgent {
     this.name = 'QAAgent';
   }
 
-  async runHealthCheck(targetUrl = 'https://ishackinnovationconsultancy.com') {
+  async runHealthCheck(targetUrl = 'https://ishackaeo.com') {
     console.log(`🛡️ [QA Agent] Initializing Structural Health Sweep for ${targetUrl}`);
     let browser;
     try {

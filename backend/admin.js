@@ -412,7 +412,7 @@ router.post('/sandbox/trigger-qa', authenticateSuperadmin, async (req, res) => {
   try {
     const qaAgent = require('../agents/qaAgent');
     // Non-blocking fire and forget
-    qaAgent.runHealthCheck('https://ishackinnovationconsultancy.com').catch(console.error);
+    qaAgent.runHealthCheck('https://ishackaeo.com').catch(console.error);
     res.json({ message: 'QA Health Trace Initialized in background.' });
   } catch(e) {
     res.status(500).json({ error: 'QA Initialization Failed' });

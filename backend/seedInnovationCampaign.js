@@ -6,7 +6,7 @@ const pmAgent = require('./agents/pmAgent');
   try {
     console.log("🚀 Seeding Innovation Consultancy Master Campaign...");
 
-    const domain = 'ishackinnovationconsultancy.com';
+    const domain = 'ishackaeo.com';
     const asanaProjectGid = process.env.ASANA_PROJECT_GID; // or create a new one
 
     // 1. Get Agency ID
@@ -21,7 +21,7 @@ const pmAgent = require('./agents/pmAgent');
     `, [agencyId, domain]);
     
     const campaignId = rows[0].id;
-    console.log(`✅ Queued iShack Innovation Consultancy Campaign ID: ${campaignId}`);
+    console.log(`✅ Queued iShack AEO and SEO partner services Campaign ID: ${campaignId}`);
 
     // 3. Draft The Intelligent Strategy Payload
     const customPayload = {

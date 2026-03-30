@@ -17,7 +17,7 @@ export class AiSeoSoftware implements OnInit {
     this.titleService.setTitle('Replace My SEO Agency with AI | Autonomous SEO Software');
     this.metaService.updateTag({ 
       name: 'description', 
-      content: 'Replace your expensive SEO agency with an autonomous programmatic SEO generator. iShack Innovation Consultancy provides self-optimizing AI SEO software.' 
+      content: 'Replace your expensive SEO agency with an autonomous programmatic SEO generator. iShack AEO and SEO partner services provides self-optimizing AI SEO software.' 
     });
   }
 }

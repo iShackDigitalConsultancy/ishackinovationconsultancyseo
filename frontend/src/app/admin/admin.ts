@@ -16,7 +16,7 @@ import { environment } from '../../environments/environment';
             <div class="h-12 w-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg border border-white/10">IS</div>
             <div>
               <h1 class="text-3xl font-extrabold text-white tracking-tight">Super Admin Global Control</h1>
-              <p class="text-slate-400">iShack Innovation Consultancy • Financials & Metrics</p>
+              <p class="text-slate-400">iShack AEO and SEO partner services • Financials & Metrics</p>
             </div>
           </div>
           <button (click)="logout()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2 rounded-xl text-sm font-bold transition-all">Exit to Sandbox</button>
@@ -457,7 +457,7 @@ import { environment } from '../../environments/environment';
                               <div class="w-8 h-8 rounded bg-slate-800 text-slate-300 font-bold flex items-center justify-center font-mono">1</div>
                               <h4 class="text-white font-bold text-sm">Select Target</h4>
                             </div>
-                            <p class="text-slate-400 text-xs leading-relaxed">Use the deployment bar above. Type in a URL like <strong class="text-slate-200">ishackinnovationconsultancy.com</strong>.</p>
+                            <p class="text-slate-400 text-xs leading-relaxed">Use the deployment bar above. Type in a URL like <strong class="text-slate-200">ishackaeo.com</strong>.</p>
                           </div>
                           
                           <div class="bg-slate-900 border border-white/5 p-5 rounded-2xl shadow-lg relative group overflow-hidden">

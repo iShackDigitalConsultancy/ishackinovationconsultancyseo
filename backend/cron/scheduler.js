@@ -64,7 +64,7 @@ function initSchedulers() {
   cron.schedule('30 * * * *', async () => {
     try {
       console.log("⏰ Task Fired: qaAgent.runHealthCheck()");
-      await qaAgent.runHealthCheck('https://ishackinnovationconsultancy.com');
+      await qaAgent.runHealthCheck('https://ishackaeo.com');
     } catch (e) {
       console.error("QAAgent Failed on Schedule", e);
     }

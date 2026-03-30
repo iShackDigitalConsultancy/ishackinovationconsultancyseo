@@ -47,7 +47,7 @@ router.get('/script.js', (req, res) => {
         document.getElementById('ishack-loading').style.display = 'block';
         document.getElementById('ishack-audit-form').style.display = 'none';
 
-        fetch('https://ishackinnovationconsultancy.com/api/widget/audit', {
+        fetch('https://ishackaeo.com/api/widget/audit', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({

@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://ishackinnovationconsultancy.com/sitemap.xml
+Sitemap: https://ishackaeo.com/sitemap.xml

@@ -55,7 +55,7 @@ export class Home implements OnInit {
     this.titleService.setTitle('White-Label AI SEO Software & Technical Automation Agency | iShack');
     this.metaService.updateTag({ 
       name: 'description', 
-      content: 'iShack Innovation Consultancy partners with digital agencies and businesses to handle the heavy technical lifting. We provide autonomous white label search engine optimization software.' 
+      content: 'iShack AEO and SEO partner services partners with digital agencies and businesses to handle the heavy technical lifting. We provide autonomous white label search engine optimization software.' 
     });
   }
 
