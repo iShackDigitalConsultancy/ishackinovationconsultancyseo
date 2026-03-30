@@ -4,6 +4,8 @@ const veraAgent = require('../agents/veraAgent');
 const autoSeoAgent = require('../agents/autoSeoAgent');
 const qaAgent = require('../agents/qaAgent');
 const outreachAgent = require('../agents/outreachAgent');
+const growthAgent = require('../agents/growthAgent');
+const uxAgent = require('../agents/uxAgent');
 
 let isPmTickRunning = false;
 let isOutreachTickRunning = false;
@@ -67,6 +69,26 @@ function initSchedulers() {
       await qaAgent.runHealthCheck('https://ishackaeo.com');
     } catch (e) {
       console.error("QAAgent Failed on Schedule", e);
+    }
+  });
+
+  // AutoResearch: Growth Agent runs twice a day to dynamically split-test copy
+  cron.schedule('0 9,21 * * *', async () => {
+    try {
+      console.log("⏰ Task Fired: growthAgent.runGrowthLoop()");
+      await growthAgent.runGrowthLoop();
+    } catch (e) {
+      console.error("GrowthAgent Failed on Schedule", e);
+    }
+  });
+
+  // AutoResearch: UX Agent runs daily at Midnight to hotfix interface friction
+  cron.schedule('0 0 * * *', async () => {
+    try {
+      console.log("⏰ Task Fired: uxAgent.runUXOptimization()");
+      await uxAgent.runUXOptimization();
+    } catch (e) {
+      console.error("UXAgent Failed on Schedule", e);
     }
   });
 

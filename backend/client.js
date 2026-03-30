@@ -51,10 +51,11 @@ router.get('/portal-data', authenticateToken, async (req, res) => {
     }
     
     // Also fetch Agency Profile data to White-Label the UI colors & logos
-    const { rows: agencyData } = await db.query('SELECT brand_color, brand_logo_url FROM agencies WHERE id = $1', [agencyId]);
+    const { rows: agencyData } = await db.query('SELECT brand_color, brand_logo_url, payment_status FROM agencies WHERE id = $1', [agencyId]);
     const branding = agencyData.length > 0 ? agencyData[0] : { brand_color: '#007bff' };
+    const paymentStatus = agencyData.length > 0 ? agencyData[0].payment_status : 'pending';
 
-    res.json({ campaigns, branding });
+    res.json({ campaigns, branding, paymentStatus });
   } catch(e) {
     console.error(e);
     res.status(500).json({ error: 'Failed to lock into B2B telemetry block' });

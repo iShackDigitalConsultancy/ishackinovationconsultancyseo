@@ -144,3 +144,22 @@ PMAgent Failed on Schedule ReferenceError: asanaService is not defined
 ⏰ Task Fired: qaAgent.runHealthCheck()
 🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
 🛡️ [QA Agent] Sweep Complete. Latency: 3108ms | UX Score: 89. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Executing assigned logic for BacklinkAgent...
+[Backlinking Agent] 🧠 Thought: Reviewing published content to determine off-site backlink velocity... | ⚡ Action: Drafting outreach emails and target sites.
+[Backlinking Agent] 🧠 Thought: Off-site outreach strategy built. | ⚡ Action: Saving to DB.
+ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:21:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+[Backlinking Agent] 🧠 Thought: Crash: asanaService is not defined | ⚡ Action: Failing Task
+PMAgent Failed on Schedule ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)

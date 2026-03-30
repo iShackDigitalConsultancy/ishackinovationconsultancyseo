@@ -39,7 +39,29 @@ import { environment } from '../../environments/environment';
       <div class="flex-1 flex flex-col relative z-0 overflow-y-auto">
         <main class="flex-1 relative z-0 focus:outline-none">
           
-          <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+          <!-- Payment Pending Lock Screen -->
+          <div *ngIf="paymentStatus === 'pending'" class="py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center flex flex-col items-center justify-center min-h-[80vh]">
+            <div class="bg-amber-100 text-amber-700 p-6 rounded-full mb-6 shadow-sm border border-amber-200">
+              <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Activate Your Subscription to Proceed</h1>
+            <p class="text-lg text-slate-600 mb-8 max-w-xl">Your iShack AEO Agency account is registered. Protect your margins and unlock autonomous AI SEO by finalizing your Paystack subscription.</p>
+            
+            <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-200 w-full max-w-lg">
+               <h3 class="font-bold text-slate-800 text-xl border-b border-slate-100 pb-4 mb-6">Complete Checkout</h3>
+               <button (click)="retrySubscription()" [disabled]="isProcessing" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all shadow-md transform hover:-translate-y-0.5 flex justify-center items-center gap-2">
+                 <span *ngIf="isProcessing">
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                 </span>
+                 <span *ngIf="!isProcessing">Finalize Secure Payment &rarr;</span>
+               </button>
+               <p class="text-xs text-slate-500 font-medium mt-4">Payments are secured globally via Visa/MasterCard through Paystack.</p>
+               <div *ngIf="error" class="mt-4 text-red-600 text-sm font-bold">{{ error }}</div>
+            </div>
+          </div>
+
+          <!-- Active Dashboard Matrices -->
+          <div *ngIf="paymentStatus !== 'pending'" class="py-6 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
             <div class="flex items-center justify-between mb-8">
               <h1 class="text-3xl font-extrabold text-slate-900" [style.color]="branding.brand_color">Client Operations Center</h1>
               <img *ngIf="branding.brand_logo_url" [src]="branding.brand_logo_url" class="h-10 object-contain rounded drop-shadow" alt="Brand Logo">
@@ -130,7 +152,7 @@ import { environment } from '../../environments/environment';
                 <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                   <div>
                     <h3 class="font-black text-slate-900 text-xl flex items-center gap-2">
-                      <svg class="w-5 h-5" [style.color]="branding.brand_color" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                       <svg class="w-5 h-5" [style.color]="branding.brand_color" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                       {{ cam.client_domain }}
                     </h3>
                     <p class="text-xs font-mono text-slate-500 mt-1 uppercase font-bold tracking-wider">
@@ -203,6 +225,7 @@ export class Dashboard implements OnInit {
 
   campaigns: any[] = [];
   branding: any = { brand_color: '#007bff', brand_logo_url: '' };
+  paymentStatus: 'pending' | 'active' | 'suspended' = 'active'; // Default active until load
   
   checkoutUrl = '';
   checkoutTier = 'pro';
@@ -228,12 +251,35 @@ export class Dashboard implements OnInit {
       next: (data) => {
         this.campaigns = data.campaigns || [];
         this.branding = data.branding || { brand_color: '#007bff' };
+        this.paymentStatus = data.paymentStatus || 'pending';
       },
       error: (err) => {
         if (err.status === 401 || err.status === 403) {
           this.router.navigate(['/login']);
         }
       }
+    });
+  }
+
+  retrySubscription() {
+    this.error = '';
+    this.isProcessing = true;
+    
+    // Attempt standard proxy charge attempt
+    this.http.post<any>(`${environment.apiUrl}/payments/initialize`, { 
+        domain: 'saas_onboarding_retry', 
+        tier: 'agency' 
+      }, { headers: this.getHeaders() }).subscribe({
+        next: (res) => {
+          this.isProcessing = false;
+          if (res.authorization_url && typeof window !== 'undefined') {
+             window.location.href = res.authorization_url;
+          }
+        },
+        error: (err) => {
+          this.isProcessing = false;
+          this.error = 'Unable to launch Paystack gateway. Please contact support.';
+        }
     });
   }
 
