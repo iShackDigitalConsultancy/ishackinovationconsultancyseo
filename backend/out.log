@@ -1,0 +1,5 @@
+⏰ Starting AI Agent CRON Schedulers...
+⏰ Schedulers successfully bound.
+Server is running on port 3001
+PostgreSQL Database schema initialized
+[0mPOST /api/openclaw/trigger [32m200[0m 11473.290 ms - 2889[0m

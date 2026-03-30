@@ -1,0 +1,16 @@
+HTTP/2 200 
+access-control-allow-origin: *
+x-railway-cdn-edge: fastly/cache-lcy-egml8630072-LCY
+content-type: application/json; charset=utf-8
+date: Mon, 30 Mar 2026 14:09:48 GMT
+etag: W/"aab-UwNIvfRHMoWPfrbL6efn4fv/rRw"
+server: railway-edge
+x-powered-by: Express
+x-railway-edge: railway/europe-west4-drams3a
+x-railway-request-id: ysDvu_PgRuS0lu-snTga3g
+x-cache: MISS
+x-cache-hits: 0
+x-served-by: cache-lcy-egml8630072-LCY
+content-length: 2731
+
+{"success":true,"report":{"domain":"ishackaeo.com","score":90,"issuesFound":1,"criticalErrors":1,"suggestions":["Poor server response time (4555ms). Goal is < 800ms."],"metrics":{"rank":"14500","organicKeywords":"12400","organicTraffic":"84500","trafficCost":"240500","adKeywords":"-","adTraffic":"-","adCost":"-","topKeywords":[]},"schemaAudit":{"hasSchema":true,"verdict":"The existing schema is comprehensive but can be enhanced. It effectively covers basic organizational and FAQ information but lacks certain elements that could improve search engine understanding and visibility.","missingPriority":["HIGH: Add 'ContactPoint' schema to improve customer service representation.","MED: Include 'SocialMediaPosting' schema to enhance social media presence.","LOW: Enhance 'LocalBusiness' schema with specific opening hours."],"generatedJsonLd":"[{\"@context\":\"https://schema.org\",\"@type\":\"ContactPoint\",\"telephone\":\"+27 (0) 11 000 0000\",\"contactType\":\"Customer Service\",\"areaServed\":\"ZA\",\"availableLanguage\":\"English\"}]","projectManagerPlan":[{"task":"Improve Server Response Time","instruction":"1. Analyze your hosting provider and the current server plan to ensure it supports optimal speed. 2. Use tools like Google PageSpeed Insights or GTmetrix to analyze current load times and get actionable insights. 3. Enable caching on your web server (e.g., using a plugin if using WordPress). 4. Optimize images by compressing them to reduce their file sizes. 5. Minimize JavaScript and CSS files. 6. Consider using a content delivery network (CDN) to serve files faster to users across different regions. 7. Regularly monitor your server response time using analytics tools to ensure it meets the goal of < 800ms."}]},"keywordOptimization":{"provided":false,"inTitle":false,"inH1":false,"inMeta":false,"inBody":false},"technicalValuation":{"loadSpeedMs":4555,"wordCount":1218,"hasViewport":true,"hasOpenGraph":true,"hasSchema":true,"linkDeficit":45,"primaryTarget":"Niche Keyword","adCost":"-","adKeywords":"-"},"consultingAdvice":["Your organic traffic is estimated at 84500/mo holding a commercial value of $240500. To scale this sustainably to a $100k asset, identify your pages ranking #11-#20 and inject thematic LSI semantic clusters to push them to Page 1.","Without organic keyword leverage, your immediate strategy should be producing localized or highly-niche blog hubs. Google heavily punishes \"Thin Content\" (under 1,000 words). Your scanned page came in at 1218 words.","We found zero Paid Search (AdWords) momentum surrounding this domain profile. This is highly risky as competitors can easily bid on your exact brand terms. Expanding into a dual Organic & Paid SEO strategy is advised."]}}
