@@ -156,6 +156,7 @@ import { environment } from '../../environments/environment';
                   <tr>
                     <th scope="col" class="px-6 py-4">Agency / Business Profile</th>
                     <th scope="col" class="px-6 py-4">Contact Person & Info</th>
+                    <th scope="col" class="px-6 py-4">CMS Integration</th>
                     <th scope="col" class="px-6 py-4">Billing Status</th>
                     <th scope="col" class="px-6 py-4">Joined</th>
                     <th scope="col" class="px-6 py-4 text-right">Actions</th>
@@ -172,6 +173,13 @@ import { environment } from '../../environments/environment';
                       <td class="px-6 py-4">
                         <div class="text-slate-200 font-medium">{{ agency.contact_person || 'No POC' }}</div>
                         <div class="font-mono text-slate-400 text-xs mt-0.5">{{ agency.email }}</div>
+                      </td>
+                      <td class="px-6 py-4">
+                        <span *ngIf="agency.cms_url" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider flex items-center inline-flex gap-1.5 w-max">
+                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                           Active Webhooks
+                        </span>
+                        <span *ngIf="!agency.cms_url" class="bg-slate-800 text-slate-500 border border-white/5 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider flex items-center inline-flex gap-1.5 w-max">Offline</span>
                       </td>
                       <td class="px-6 py-4">
                         <span *ngIf="agency.role === 'paid'" class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Paid ($299/mo)</span>
@@ -200,6 +208,13 @@ import { environment } from '../../environments/environment';
                         <input [(ngModel)]="agency.contact_person" placeholder="Contact Person" class="w-full bg-slate-950 border border-white/20 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500">
                         <input [(ngModel)]="agency.email" type="email" placeholder="Login Email" class="w-full bg-slate-950 border border-white/20 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500">
                       </td>
+                      <td class="px-6 py-4 space-y-2">
+                        <input [(ngModel)]="agency.cms_url" placeholder="https://wp-domain.com" class="w-full bg-slate-950 border border-blue-500/30 rounded px-2 py-1 text-xs text-blue-400 focus:outline-none focus:border-blue-500 placeholder-blue-500/50">
+                        <div class="flex gap-2">
+                          <input [(ngModel)]="agency.cms_username" placeholder="WP User" class="w-1/2 bg-slate-950 border border-blue-500/30 rounded px-2 py-1 text-xs text-blue-400 focus:outline-none focus:border-blue-500 placeholder-blue-500/50">
+                          <input [(ngModel)]="agency.cms_password" type="password" placeholder="WP App Pass" class="w-1/2 bg-slate-950 border border-blue-500/30 rounded px-2 py-1 text-xs text-blue-400 focus:outline-none focus:border-blue-500 placeholder-blue-500/50">
+                        </div>
+                      </td>
                       <td class="px-6 py-4">
                         <select [(ngModel)]="agency.role" class="w-full bg-slate-950 border border-white/20 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
                           <option value="free">Free Tier</option>
@@ -216,7 +231,7 @@ import { environment } from '../../environments/environment';
                     </ng-container>
                   </tr>
                   <tr *ngIf="!recentAgencies || recentAgencies.length === 0">
-                    <td colspan="5" class="px-6 py-12 text-center text-slate-500 font-medium italic">No client profiles registered yet.</td>
+                    <td colspan="6" class="px-6 py-12 text-center text-slate-500 font-medium italic">No client profiles registered yet.</td>
                   </tr>
                 </tbody>
               </table>
@@ -224,8 +239,32 @@ import { environment } from '../../environments/environment';
           </div>
 
         <!-- AI Agent War Room View -->
-        <div *ngIf="activeTab === 'agents'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div *ngIf="activeTab === 'agents'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
           
+          <!-- Human-in-the-Loop Override Queue -->
+          <div *ngIf="awaitingApprovals.length > 0" class="col-span-full bg-slate-900 border border-yellow-500/50 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-yellow-500 animate-pulse"></div>
+            <div class="flex items-center justify-between mb-4 pl-4">
+              <h2 class="text-xl font-extrabold text-white flex items-center gap-3">
+                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Human-in-the-Loop: Awaiting Approvals
+              </h2>
+              <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{{ awaitingApprovals.length }} Pending Runbooks</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4">
+              <div *ngFor="let task of awaitingApprovals" class="bg-slate-950/50 border border-white/10 rounded-xl p-4 hover:border-yellow-500/50 transition-colors">
+                <div class="text-xs text-yellow-400 font-bold mb-1 tracking-wider uppercase">Phase Intercepted</div>
+                <div class="font-bold text-white mb-2">{{ task.task_type }}</div>
+                <div class="text-sm text-slate-400 mb-4 line-clamp-2">{{ task.result_payload | json }}</div>
+                <button (click)="openApprovalModal(task)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold py-2 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                  Review & Approve JSON
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Left Column: Campaigns & Tasks -->
           <div class="col-span-1 space-y-6">
             <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-xl">
@@ -619,10 +658,56 @@ import { environment } from '../../environments/environment';
               </table>
             </div>
           </div>
+
+          <!-- B2B Inbound Audit Leads Core -->
+          <div class="bg-slate-900 border border-white/5 rounded-2xl p-6 shadow-2xl mt-8">
+            <h2 class="text-2xl font-extrabold text-white flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+              </div>
+              B2B Embedded Audit Leads
+            </h2>
+            <p class="text-sm text-slate-400 font-medium ml-13 mb-6">Inbound lead capture stream generated directly from Agency-embedded Zero-Touch SEO Widgets.</p>
+
+            <div class="overflow-x-auto rounded-xl border border-white/5">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead class="bg-slate-950 text-xs uppercase tracking-wider font-bold text-slate-500 border-b border-white/5">
+                  <tr>
+                    <th class="px-6 py-4">Lead Email</th>
+                    <th class="px-6 py-4">Target Domain</th>
+                    <th class="px-6 py-4">Pipeline Agency Owner</th>
+                    <th class="px-6 py-4 text-center">Audit Severity Proxy</th>
+                    <th class="px-6 py-4 text-right">Captured Over Webhook</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr *ngFor="let lead of agencyLeads" class="hover:bg-white/[0.02] transition-colors">
+                    <td class="px-6 py-4 font-bold text-slate-200">
+                       <a [href]="'mailto:' + lead.client_email" class="hover:text-blue-400 transition-colors">{{ lead.client_email }}</a>
+                    </td>
+                    <td class="px-6 py-4 font-mono text-xs text-slate-400">{{ lead.client_domain }}</td>
+                    <td class="px-6 py-4 text-slate-300 font-bold capitalize">{{ lead.agency_name }}</td>
+                    <td class="px-6 py-4 text-center">
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border"
+                            [ngClass]="lead.audit_score < 40 ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'">
+                        {{ lead.audit_score }}/100 Deficit
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-right text-xs text-slate-500 font-mono">{{ lead.created_at | date:'shortTime' }}</td>
+                  </tr>
+                  <tr *ngIf="agencyLeads.length === 0">
+                    <td colspan="5" class="px-6 py-12 text-center text-slate-500 font-medium italic">Embed widget payloads awaiting structural initiation.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         <!-- System & Billing Settings View -->
         <div *ngIf="activeTab === 'settings'" class="animate-fade-in grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          <!-- Promo Codes Engine -->
           <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
             <div class="p-6 border-b border-white/5 bg-slate-900/50">
               <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
@@ -636,11 +721,11 @@ import { environment } from '../../environments/environment';
             
             <div class="p-6">
               <div class="flex gap-3 mb-6">
-                <input #newPromo type="text" placeholder="e.g. VIP-AGENCY-2027" class="flex-1 bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors uppercase font-mono tracking-wider">
-                <button (click)="createPromoCode(newPromo.value); newPromo.value=''" class="bg-purple-600 hover:bg-purple-500 px-6 py-3 rounded-xl text-white font-bold shadow-md transition-colors flex items-center gap-2">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                  Generate Free Key
-                </button>
+                 <input #newPromo type="text" placeholder="e.g. VIP-AGENCY-2027" class="flex-1 bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition-colors uppercase font-mono tracking-wider">
+                 <button (click)="createPromoCode(newPromo.value); newPromo.value=''" class="bg-purple-600 hover:bg-purple-500 px-6 py-3 rounded-xl text-white font-bold shadow-md transition-colors flex items-center gap-2">
+                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                   Generate Free Key
+                 </button>
               </div>
 
               <div class="bg-slate-950 rounded-xl border border-white/5 overflow-hidden">
@@ -655,6 +740,86 @@ import { environment } from '../../environments/environment';
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          <!-- Quality Assurance (QA) Engine Tracker -->
+          <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-white/5 bg-slate-900/50 flex justify-between items-start">
+              <div>
+                <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                  </div>
+                  Self-Healing QA Engine
+                </h2>
+                <p class="text-sm text-slate-400 mt-1 font-medium ml-13">Autonomous system checks monitoring frontend latency and UX degradation.</p>
+              </div>
+              <button (click)="forceQaHeartbeat()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-4 py-2 rounded-lg text-xs font-bold transition-colors uppercase tracking-wider shadow-lg">Force Audit</button>
+            </div>
+            
+            <div class="p-6">
+              <div *ngIf="platformHealth.length === 0" class="text-center text-slate-500 py-8 font-medium">Awaiting initial QA structural telemetry hook...</div>
+              
+              <div *ngIf="platformHealth.length > 0" class="space-y-4">
+                <div *ngFor="let check of platformHealth; let first = first" 
+                     [ngClass]="first ? 'bg-emerald-500/5 border-emerald-500/20 shadow-inner' : 'bg-slate-950 border-white/5 opacity-70'"
+                     class="border rounded-xl p-4 transition-all">
+                  
+                  <div class="flex justify-between items-center mb-3">
+                    <span class="text-slate-300 font-bold text-sm flex items-center gap-2">
+                       <span class="w-2 h-2 rounded-full" [ngClass]="check.ux_score >= 90 ? 'bg-emerald-400' : 'bg-yellow-400'"></span>
+                       Audit Run: {{ check.snapshot_date | date:'shortTime' }}
+                    </span>
+                    <span class="text-xs font-mono font-bold" [ngClass]="check.ux_score >= 90 ? 'text-emerald-400' : 'text-yellow-400'">UX: {{ check.ux_score }}/100</span>
+                  </div>
+                  
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-900 border border-white/5 rounded-lg p-2.5 flex items-center justify-between">
+                      <span class="text-xs text-slate-500 font-bold">Latency</span>
+                      <span class="text-sm text-white font-mono">{{ check.latency_ms }}ms</span>
+                    </div>
+                    <div class="bg-slate-900 border border-white/5 rounded-lg p-2.5 flex items-center justify-between">
+                      <span class="text-xs text-slate-500 font-bold">404s/Fails</span>
+                      <span class="text-sm text-white font-mono" [ngClass]="check.broken_links > 0 ? 'text-red-400' : 'text-emerald-400'">{{ check.broken_links }}</span>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- Approval Modal Target -->
+        <div *ngIf="editingTask" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-4xl shadow-2xl animate-fade-in flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-6">
+              <div>
+                <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                  <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                  Reviewing: {{ editingTask.task_type }}
+                </h3>
+                <p class="text-sm text-slate-400 mt-1">Safely modify the Neural Array outputs produced by {{ editingTask.assigned_agent }} before approving execution onto the active database.</p>
+              </div>
+              <button (click)="closeApprovalModal()" class="text-slate-500 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            
+            <div class="flex-1 overflow-hidden flex flex-col mb-6">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Editable JSON Neural Output String</label>
+              <textarea [(ngModel)]="editedPayloadString" class="w-full flex-1 bg-slate-950 border border-white/10 rounded-xl p-4 text-sm text-green-400 font-mono focus:outline-none focus:border-yellow-500/50 resize-none shadow-inner leading-relaxed"></textarea>
+            </div>
+            
+            <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+              <button (click)="closeApprovalModal()" class="px-6 py-2.5 rounded-lg font-bold text-slate-300 hover:bg-slate-800 transition-colors">Cancel</button>
+              <button (click)="submitApproval()" class="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-extrabold px-8 py-2.5 rounded-lg shadow-lg shadow-yellow-500/20 transition-all flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Confirm & Overwrite Core
+              </button>
             </div>
           </div>
         </div>
@@ -676,12 +841,22 @@ export class AdminDashboard implements OnInit {
   campaigns: any[] = [];
   agentTasks: any[] = [];
   agentLogs: any[] = [];
+  targetedUrls: any[] = [];
+  
+  // Human-in-the-Loop State
+  editingTask: any = null;
+  editedPayloadString: string = '';
   
   // Settings & CRM State
   expandedCampaign: number | null = null;
   promoCodes: any[] = [];
   editAgencyId: number | null = null;
-  targetedUrls: any[] = [];
+  platformHealth: any[] = [];
+  agencyLeads: any[] = [];
+
+  get awaitingApprovals() {
+    return this.agentTasks.filter((t: any) => t.status === 'awaiting_approval');
+  }
 
   ngOnInit() {
     this.fetchMetrics();
@@ -690,6 +865,9 @@ export class AdminDashboard implements OnInit {
       setInterval(() => {
         if (this.activeTab === 'agents' || this.activeTab === 'crm') {
           this.fetchAgentData();
+        }
+        if (this.activeTab === 'settings') {
+          this.fetchPlatformHealth();
         }
       }, 15000);
     }
@@ -702,15 +880,41 @@ export class AdminDashboard implements OnInit {
     }
     if (tab === 'settings') {
       this.fetchPromoCodes();
+      this.fetchPlatformHealth();
     }
     if (tab === 'urls') {
       this.fetchTargetedUrls();
+      this.fetchAgencyLeads();
+    }
+  }
+
+  fetchPlatformHealth() {
+    this.http.get<any[]>(`${environment.apiUrl}/admin/platform-health`, { headers: this.getHeaders() })
+      .subscribe(data => this.platformHealth = data);
+  }
+
+  forceQaHeartbeat() {
+    if (confirm("Force an aggressive headless health check via Puppeteer?")) {
+      this.http.post(`${environment.apiUrl}/admin/sandbox/trigger-qa`, {}, { headers: this.getHeaders() }).subscribe({
+         next: (res: any) => {
+           alert("QA Initialization verified. Process running asynchronously.");
+           setTimeout(() => this.fetchPlatformHealth(), 4000);
+         },
+         error: () => alert("QA Heartbeat Trigger Failed.")
+      });
     }
   }
 
   fetchTargetedUrls() {
     this.http.get<any[]>(`${environment.apiUrl}/admin/targeted-urls`, { headers: this.getHeaders() }).subscribe({
       next: (data) => this.targetedUrls = data,
+      error: (err) => console.error(err)
+    });
+  }
+
+  fetchAgencyLeads() {
+    this.http.get<any[]>(`${environment.apiUrl}/admin/agency-leads`, { headers: this.getHeaders() }).subscribe({
+      next: (data) => this.agencyLeads = data,
       error: (err) => console.error(err)
     });
   }
@@ -753,6 +957,37 @@ export class AdminDashboard implements OnInit {
     this.http.get<any[]>(`${environment.apiUrl}/admin/campaigns`, { headers }).subscribe(data => this.campaigns = data);
     this.http.get<any[]>(`${environment.apiUrl}/admin/agent-tasks`, { headers }).subscribe(data => this.agentTasks = data);
     this.http.get<any[]>(`${environment.apiUrl}/admin/agent-logs`, { headers }).subscribe(data => this.agentLogs = data);
+  }
+  
+  openApprovalModal(task: any) {
+    this.editingTask = task;
+    this.editedPayloadString = JSON.stringify(task.result_payload, null, 2);
+  }
+  
+  closeApprovalModal() {
+    this.editingTask = null;
+    this.editedPayloadString = '';
+  }
+  
+  submitApproval() {
+    if (!this.editingTask) return;
+    
+    try {
+      const parsedPayload = JSON.parse(this.editedPayloadString);
+      this.http.post(`${environment.apiUrl}/admin/tasks/${this.editingTask.id}/approve`, { edited_payload: parsedPayload }, { headers: this.getHeaders() })
+        .subscribe({
+          next: (res: any) => {
+            alert(res.message);
+            this.closeApprovalModal();
+            this.fetchAgentData();
+            // Instantly try running PM Agent in the background so humans don't have to wait for the cron
+            this.http.post(`${environment.apiUrl}/admin/sandbox/trigger-pm`, {}, { headers: this.getHeaders() }).subscribe();
+          },
+          error: (err) => alert('Failed to approve task')
+        });
+    } catch(e) {
+      alert("Invalid JSON format. Please ensure your edits follow structural JSON rules before submitting.");
+    }
   }
 
   forcePmHeartbeat() {

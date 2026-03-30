@@ -11,14 +11,21 @@ class ImplementationAgent extends BaseAgent {
   async executeTask(taskId, campaignId, payload) {
     await this.logThought(campaignId, 'Ingesting Keyword strategy. Preparing to write onsite structural tags.', 'Drafting content blocks...');
     
-    const prompt = `Using the following Keyword Map, generate a highly optimized Homepage Title Tag, Meta Description, and primary H1. Keep within standard pixel width limits. Output strictly as JSON.`;
+    try {
+      const prompt = `Using the following Keyword Map, generate a highly optimized Homepage Title Tag, Meta Description, and primary H1. Keep within standard pixel width limits. Output strictly as JSON.`;
+      
+      const result = await this.think(prompt, payload);
+      const cleanRes = result.replace(/```json\n?|\n?```/g, '');
+      
+      await this.logThought(campaignId, 'Onsite implementation tags drafted successfully.', 'Submitting for approval.');
+      await this.submitForApproval(taskId, JSON.parse(cleanRes));
+    } catch (e) {
+      console.error(e);
+      await this.logThought(campaignId, `Execution Crash: ${e.message}`, `Failing Task`);
+      await this.submitForApproval(taskId, { error: e.message });
+    }
     
-    const result = await this.think(prompt, payload);
-    
-    await this.logThought(campaignId, 'Onsite implementation tags drafted successfully.', 'Writing result payload back to database.');
-    await this.completeTask(taskId, { onsite_tags: result });
-    
-    return result;
+    return;
   }
 }
 

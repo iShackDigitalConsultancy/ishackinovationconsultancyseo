@@ -48,13 +48,25 @@ class BaseAgent {
     }
   }
   
+  async submitForApproval(taskId, resultPayload) {
+    try {
+      await db.query(`
+        UPDATE agent_tasks 
+        SET status = 'awaiting_approval', result_payload = $1
+        WHERE id = $2
+      `, [JSON.stringify(resultPayload), taskId]);
+    } catch (e) {
+      console.error(`[${this.name}] Failed to submit task for approval`, e);
+    }
+  }
+
   async completeTask(taskId, resultPayload) {
     try {
       await db.query(`
         UPDATE agent_tasks 
         SET status = 'completed', result_payload = $1, completed_at = CURRENT_TIMESTAMP
         WHERE id = $2
-      `, [resultPayload, taskId]);
+      `, [JSON.stringify(resultPayload), taskId]);
     } catch (e) {
       console.error(`[${this.name}] Failed to mark task complete`, e);
     }

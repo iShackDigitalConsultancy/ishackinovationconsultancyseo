@@ -13,11 +13,20 @@ class BacklinkAgent extends BaseAgent {
     
     const prompt = `Based on the client's optimized onsite implementation, create a list of 5 hyper-relevant link-building targets and write one personalized outreach email to request a guest post.`;
     
-    const result = await this.think(prompt, payload);
-    
-    await this.logThought(campaignId, 'Off-site outreach strategy built.', 'Saving to DB.');
-    await this.completeTask(taskId, { link_targets: result });
-    
+    try {
+      const result = await this.think(prompt, payload);
+      const cleanRes = result.replace(/```json/g, '').replace(/```/g, '');
+      
+      await this.logThought(campaignId, 'Off-site outreach strategy built.', 'Saving to DB.');
+      await asanaService.updateTaskCompletion(taskId, `Outreach completed.\n\nTargets JSON:\n${cleanRes}`);
+      await this.submitForApproval(taskId, JSON.parse(cleanRes));
+
+    } catch (e) {
+      console.error(e);
+      await this.logThought(campaignId, `Crash: ${e.message}`, `Failing Task`);
+      await asanaService.updateTaskCompletion(taskId, `Outreach Task Failed:\n\n${e.message}`);
+      await this.completeTask(taskId, { error: e.message });
+    }
     return result;
   }
 }

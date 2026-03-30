@@ -36,12 +36,22 @@ class ResearchAgent extends BaseAgent {
       Return ONLY a JSON array of top keywords.
     `;
     
-    const result = await this.think(prompt, payload);
-    
-    await this.logThought(campaignId, 'Keyword clusters successfully generated.', 'Writing output payload to PostgreSQL.');
-    await this.completeTask(taskId, { keywords: result });
-    
-    return result;
+    try {
+      const result = await this.think(prompt, payload);
+      const cleanRes = result.replace(/```json\n?|\n?```/g, '');
+      
+      await this.logThought(campaignId, 'Keyword clusters successfully generated.', 'Writing output payload to PostgreSQL.');
+      await asanaService.updateTaskCompletion(taskId, `Keyword Research complete.\n\nStrategy JSON:\n${cleanRes}`);
+      await this.submitForApproval(taskId, JSON.parse(cleanRes));
+      return result;
+
+    } catch (e) {
+      console.error(e);
+      await this.logThought(campaignId, `API Error Output: ${e.message}`, `Failing Task Gracefully`);
+      await asanaService.updateTaskCompletion(taskId, `Task Failed:\n\n${e.message}`);
+      await this.completeTask(taskId, { error: e.message });
+      return null;
+    }
   }
 }
 

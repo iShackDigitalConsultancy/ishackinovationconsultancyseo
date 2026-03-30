@@ -41,6 +41,40 @@ const mailService = {
       console.error("Vera Sharp failed to send email", error);
       return false;
     }
+  },
+
+  sendOutreachPitch: async (to, subject, htmlBody) => {
+    const user = process.env.VERA_EMAIL_USER || 'veras@ishack.co.za';
+    const pass = process.env.VERA_EMAIL_PASS;
+
+    if (!pass) {
+      console.log(`\n--- [MOCK OUTREACH DISPATCH] ---`);
+      console.log(`TO: ${to}`);
+      console.log(`SUBJECT: ${subject}`);
+      console.log(`--------------------------------\n`);
+      return true;
+    }
+
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user, pass }
+      });
+
+      const mailOptions = {
+        from: `"iShack SEO Partnerships" <${user}>`,
+        to: to,
+        subject: subject,
+        html: htmlBody
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`[SMTP] Successfully dispatched backlink pitch to ${to}`);
+      return true;
+    } catch (error) {
+      console.error("[SMTP] Failed to dispatch outreach pitch", error);
+      return false;
+    }
   }
 };
 

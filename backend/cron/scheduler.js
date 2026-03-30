@@ -2,8 +2,11 @@ const cron = require('node-cron');
 const pmAgent = require('../agents/pmAgent');
 const veraAgent = require('../agents/veraAgent');
 const autoSeoAgent = require('../agents/autoSeoAgent');
+const qaAgent = require('../agents/qaAgent');
+const outreachAgent = require('../agents/outreachAgent');
 
 let isPmTickRunning = false;
+let isOutreachTickRunning = false;
 
 function initSchedulers() {
   console.log("⏰ Starting AI Agent CRON Schedulers...");
@@ -25,6 +28,18 @@ function initSchedulers() {
     }
   });
 
+  // Autonomous Prospecting / Outreach Subroutine -- Runs every 12 hours
+  cron.schedule('0 */12 * * *', async () => {
+    if (isOutreachTickRunning) return;
+    isOutreachTickRunning = true;
+    
+    console.log('--- [CRON] Starting Autonomous Outreach Prospecting Cycle ---');
+    await outreachAgent.runBacklinkEngine();
+    console.log('--- [CRON] Outreach Prospecting Cycle Complete ---\n');
+    
+    isOutreachTickRunning = false;
+  });
+
   // Vera Sharp runs every day at 17:00 (5:00 PM) Server Time
   cron.schedule('0 17 * * *', async () => {
     try {
@@ -42,6 +57,16 @@ function initSchedulers() {
       await autoSeoAgent.runWeeklyResearch();
     } catch (e) {
       console.error("AutoSeoAgent Failed on Schedule", e);
+    }
+  });
+
+  // Self-Healing QA Agent runs at the bottom of every hour (XX:30) to map structural platform UX degradation natively
+  cron.schedule('30 * * * *', async () => {
+    try {
+      console.log("⏰ Task Fired: qaAgent.runHealthCheck()");
+      await qaAgent.runHealthCheck('https://ishackinnovationconsultancy.com');
+    } catch (e) {
+      console.error("QAAgent Failed on Schedule", e);
     }
   });
 

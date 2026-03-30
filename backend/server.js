@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const authRouter = require('./auth');
+const widgetRouter = require('./widget');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -20,6 +21,9 @@ app.get('/api/health', (req, res) => {
 // Auth Routes
 app.use('/api/auth', authRouter);
 
+// Widget Routes
+app.use('/api/widget', widgetRouter);
+
 // Protected Sites API
 const sitesRouter = require('./sites');
 app.use('/api/sites', sitesRouter);
@@ -27,6 +31,10 @@ app.use('/api/sites', sitesRouter);
 // Superadmin API
 const adminRouter = require('./admin');
 app.use('/api/admin', adminRouter);
+
+// B2B White-Label Client Portal API
+const clientRouter = require('./client');
+app.use('/api/client', clientRouter);
 
 // Payment Gateways & Promos
 const paymentsRouter = require('./payments');

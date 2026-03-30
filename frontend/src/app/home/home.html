@@ -1,4 +1,4 @@
-<main class="min-h-screen bg-slate-50 text-slate-800 font-sans relative overflow-x-hidden">
+<main class="min-h-screen bg-slate-50 text-slate-800 font-sans relative overflow-x-hidden print:overflow-visible print:bg-white">
   <!-- Navigation -->
   <nav class="fixed w-full z-50 glass-panel py-4 px-6 lg:px-12 flex justify-between items-center transition-all duration-300">
     <div class="flex items-center gap-2">
@@ -269,7 +269,7 @@
               </div>
               <ul class="list-disc pl-5 space-y-2 text-sm font-medium relative z-10">
                 @for (suggestion of mockReport()?.suggestions; track $index) {
-                  <li>{{ suggestion }}</li>
+                  <li>{{ suggestion?.message || suggestion }}</li>
                 }
               </ul>
             </div>
@@ -486,8 +486,8 @@
       @if (funnelState() === 'upgrade') {
         <div class="animate-fade-in space-y-6">
           <div class="text-center mb-10">
-            <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-800 mb-2">Hire Your Autonomous AI Agency</h2>
-            <p class="text-lg text-slate-500 font-medium">Select your execution tier. Our AI Agents work 24/7 to scale your organic ranking safely.</p>
+            <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-800 mb-2">Enterprise SEO Packages & White-Label Agency Services</h2>
+            <p class="text-lg text-slate-500 font-medium">Select your execution tier. Our AI Agents work 24/7 to scale your organic ranking securely via high-DR Backlinking.</p>
           </div>
           
           <div class="grid lg:grid-cols-3 gap-6 items-center">
@@ -544,6 +544,36 @@
 
     </div>
     
+    <!-- Enterprise SEO Case Studies (E-E-A-T Trust Signals) -->
+    <section class="max-w-6xl mx-auto px-6 lg:px-8 pb-20 mt-10">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-extrabold text-slate-900">Proven Enterprise B2B Search Domination</h2>
+        <p class="mt-4 text-lg text-slate-600">We don't just audit. We execute safely and algorithmically.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <article class="bg-white rounded-3xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition-shadow relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+          <div class="text-xs font-bold text-primary uppercase tracking-widest mb-2">Hospitality & Vending</div>
+          <h3 class="text-2xl font-bold text-slate-800 mb-4">Dallmayr Case Study</h3>
+          <p class="text-slate-600 mb-6">Generated a bespoke AI-structured clustering roadmap and automated digital PR sequencing.</p>
+          <div class="flex items-center gap-4 border-t border-slate-100 pt-6">
+            <div class="text-4xl font-black text-slate-900">55+</div>
+            <div class="text-sm font-medium text-slate-500 leading-tight">Highly Competitive Industry Keywords<br>Ranked #1 Organically.</div>
+          </div>
+        </article>
+        <article class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 border border-slate-700 shadow-xl relative overflow-hidden text-white">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-2xl"></div>
+          <div class="text-xs font-bold text-accent uppercase tracking-widest mb-2">Real Estate Education</div>
+          <h3 class="text-2xl font-bold text-white mb-4">Propacademy Metrics</h3>
+          <p class="text-slate-300 mb-6">Overtook massive legacy competitors through Artificial Engine Optimization (AEO) schema restructuring and Titan Backlinking.</p>
+          <div class="flex items-center gap-4 border-t border-slate-700 pt-6">
+            <div class="text-4xl font-black text-white">#1</div>
+            <div class="text-sm font-medium text-slate-400 leading-tight">Secured Dominance across the largest<br>commercial intent keyword matrix.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <!-- Generative AI Zero-Click FAQ -->
     <div class="max-w-4xl mx-auto px-6 lg:px-8 pb-32 mt-20">
       <h2 class="text-4xl font-bold text-slate-900 mb-10 text-center">Artificial Engine Optimization (AEO) FAQ</h2>

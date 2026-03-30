@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
+const mailService = require('./services/mailService');
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_for_dev';
@@ -48,10 +49,10 @@ router.post('/agencies', authenticateSuperadmin, async (req, res) => {
 
 router.put('/agencies/:id', authenticateSuperadmin, async (req, res) => {
   try {
-    const { agencyName, email, role, contactPerson, address, brandColor, brandLogoUrl } = req.body;
+    const { agencyName, email, role, contactPerson, address, brandColor, brandLogoUrl, cms_url, cms_username, cms_password } = req.body;
     await db.query(
-      'UPDATE agencies SET agency_name = $1, email = $2, role = $3, contact_person = $4, address = $5, brand_color = $6, brand_logo_url = $7 WHERE id = $8',
-      [agencyName, email, role, contactPerson || '', address || '', brandColor || '#007bff', brandLogoUrl || '', req.params.id]
+      'UPDATE agencies SET agency_name = $1, email = $2, role = $3, contact_person = $4, address = $5, brand_color = $6, brand_logo_url = $7, cms_url = $8, cms_username = $9, cms_password = $10 WHERE id = $11',
+      [agencyName, email, role, contactPerson || '', address || '', brandColor || '#007bff', brandLogoUrl || '', cms_url || '', cms_username || '', cms_password || '', req.params.id]
     );
     res.json({ success: true });
   } catch (err) {
@@ -92,7 +93,7 @@ router.get('/metrics', authenticateSuperadmin, async (req, res) => {
     
     const mrr = paidAgencies * 299;
 
-    const recentAgenciesResult = await db.query("SELECT id, agency_name, email, role, contact_person, address, brand_color, brand_logo_url, created_at FROM agencies WHERE role != 'superadmin' ORDER BY created_at DESC");
+    const recentAgenciesResult = await db.query("SELECT id, agency_name, email, role, contact_person, address, brand_color, brand_logo_url, cms_url, cms_username, cms_password, created_at FROM agencies WHERE role != 'superadmin' ORDER BY created_at DESC");
 
     res.json({
       metrics: {
@@ -141,21 +142,127 @@ router.get('/campaigns', authenticateSuperadmin, async (req, res) => {
       const tasksQuery = await db.query("SELECT * FROM agent_tasks WHERE campaign_id = $1 ORDER BY created_at ASC", [c.id]);
       c.tasks = tasksQuery.rows;
       
-      // Generate some Mock Historic Data for visual testing until we let SEMrush run for months
-      c.historic_metrics = {
-        organicKeywords: Math.floor(Math.random() * 1000) + 120,
-        positionChanges: [
-          { keyword: 'digital marketing agency', prev: 24, current: 8 },
-          { keyword: 'seo services', prev: 55, current: 12 },
-          { keyword: 'b2b lead generation', prev: 80, current: 22 }
-        ],
-        trafficValue: Math.floor(Math.random() * 5000) + 800
-      };
+      // Pull real historic telemetry from SEMrush Analytics Agent
+      const metricsQuery = await db.query("SELECT * FROM campaign_metrics WHERE campaign_id = $1 ORDER BY snapshot_date DESC LIMIT 1", [c.id]);
+      
+      if (metricsQuery.rows.length > 0) {
+        const live = metricsQuery.rows[0];
+        c.historic_metrics = {
+          organicKeywords: live.organic_keywords,
+          trafficValue: live.organic_traffic,
+          domainRating: live.domain_rating,
+          positionChanges: live.top_keywords || []
+        };
+      } else {
+        // Fallback for newly mounted campaigns pending the Analytics engine pass
+        c.historic_metrics = {
+          organicKeywords: 0,
+          trafficValue: 0,
+          domainRating: 0,
+          positionChanges: []
+        };
+      }
     }
     
     res.json(campaigns);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch campaigns' });
+  }
+});
+
+// Human-in-the-loop: Approve Task Custom Payload
+router.post('/tasks/:taskId/approve', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { edited_payload } = req.body;
+    
+    // Validate that the task exists and is awaiting approval
+    const taskCheck = await db.query("SELECT * FROM agent_tasks WHERE id = $1 AND status = 'awaiting_approval'", [taskId]);
+    if (taskCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Task not found or not awaiting approval.' });
+    }
+    
+    // Save the human-edited payload and finalize the agent phase
+    await db.query(`
+      UPDATE agent_tasks 
+      SET status = 'completed', result_payload = $1, completed_at = CURRENT_TIMESTAMP
+      WHERE id = $2
+    `, [JSON.stringify(edited_payload), taskId]);
+    
+    const coreTaskObj = taskCheck.rows[0];
+    
+    // Epic 7: Extract potential WP Content Management System parameters linked to the current Campaign's Agency Parent Umbrella
+    const agencyCmsResult = await db.query(`
+      SELECT a.cms_url, a.cms_username, a.cms_password 
+      FROM agencies a 
+      JOIN campaigns c ON c.agency_id = a.id 
+      WHERE c.id = $1
+    `, [coreTaskObj.campaign_id]);
+    const agencyCms = agencyCmsResult.rows[0];
+
+    // Intercept specific payloads dynamically based on their underlying Neural Vector Types
+    if (coreTaskObj.task_type === 'backlink_outreach') {
+       const emailTo = edited_payload.to;
+       const emailSubject = edited_payload.subject;
+       const emailBody = edited_payload.body;
+       
+       await mailService.sendOutreachPitch(emailTo, emailSubject, emailBody);
+       
+       await db.query(`
+         INSERT INTO agent_logs (campaign_id, agent_name, action_taken, thought_process)
+         VALUES ($1, 'OutreachAgent', 'Dispatched Pitch Email', $2)
+       `, [coreTaskObj.campaign_id, `Successfully routed HTML vector payload across SMTP grid directly to Prospect: [${emailTo}]`]);
+       
+    } else if (coreTaskObj.task_type === 'onsite_content') {
+       // Zero-Friction CMS Webhook Publisher Route
+       if (agencyCms && agencyCms.cms_url && agencyCms.cms_username && agencyCms.cms_password) {
+           try {
+               const wpTitle = edited_payload.H1 || edited_payload['Title Tag'] || 'Optimized SEO Draft';
+               const metaDesc = edited_payload['Meta Description'] || 'Generated by OpenClaw Engine.';
+               
+               const wpBodyHtml = `
+                 <h1>${wpTitle}</h1>
+                 <p><strong>Primary Meta Focus:</strong> ${metaDesc}</p>
+                 <hr/>
+                 <img src="https://source.unsplash.com/random/800x400/?business,seo" alt="Enterprise SEO Structure" />
+                 <p><em>This comprehensive onsite architecture was autonomously drafted and REST-pushed by the iShack AI Matrix via Native Webhooks.</em></p>
+               `;
+               
+               const b64Auth = Buffer.from(`${agencyCms.cms_username}:${agencyCms.cms_password}`).toString('base64');
+               const cleanUrl = agencyCms.cms_url.replace(/\/$/, ""); // Strip trailing slashes
+               
+               const wpResponse = await fetch(`${cleanUrl}/wp-json/wp/v2/posts`, {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'Authorization': `Basic ${b64Auth}`
+                   },
+                   body: JSON.stringify({
+                       title: wpTitle,
+                       content: wpBodyHtml,
+                       status: 'draft'
+                   })
+               });
+
+               if (wpResponse.ok) {
+                   await db.query(`
+                     INSERT INTO agent_logs (campaign_id, agent_name, action_taken, thought_process)
+                     VALUES ($1, 'ImplementationAgent', 'CMS Push Successful', 'Securely authenticated to WordPress REST API using provided Client Application Passwords. Successfully injected raw HTML schema as a DRAFT post.')
+                   `, [coreTaskObj.campaign_id]);
+               } else {
+                   const errText = await wpResponse.text();
+                   console.error("[WP REST FAILURE] Payload rejection:", errText);
+               }
+           } catch (pushErr) {
+               console.error("[WP REST EXCEPTION] Webhook Network failure:", pushErr);
+           }
+       }
+    }
+    
+    res.json({ message: 'Task formally approved. Action securely executed.' });
+  } catch (e) {
+    console.error('Task Approval Error:', e);
+    res.status(500).json({ error: 'Failed to approve task externally' });
   }
 });
 
@@ -176,6 +283,21 @@ router.get('/targeted-urls', authenticateSuperadmin, async (req, res) => {
     res.json(urls.rows);
   } catch(e) {
     res.status(500).json({ error: 'Failed to aggregate targeted URLs' });
+  }
+});
+
+router.get('/agency-leads', authenticateSuperadmin, async (req, res) => {
+  try {
+    const query = `
+      SELECT l.id, l.client_domain, l.client_email, l.audit_score, l.status, l.created_at, a.agency_name
+      FROM agency_leads l
+      JOIN agencies a ON l.agency_id = a.id
+      ORDER BY l.created_at DESC
+    `;
+    const leads = await db.query(query);
+    res.json(leads.rows);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to extract global CRM leads' });
   }
 });
 
@@ -219,7 +341,7 @@ router.post('/sandbox/start-campaign', authenticateSuperadmin, async (req, res) 
     const finalAgencyId = agencyId ? parseInt(agencyId, 10) : req.user.agencyId;
     
     // Assign to the selected child agency (or fallback to Superadmin umbrella)
-    await db.query("INSERT INTO campaigns (agency_id, client_domain, package_tier) VALUES ($1, $2, $3)", [finalAgencyId, domain, packageTier]);
+    await db.query("INSERT INTO campaigns (agency_id, client_domain, package_tier, status) VALUES ($1, $2, $3, 'active')", [finalAgencyId, domain, packageTier]);
     
     // Automatically trigger the PM agent heartbeat to pick up the brand new campaign immediately!
     await pmAgent.tick();
@@ -272,6 +394,28 @@ router.post('/sandbox/seed-vera', async (req, res) => {
     res.json({ success: true, message: 'Superadmin veras@ishack.co.za physically injected into production DB.' });
   } catch (err) {
     res.status(500).json({ error: 'Fatal seed error', details: err.message });
+  }
+});
+
+// Real-Time Self-Healing QA Uptime Telemetry
+router.get('/platform-health', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM platform_health ORDER BY snapshot_date DESC LIMIT 5');
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to access structural telemetry' });
+  }
+});
+
+// Force the QA Engine to perform an immediate hot-audit outside of the scheduler loop
+router.post('/sandbox/trigger-qa', authenticateSuperadmin, async (req, res) => {
+  try {
+    const qaAgent = require('../agents/qaAgent');
+    // Non-blocking fire and forget
+    qaAgent.runHealthCheck('https://ishackinnovationconsultancy.com').catch(console.error);
+    res.json({ message: 'QA Health Trace Initialized in background.' });
+  } catch(e) {
+    res.status(500).json({ error: 'QA Initialization Failed' });
   }
 });
 

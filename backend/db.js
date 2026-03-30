@@ -17,6 +17,9 @@ const initSchema = async () => {
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         role VARCHAR(50) DEFAULT 'free',
+        cms_url VARCHAR(255),
+        cms_username VARCHAR(255),
+        cms_password VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -73,6 +76,35 @@ const initSchema = async () => {
         code VARCHAR(50) UNIQUE NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      CREATE TABLE IF NOT EXISTS campaign_metrics (
+        id SERIAL PRIMARY KEY,
+        campaign_id INTEGER REFERENCES campaigns(id) ON DELETE CASCADE,
+        snapshot_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        organic_traffic INTEGER DEFAULT 0,
+        organic_keywords INTEGER DEFAULT 0,
+        domain_rating INTEGER DEFAULT 0,
+        top_keywords JSONB
+      );
+
+      CREATE TABLE IF NOT EXISTS platform_health (
+        id SERIAL PRIMARY KEY,
+        snapshot_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        latency_ms INTEGER DEFAULT 0,
+        broken_links INTEGER DEFAULT 0,
+        ux_score INTEGER DEFAULT 100,
+        console_errors JSONB
+      );
+
+      CREATE TABLE IF NOT EXISTS agency_leads (
+        id SERIAL PRIMARY KEY,
+        agency_id INTEGER REFERENCES agencies(id) ON DELETE CASCADE,
+        client_domain VARCHAR(255) NOT NULL,
+        client_email VARCHAR(255) NOT NULL,
+        audit_score INTEGER DEFAULT 0,
+        status VARCHAR(50) DEFAULT 'new',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
     
     try {
@@ -93,6 +125,11 @@ const initSchema = async () => {
 
     try {
       await client.query("ALTER TABLE campaigns ADD COLUMN package_tier VARCHAR(50) DEFAULT 'basic'");
+    } catch(e) {}
+    
+    // Auto-migrate any dormant campaigns locked into the wrong initial phase
+    try {
+      await client.query("UPDATE campaigns SET status = 'active' WHERE status = 'new'");
     } catch(e) {}
 
     console.log('PostgreSQL Database schema initialized');
