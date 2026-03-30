@@ -141,3 +141,6 @@ PMAgent Failed on Schedule ReferenceError: asanaService is not defined
     at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
     at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
     at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 3108ms | UX Score: 89. Logs secured.

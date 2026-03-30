@@ -154,8 +154,20 @@ import { environment } from '../../../environments/environment';
               </div>
             </div>
 
+            <!-- Legal Consent -->
+            <div class="mb-6 flex items-start gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div class="flex items-center h-5 mt-0.5">
+                <input id="terms" name="terms" type="checkbox" required [(ngModel)]="acceptedTerms" [disabled]="loading" class="w-4 h-4 text-primary bg-white border-slate-300 rounded focus:ring-primary focus:ring-2 cursor-pointer">
+              </div>
+              <label for="terms" class="text-sm font-medium text-slate-700 leading-tight">
+                I have legally reviewed and explicitly agree to the B2B 
+                <a routerLink="/terms" target="_blank" class="text-primary hover:underline">Terms of Service, Disclaimers, and Liability Clauses</a> 
+                stipulated by iShack.
+              </label>
+            </div>
+
             <div>
-              <button type="submit" [disabled]="loading" class="relative overflow-hidden w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
+              <button type="submit" [disabled]="loading || !acceptedTerms" class="relative overflow-hidden w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
                 <span *ngIf="!loading && (!promoCode || promoCode.toLowerCase() !== 'evertonfc')">
                   Register & Pay ({{ planType === 'agency' ? '$299/mo' : '$49' }})
                 </span>
@@ -183,14 +195,20 @@ export class Register {
   email = '';
   password = '';
   promoCode = '';
+  acceptedTerms = false;
   loading = false;
   error = '';
 
   onSubmit() {
     this.error = '';
     
+    if (!this.acceptedTerms) {
+      this.error = 'You must agree to the legally binding Terms of Service to proceed.';
+      return;
+    }
+
     if (!this.agencyName || !this.email || !this.password || !this.contactPerson || !this.address) {
-      this.error = 'Please fill out all required fields.';
+      this.error = 'Please fill out all required physical entity fields.';
       return;
     }
 
