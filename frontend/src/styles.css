@@ -21,22 +21,21 @@ html {
 
 /* Print PDF Isolation */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  #report-container, #report-container * {
-    visibility: visible;
-  }
-  #report-container {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  html, body {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
   }
   
-  /* Ensure backgrounds render on PDF */
+  #report-container {
+    position: relative !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Force WebKit to preserve background colors/gradients */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
