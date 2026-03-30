@@ -6,3 +6,138 @@ PostgreSQL Database schema initialized
 ⏰ Task Fired: qaAgent.runHealthCheck()
 🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
 🛡️ [QA Agent] Sweep Complete. Latency: 3408ms | UX Score: 86. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+⏰ Task Fired: VeraAgent.runDailyReport()
+📝 [Vera Sharp] Compiling daily aggregate report...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Executing assigned logic for BacklinkAgent...
+[Backlinking Agent] 🧠 Thought: Reviewing published content to determine off-site backlink velocity... | ⚡ Action: Drafting outreach emails and target sites.
+📝 [Vera Sharp] Dispatching summary to Mailer service.
+VERA_EMAIL_PASS is missing. Vera Sharp will run in Mock Mode.
+[MOCK EMAIL SEND] To: wayneb@ishack.co.za, richardb@ishack.co.za
+[MOCK EMAIL SUBJECT] iShack SEO AI Agency: Daily Progress Update
+[Backlinking Agent] 🧠 Thought: Off-site outreach strategy built. | ⚡ Action: Saving to DB.
+ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:21:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+[Backlinking Agent] 🧠 Thought: Crash: asanaService is not defined | ⚡ Action: Failing Task
+PMAgent Failed on Schedule ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 2108ms | UX Score: 99. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Executing assigned logic for BacklinkAgent...
+[Backlinking Agent] 🧠 Thought: Reviewing published content to determine off-site backlink velocity... | ⚡ Action: Drafting outreach emails and target sites.
+[Backlinking Agent] 🧠 Thought: Off-site outreach strategy built. | ⚡ Action: Saving to DB.
+ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:21:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+[Backlinking Agent] 🧠 Thought: Crash: asanaService is not defined | ⚡ Action: Failing Task
+PMAgent Failed on Schedule ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1174ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Executing assigned logic for BacklinkAgent...
+[Backlinking Agent] 🧠 Thought: Reviewing published content to determine off-site backlink velocity... | ⚡ Action: Drafting outreach emails and target sites.
+[Backlinking Agent] 🧠 Thought: Off-site outreach strategy built. | ⚡ Action: Saving to DB.
+ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:21:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+[Backlinking Agent] 🧠 Thought: Crash: asanaService is not defined | ⚡ Action: Failing Task
+PMAgent Failed on Schedule ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1000ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Executing assigned logic for BacklinkAgent...
+[Backlinking Agent] 🧠 Thought: Reviewing published content to determine off-site backlink velocity... | ⚡ Action: Drafting outreach emails and target sites.
+[Backlinking Agent] 🧠 Thought: Off-site outreach strategy built. | ⚡ Action: Saving to DB.
+ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:21:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+[Backlinking Agent] 🧠 Thought: Crash: asanaService is not defined | ⚡ Action: Failing Task
+PMAgent Failed on Schedule ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1092ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Executing assigned logic for BacklinkAgent...
+[Backlinking Agent] 🧠 Thought: Reviewing published content to determine off-site backlink velocity... | ⚡ Action: Drafting outreach emails and target sites.
+[Backlinking Agent] 🧠 Thought: Off-site outreach strategy built. | ⚡ Action: Saving to DB.
+ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:21:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+[Backlinking Agent] 🧠 Thought: Crash: asanaService is not defined | ⚡ Action: Failing Task
+PMAgent Failed on Schedule ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1049ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Executing assigned logic for BacklinkAgent...
+[Backlinking Agent] 🧠 Thought: Reviewing published content to determine off-site backlink velocity... | ⚡ Action: Drafting outreach emails and target sites.
+[Backlinking Agent] 🧠 Thought: Off-site outreach strategy built. | ⚡ Action: Saving to DB.
+ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:21:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+[Backlinking Agent] 🧠 Thought: Crash: asanaService is not defined | ⚡ Action: Failing Task
+PMAgent Failed on Schedule ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)

@@ -111,24 +111,33 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     if (event.event === 'charge.success') {
       const metadata = event.data.metadata;
       const agencyId = metadata.agency_id;
-      const domain = metadata.domain;
-      const tier = metadata.package_tier;
+      const type = metadata.type;
+      
+      if (type === 'saas_subscription') {
+        // SaaS User Onboarding Payment (Global Account Setup)
+        await db.query("UPDATE agencies SET payment_status = 'active' WHERE id = $1", [agencyId]);
+        console.log(`[Paystack Webhook] Successfully activated SaaS subscription for Agency ID: ${agencyId}`);
+      } else {
+        // Standard Campaign / Site Add-on Payment
+        const domain = metadata.domain;
+        const tier = metadata.package_tier;
 
-      // Ensure the payment hasn't already been processed
-      const existing = await db.query('SELECT id FROM campaigns WHERE agency_id = $1 AND client_domain = $2', [agencyId, domain]);
-      if (existing.rowCount === 0) {
-        
-        // Insert Paid Campaign
-        await db.query(
-          "INSERT INTO campaigns (agency_id, client_domain, package_tier, status) VALUES ($1, $2, $3, 'active')",
-          [agencyId, domain, tier]
-        );
+        // Ensure the payment hasn't already been processed
+        const existing = await db.query('SELECT id FROM campaigns WHERE agency_id = $1 AND client_domain = $2', [agencyId, domain]);
+        if (existing.rowCount === 0) {
+          
+          // Insert Paid Campaign
+          await db.query(
+            "INSERT INTO campaigns (agency_id, client_domain, package_tier, status) VALUES ($1, $2, $3, 'active')",
+            [agencyId, domain, tier]
+          );
 
-        // Map over to OCR Scans as well natively 
-        await db.query("INSERT INTO client_sites (agency_id, url, status) VALUES ($1, $2, 'pending')", [agencyId, domain]);
-        
-        // Unleash PM Robotics!
-        await pmAgent.tick();
+          // Map over to OCR Scans as well natively 
+          await db.query("INSERT INTO client_sites (agency_id, url, status) VALUES ($1, $2, 'pending')", [agencyId, domain]);
+          
+          // Unleash PM Robotics!
+          await pmAgent.tick();
+        }
       }
     }
 

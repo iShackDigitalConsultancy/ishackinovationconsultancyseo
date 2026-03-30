@@ -112,6 +112,10 @@ const initSchema = async () => {
     } catch(e) {}
     
     try {
+      await client.query("ALTER TABLE agencies ADD COLUMN payment_status VARCHAR(50) DEFAULT 'pending'");
+    } catch(e) {}
+    
+    try {
       await client.query("ALTER TABLE agencies ADD COLUMN brand_logo_url TEXT");
     } catch(e) {}
 

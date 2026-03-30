@@ -65,7 +65,12 @@ router.post('/register', async (req, res) => {
           {
             email: email,
             amount: billingAmount,
-            callback_url: 'http://localhost:4200/dashboard'
+            callback_url: 'https://ishackaeo.com/dashboard',
+            metadata: {
+              agency_id: agencyId,
+              package_tier: selectedPlan,
+              type: 'saas_subscription'
+            }
           },
           {
             headers: {
