@@ -1,9 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
-const { authenticate } = require('./auth');
+const jwt = require('jsonwebtoken');
 
-router.get('/portal-data', authenticate, async (req, res) => {
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_for_dev';
+
+const authenticateToken = async (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: 'Access denied. No token provided.' });
+
+  jwt.verify(token, JWT_SECRET, async (err, decoded) => {
+    if (err) return res.status(403).json({ error: 'Invalid or expired token.' });
+    
+    try {
+      const userResult = await db.query('SELECT role FROM agencies WHERE id = $1', [decoded.agencyId]);
+      req.user = {
+        ...decoded,
+        role: userResult.rows[0] ? userResult.rows[0].role : 'free'
+      };
+      next();
+    } catch(dbErr) {
+      return res.status(500).json({ error: 'Database check failed' });
+    }
+  });
+};
+
+router.get('/portal-data', authenticateToken, async (req, res) => {
   try {
     const agencyId = req.user.agencyId;
     
