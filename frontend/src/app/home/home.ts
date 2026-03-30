@@ -51,6 +51,61 @@ export class Home implements OnInit {
     }
   }
 
+  // Factual SEO Case Studies (Extracted from Google Drive PDFs)
+  caseStudies = [
+    {
+      id: 1,
+      client: 'Dallmayr',
+      industry: 'Commercial Coffee Solutions',
+      summary: 'Drove massive enterprise visibility for high-ticket coffee/vending machine rentals.',
+      trafficSessions: '21,247',
+      pageOneKeywords: 3,
+      topKeywords: [
+        { phrase: 'coffee vending machine', rank: 3 },
+        { phrase: 'commercial coffee machine for sale', rank: 5 },
+        { phrase: 'coffee machine rental', rank: 10 }
+      ],
+      timeframe: 'Dec 2025 - Feb 2026'
+    },
+    {
+      id: 2,
+      client: 'Jpak',
+      industry: 'Industrial Food Packaging',
+      summary: 'Dominated the SERPs for highly-niche B2B industrial printing machinery queries.',
+      trafficSessions: '22,107',
+      pageOneKeywords: 12,
+      topKeywords: [
+        { phrase: 'Food Packaging printer', rank: 1 },
+        { phrase: 'Industrial Metal Detector', rank: 1 },
+        { phrase: 'Thermal Inkjet printer', rank: 2 },
+        { phrase: 'Continuous inkjet printer', rank: 3 }
+      ],
+      timeframe: 'Dec 2025 - Feb 2026'
+    },
+    {
+      id: 3,
+      client: 'Propacademy',
+      industry: 'Real Estate Education',
+      summary: 'Captured the exact national search intent for South African real estate compliance and course certification.',
+      trafficSessions: '43,851',
+      pageOneKeywords: 15,
+      topKeywords: [
+        { phrase: 'real estate courses', rank: 1 },
+        { phrase: 'property agent course', rank: 1 },
+        { phrase: 'property management courses', rank: 2 },
+        { phrase: 'become a real estate agent', rank: 8 }
+      ],
+      timeframe: 'Dec 2025 - Feb 2026'
+    }
+  ];
+
+  // Accordion State tracking
+  expandedCaseId = signal<number | null>(null);
+
+  toggleCaseStudy(id: number) {
+    this.expandedCaseId.update(current => current === id ? null : id);
+  }
+
   ngOnInit() {
     this.titleService.setTitle('White-Label AI SEO Software & Technical Automation Agency | iShack');
     this.metaService.updateTag({ 

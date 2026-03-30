@@ -552,74 +552,81 @@
       </div>
       
       <div class="grid lg:grid-cols-3 gap-8">
-        <!-- Case Study 1: Dallmayr -->
-        <article class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group">
-          <div class="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors"></div>
-          <div class="text-xs font-black text-primary uppercase tracking-widest mb-3 border-l-4 border-primary pl-3">Hospitality & Vending</div>
-          <h3 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Dallmayr Vending</h3>
-          <p class="text-slate-600 mb-8 leading-relaxed font-medium">Deployed our <span class="text-slate-900 font-bold">ResearchAgent</span> to dismantle competitor clustering maps. Automated digital PR sequencing systematically acquired 100+ high-DR referring domains within 6 months.</p>
-          
-          <div class="space-y-4 mb-8">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span class="text-slate-500 font-medium">Organic Traffic Value</span>
-              <span class="text-xl font-bold text-green-600">+$42,000/mo</span>
+        @for (study of caseStudies; track study.id) {
+          <article 
+            (click)="toggleCaseStudy(study.id)"
+            class="bg-white rounded-3xl p-8 border shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group cursor-pointer"
+            [class.border-primary]="expandedCaseId() === study.id"
+            [class.border-slate-200]="expandedCaseId() !== study.id"
+            [class.lg:-translate-y-4]="expandedCaseId() === study.id"
+            [class.z-10]="expandedCaseId() === study.id"
+          >
+            <!-- Background Glow -->
+            <div class="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl transition-colors"
+                 [class.bg-primary]="expandedCaseId() === study.id"
+                 [class.bg-slate-200]="expandedCaseId() !== study.id"
+                 [class.opacity-10]="true"></div>
+                 
+            <div class="text-xs font-black uppercase tracking-widest mb-3 border-l-4 pl-3"
+                 [class.text-primary]="expandedCaseId() === study.id"
+                 [class.border-primary]="expandedCaseId() === study.id"
+                 [class.text-slate-400]="expandedCaseId() !== study.id"
+                 [class.border-slate-300]="expandedCaseId() !== study.id">
+              {{ study.industry }}
             </div>
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span class="text-slate-500 font-medium">Backlink Acquisition</span>
-              <span class="text-xl font-bold text-slate-800">124 DR60+ Links</span>
+            
+            <h3 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight flex items-center justify-between">
+              {{ study.client }}
+              
+              <!-- Expand Icon -->
+              <svg *ngIf="expandedCaseId() !== study.id" class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              <svg *ngIf="expandedCaseId() === study.id" class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+            </h3>
+            
+            <p class="text-slate-600 mb-6 leading-relaxed font-medium">
+              {{ study.summary }}
+            </p>
+            
+            <div class="space-y-4 mb-2">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <span class="text-slate-500 font-medium">Monthly Organics</span>
+                <span class="text-xl font-bold" [class.text-green-600]="expandedCaseId() === study.id" [class.text-slate-800]="expandedCaseId() !== study.id">
+                  {{ study.trafficSessions }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between pb-2">
+                <span class="text-slate-500 font-medium">Page 1 Placements</span>
+                <span class="text-2xl font-black" [class.text-primary]="expandedCaseId() === study.id" [class.text-slate-800]="expandedCaseId() !== study.id">
+                  {{ study.pageOneKeywords }}
+                </span>
+              </div>
             </div>
-            <div class="flex items-center justify-between pb-2">
-              <span class="text-slate-500 font-medium">Rank #1 Target Keywords</span>
-              <span class="text-2xl font-black text-primary">58</span>
-            </div>
-          </div>
-        </article>
-        
-        <!-- Case Study 2: Propacademy -->
-        <article class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 border border-slate-700 shadow-2xl relative overflow-hidden text-white transform lg:-translate-y-4 z-10">
-          <div class="absolute top-0 right-0 w-40 h-40 bg-accent/20 rounded-full blur-3xl"></div>
-          <div class="text-xs font-black text-accent uppercase tracking-widest mb-3 border-l-4 border-accent pl-3">Real Estate Education</div>
-          <h3 class="text-3xl font-bold text-white mb-4 tracking-tight">Propacademy SaaS</h3>
-          <p class="text-slate-300 mb-8 leading-relaxed font-medium">Overtook massive legacy competitors through Artificial Engine Optimization (AEO). The <span class="text-white font-bold">ImplementationAgent</span> dynamically rewrote over 2,400 endpoints with zero-click JSON-LD Schema answers.</p>
-          
-          <div class="space-y-4 mb-8">
-            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-              <span class="text-slate-400 font-medium">Traffic Growth YoY</span>
-              <span class="text-xl font-bold text-accent">+312%</span>
-            </div>
-            <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-              <span class="text-slate-400 font-medium">Core Web Vitals TTFB</span>
-              <span class="text-xl font-bold text-white">120ms Avg</span>
-            </div>
-            <div class="flex items-center justify-between pb-2">
-              <span class="text-slate-400 font-medium">SGE & AI Scraping Share</span>
-              <span class="text-2xl font-black text-accent">Dominant</span>
-            </div>
-          </div>
-        </article>
 
-        <!-- Case Study 3: iShack Backend Hub -->
-        <article class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group">
-          <div class="absolute top-0 right-0 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl group-hover:bg-teal-500/20 transition-colors"></div>
-          <div class="text-xs font-black text-teal-600 uppercase tracking-widest mb-3 border-l-4 border-teal-500 pl-3">B2B SaaS Security</div>
-          <h3 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Live Platform Case</h3>
-          <p class="text-slate-600 mb-8 leading-relaxed font-medium">The exact SEO audit algorithms utilized on this page natively reverse-engineered Google's primary ranking parameters. The <span class="text-slate-900 font-bold">QAAgent</span> securely patches UI leaks dynamically 24/7.</p>
-          
-          <div class="space-y-4 mb-8">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span class="text-slate-500 font-medium">Lead Conversion Rate</span>
-              <span class="text-xl font-bold text-teal-600">8.4% CVR</span>
+            <!-- Expandable Accordion Content -->
+            <div class="overflow-hidden transition-all duration-300 ease-in-out"
+                 [style.maxHeight]="expandedCaseId() === study.id ? '500px' : '0px'"
+                 [style.opacity]="expandedCaseId() === study.id ? '1' : '0'">
+              
+              <div class="pt-6 border-t border-slate-100 mt-4">
+                <h4 class="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">Verified Keyword Success</h4>
+                <ul class="space-y-3">
+                  @for (kw of study.topKeywords; track kw.phrase) {
+                    <li class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-100">
+                      <span class="text-slate-700 font-medium text-sm">"{{ kw.phrase }}"</span>
+                      <span class="text-xs font-bold text-white bg-primary px-2 py-1 rounded-md shadow-sm">
+                        Rank #{{ kw.rank }}
+                      </span>
+                    </li>
+                  }
+                </ul>
+                <div class="mt-5 text-right">
+                  <span class="text-xs font-medium text-slate-400">Verified Period: {{ study.timeframe }}</span>
+                </div>
+              </div>
             </div>
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span class="text-slate-500 font-medium">Crawler Error Resolution</span>
-              <span class="text-xl font-bold text-slate-800">100% Automated</span>
-            </div>
-            <div class="flex items-center justify-between pb-2">
-              <span class="text-slate-500 font-medium">Manual Agency Hours</span>
-              <span class="text-2xl font-black text-teal-600">0</span>
-            </div>
-          </div>
-        </article>
+            
+          </article>
+        }
       </div>
     </section>
 
