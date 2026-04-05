@@ -763,10 +763,9 @@ import { environment } from '../../environments/environment';
                       <div class="text-[10px] text-slate-500 font-mono">ID: {{ target.agency_id }}</div>
                     </td>
                     <td class="px-6 py-5">
-                      <span class="inline-flex items-center px-2.5 py-1 rounded bg-slate-800 text-xs font-bold capitalize border border-white/10"
-                            [ngClass]="{'text-blue-400 border-blue-500/30': target.package_tier === 'pro', 'text-yellow-400 border-yellow-500/30': target.package_tier === 'enterprise', 'text-slate-300': target.package_tier === 'basic'}">
-                        {{ target.package_tier }}
-                      </span>
+                      <select [ngModel]="target.package_tier" (ngModelChange)="updateTargetPackage(target.campaign_id, $event)" class="bg-slate-800 text-xs font-bold capitalize border border-white/10 rounded px-2.5 py-1 text-slate-300 focus:outline-none focus:border-emerald-500 hover:border-white/20 transition-colors cursor-pointer">
+                        <option *ngFor="let p of packages" [value]="p.tier_name">{{ p.tier_name }}</option>
+                      </select>
                     </td>
                     <td class="px-6 py-5">
                       <div class="text-xs font-bold text-slate-300 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 inline-flex items-center gap-2">
@@ -1731,6 +1730,21 @@ export class AdminDashboard implements OnInit {
         this.isChatLoading = false;
       }
     });
+  }
+
+  updateTargetPackage(id: number, tier: string) {
+    if (confirm(`Are you sure you want to transition this URL to the ${tier.toUpperCase()} package tier?`)) {
+      this.http.put(`${environment.apiUrl}/admin/targeted-urls/${id}/package`, { package_tier: tier }, { headers: this.getHeaders() }).subscribe({
+        next: () => {
+          alert('Package assigned successfully.');
+          this.fetchTargetedUrls(); // Refresh the grid
+        },
+        error: (err: any) => alert(err.error?.error || 'Failed to re-assign package')
+      });
+    } else {
+      // Refresh to revert the dropdown visual change if user cancels
+      this.fetchTargetedUrls();
+    }
   }
 
   deleteTargetUrl(id: number, domain: string) {

@@ -406,6 +406,16 @@ router.get('/targeted-urls', authenticateSuperadmin, async (req, res) => {
   }
 });
 
+router.put('/targeted-urls/:id/package', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { package_tier } = req.body;
+    await db.query('UPDATE campaigns SET package_tier = $1 WHERE id = $2', [package_tier, req.params.id]);
+    res.json({ message: 'Package updated successfully.' });
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to update package tier.' });
+  }
+});
+
 router.delete('/targeted-urls/:id', authenticateSuperadmin, async (req, res) => {
   try {
     const { id } = req.params;
