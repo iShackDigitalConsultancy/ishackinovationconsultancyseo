@@ -1,0 +1,1 @@
+PGPASSWORD=$PGPASSWORD psql -h roundhouse.proxy.rlwy.net -p 47464 -U postgres -d railway -c "INSERT INTO campaigns (agency_id, client_domain, package_tier, status) VALUES (3, 'ishack.co.za', 'enterprise', 'active');"
