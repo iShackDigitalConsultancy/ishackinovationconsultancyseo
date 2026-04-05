@@ -47,11 +47,7 @@ const initSchema = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
-      INSERT INTO packages (tier_name, mrr_price, max_ai_phase) VALUES 
-        ('basic', 499, 2),
-        ('pro', 899, 3),
-        ('enterprise', 1499, 6)
-      ON CONFLICT (tier_name) DO NOTHING;
+
 
       CREATE TABLE IF NOT EXISTS campaigns (
         id SERIAL PRIMARY KEY,
