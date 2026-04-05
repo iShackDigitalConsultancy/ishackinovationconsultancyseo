@@ -14,7 +14,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/index.csr.html"
+      "destination": "/browser/index.html"
     }
   ]
 }
