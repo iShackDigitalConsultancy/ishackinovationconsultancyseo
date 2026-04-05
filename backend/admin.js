@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
 const mailService = require('./services/mailService');
+const googleAnalyticsService = require('./services/googleAnalyticsService');
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_super_secret_for_dev';
@@ -95,18 +96,34 @@ router.get('/metrics', authenticateSuperadmin, async (req, res) => {
 
     const recentAgenciesResult = await db.query("SELECT id, agency_name, email, role, contact_person, address, brand_color, brand_logo_url, cms_url, cms_username, cms_password, created_at FROM agencies WHERE role != 'superadmin' ORDER BY created_at DESC");
 
+    const googleAnalytics = await googleAnalyticsService.getDashboardMetrics();
+
     res.json({
       metrics: {
         totalAgencies,
         paidAgencies,
         totalSites,
-        mrr
+        mrr,
+        googleAnalytics
       },
       recentAgencies: recentAgenciesResult.rows
     });
   } catch (error) {
     console.error('Admin metrics error:', error);
     res.status(500).json({ error: 'Failed to fetch admin metrics' });
+  }
+});
+
+const analyticsAgent = require('./agents/analyticsAgent');
+
+router.get('/metrics/insights', authenticateSuperadmin, async (req, res) => {
+  try {
+    const googleAnalytics = await googleAnalyticsService.getDashboardMetrics();
+    const insights = await analyticsAgent.generateInsights(googleAnalytics);
+    res.json({ insights });
+  } catch (error) {
+    console.error('Analytics agent error:', error);
+    res.status(500).json({ error: 'Failed to generate insights.' });
   }
 });
 
@@ -131,12 +148,13 @@ router.get('/campaigns', authenticateSuperadmin, async (req, res) => {
     
     // Add logic to fetch tasks and calculate revenue
     const campaigns = campaignsQuery.rows;
+    const { rows: packageRows } = await db.query("SELECT tier_name, mrr_price FROM packages");
+    const packageMap = {};
+    packageRows.forEach(p => packageMap[p.tier_name] = p.mrr_price);
+
     for (let c of campaigns) {
-      // Calc Revenue
-      if (c.package_tier === 'basic') c.revenue = 499;
-      else if (c.package_tier === 'pro') c.revenue = 899;
-      else if (c.package_tier === 'enterprise') c.revenue = 1499;
-      else c.revenue = 0;
+      // Calc Revenue Dynamically
+      c.revenue = packageMap[c.package_tier] || 0;
       
       // Fetch upcoming tasks
       const tasksQuery = await db.query("SELECT * FROM agent_tasks WHERE campaign_id = $1 ORDER BY created_at ASC", [c.id]);
@@ -170,7 +188,28 @@ router.get('/campaigns', authenticateSuperadmin, async (req, res) => {
   }
 });
 
-// Human-in-the-loop: Approve Task Custom Payload
+// Save explicit strategic backlink directives
+router.post('/sandbox/campaigns/:id/backlinks', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { backlinkKeywords } = req.body;
+    
+    await db.query('UPDATE campaigns SET backlink_keywords = $1, last_updated = CURRENT_TIMESTAMP WHERE id = $2', [backlinkKeywords, id]);
+    
+    // Log the SuperAdmin interaction 
+    await db.query(`
+      INSERT INTO agent_logs (campaign_id, agent_name, action_taken, thought_process)
+      VALUES ($1, 'SuperAdmin', 'Strategic Directive Injected', 'Manually appended strict keyword phrases to bind the Backlink Agent during Phase 3 Procurement.')
+    `, [id]);
+    
+    res.json({ message: 'Strategic Directives Saved System-Wide.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to inject backlink directives into core memory' });
+  }
+});
+
+// Handle Neural Override Actions inside Deep Dive Task Custom Payload
 router.post('/tasks/:taskId/approve', authenticateSuperadmin, async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -266,6 +305,87 @@ router.post('/tasks/:taskId/approve', authenticateSuperadmin, async (req, res) =
   }
 });
 
+// Deep Dive Campaign Intelligence
+router.get('/campaigns/:id/deepdive', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const campResult = await db.query('SELECT c.*, a.agency_name, a.brand_color FROM campaigns c JOIN agencies a ON c.agency_id = a.id WHERE c.id = $1', [id]);
+    if (campResult.rows.length === 0) return res.status(404).json({ error: 'Campaign not found' });
+    
+    // Extract Agent Memory & Tasks
+    const tasksQuery = await db.query('SELECT * FROM agent_tasks WHERE campaign_id = $1 ORDER BY created_at ASC', [id]);
+    
+    // Extract Historic Telemetry for Monthly Reports
+    const metricsQuery = await db.query('SELECT * FROM campaign_metrics WHERE campaign_id = $1 ORDER BY snapshot_date DESC LIMIT 12', [id]);
+    
+    // Extract Agent Logs for Project History
+    const logsQuery = await db.query('SELECT agent_name, action_taken as action_type, thought_process as details, created_at FROM agent_logs WHERE campaign_id = $1 ORDER BY created_at DESC', [id]);
+
+    res.json({
+      campaign: campResult.rows[0],
+      tasks: tasksQuery.rows,
+      metrics: metricsQuery.rows,
+      logs: logsQuery.rows
+    });
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to assemble deep dive.' });
+  }
+});
+
+router.post('/campaigns/:id/action', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { actionType, payload } = req.body;
+    
+    if (actionType === 'add_keyword') {
+       // Inject an Ad-Hoc directive into the active Agent Task queue for Keywords
+       await db.query(`
+         INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type, status, payload)
+         VALUES ($1, 'ImplementationAgent', 'Ad-Hoc: Force Keyword Target', 'completed', $2)
+       `, [id, JSON.stringify({ suggestedKeyword: payload })]);
+       res.json({ message: 'Keyword locked into AI queue.' });
+       
+    } else if (actionType === 'add_competitor') {
+       await db.query(`
+         INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type, status, payload)
+         VALUES ($1, 'ResearchAgent', 'Ad-Hoc: Active Competitor Map', 'completed', $2)
+       `, [id, JSON.stringify({ trackedCompetitor: payload })]);
+       res.json({ message: 'AutoResearch loop will now tail this competitor.' });
+       
+    } else if (actionType === 'generate_report') {
+       // For monthly reports, Vera intercepts
+       const veraAgent = require('./agents/veraAgent');
+       const emailRes = await veraAgent.think(`
+         Write a pristine executive monthly SEO report for campaign ID: ${id}. 
+         CRITICAL INSTRUCTION: You MUST use the following raw telemetry payload exclusively. 
+         DO NOT hallucinate, fabricate, or estimate any data. If a metric is 0 or missing, state that it is unavailable.
+         Cross-reference both the SEMrush pipeline traffic and Google Analytics verified retention if available.
+         Keep it strictly business-oriented and use bullet points to highlight:
+         1. Executive Traffic Synthesis (Compare SEMrush Domain Analytics vs Google Analytics Active Users if both are present)
+         2. Total Organic Keywords Indexed & Health
+         3. Top performing keyword trajectory and user retention benchmarks (GA4 Bounce Rate / Avg Session).
+         
+         RAW TELEMETRY PAYLOAD: ${JSON.stringify(payload)}
+       `);
+       res.json({ message: 'Report generated natively by Vera without hallucinations.', report: emailRes });
+       
+    } else if (actionType === 'draft_wordpress_blog') {
+       const contentAgent = require('./agents/contentAgent');
+       const targetTopic = payload.targetTopic || "Strategic Insight Blog";
+       
+       // Fire autonomously without blocking the UI thread infinitely
+       contentAgent.executeTask(id, targetTopic).catch(e => console.error("Content Agent background crash:", e.message));
+       
+       res.json({ message: `The Content Agent has begun drafting a massive SGE-optimized article on [${targetTopic}] and will push it directly to WordPress upon completion.` });
+
+    } else {
+       res.status(400).json({ error: 'Unknown directive.' });
+    }
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to commit deep dive action.' });
+  }
+});
+
 // Global Targeted URLs Mapping Endpoint
 router.get('/targeted-urls', authenticateSuperadmin, async (req, res) => {
   try {
@@ -286,6 +406,52 @@ router.get('/targeted-urls', authenticateSuperadmin, async (req, res) => {
   }
 });
 
+router.delete('/targeted-urls/:id', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM agent_logs WHERE campaign_id = $1', [id]);
+    await db.query('DELETE FROM agent_tasks WHERE campaign_id = $1', [id]);
+    await db.query('DELETE FROM campaign_metrics WHERE campaign_id = $1', [id]);
+    await db.query('DELETE FROM campaigns WHERE id = $1', [id]);
+    res.json({ message: 'Targeted URL wiped successfully.' });
+  } catch (e) {
+    console.error('Delete target URL error:', e);
+    res.status(500).json({ error: 'Failed to delete target URL.' });
+  }
+});
+
+router.post('/chat', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { message } = req.body;
+    
+    // Load dynamic context
+    const activeCamps = (await db.query("SELECT client_domain, package_tier, status FROM campaigns ORDER BY created_at DESC LIMIT 10")).rows;
+    const tasksCount = (await db.query("SELECT COUNT(*) as count FROM agent_tasks")).rows[0].count;
+    const leadsCount = (await db.query("SELECT COUNT(*) as count FROM leads")).rows[0].count;
+
+    let contextStr = `Here is the current backend context:
+- There are ${tasksCount} task rows executed by the AI.
+- There are ${leadsCount} leads gathered.
+- The most recent targeted URLs tracked in the system:
+${activeCamps.map(c => `  * ${c.client_domain} (${c.package_tier}) - status: ${c.status}`).join('\n')}
+`;
+
+    const veraAgent = require('./agents/veraAgent');
+    const prompt = `You are the super-smart Admin Assistant living inside the iShack SEO SuperAdmin panel.
+The human admin is asking you a question about the active dashboard state. Read the context and answer their question clearly, concisely, and professionally. Format with clean markdown to look good in the UI.
+
+${contextStr}
+
+ADMIN QUESTION: "${message}"`;
+
+    const aiResponse = await veraAgent.think(prompt);
+    res.json({ reply: aiResponse });
+  } catch (e) {
+    console.error('Chat endpoint error:', e);
+    res.status(500).json({ error: 'AI failed to process the request.' });
+  }
+});
+
 router.get('/agency-leads', authenticateSuperadmin, async (req, res) => {
   try {
     const query = `
@@ -298,6 +464,16 @@ router.get('/agency-leads', authenticateSuperadmin, async (req, res) => {
     res.json(leads.rows);
   } catch (e) {
     res.status(500).json({ error: 'Failed to extract global CRM leads' });
+  }
+});
+
+router.get('/leads', authenticateSuperadmin, async (req, res) => {
+  try {
+    const query = `SELECT * FROM leads ORDER BY created_at DESC LIMIT 500`;
+    const leads = await db.query(query);
+    res.json(leads.rows);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to extract direct CRM leads from database' });
   }
 });
 
@@ -334,14 +510,24 @@ router.post('/sandbox/trigger-vera', authenticateSuperadmin, async (req, res) =>
 
 router.post('/sandbox/start-campaign', authenticateSuperadmin, async (req, res) => {
   try {
-    const { domain, tier, agencyId } = req.body;
+    const { domain, tier, agencyId, territory, gaPropertyId, wpUrl, wpUsername, wpPassword, wpStatus } = req.body;
     if (!domain) return res.status(400).json({ error: 'Domain is required.' });
     
     const packageTier = tier || 'basic';
+    const targetTerritory = territory || 'us';
     const finalAgencyId = agencyId ? parseInt(agencyId, 10) : req.user.agencyId;
     
-    // Assign to the selected child agency (or fallback to Superadmin umbrella)
-    await db.query("INSERT INTO campaigns (agency_id, client_domain, package_tier, status) VALUES ($1, $2, $3, 'active')", [finalAgencyId, domain, packageTier]);
+    // Check for duplicates
+    const checkDuplicate = await db.query("SELECT id FROM campaigns WHERE client_domain = $1", [domain]);
+    if (checkDuplicate.rows.length > 0) {
+      return res.status(400).json({ error: 'Domain is already mapped as a targeted URL.' });
+    }
+    
+    // Assign to the selected child agency (or fallback to Superadmin umbrella) with optional GA4 & WordPress tracking parameters
+    await db.query(
+      "INSERT INTO campaigns (agency_id, client_domain, package_tier, target_territory, ga_property_id, wp_url, wp_username, wp_password, wp_publish_status, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active')", 
+      [finalAgencyId, domain, packageTier, targetTerritory, gaPropertyId || null, wpUrl || null, wpUsername || null, wpPassword || null, wpStatus || 'publish']
+    );
     
     // Automatically trigger the PM agent heartbeat to pick up the brand new campaign immediately!
     await pmAgent.tick();
@@ -416,6 +602,42 @@ router.post('/sandbox/trigger-qa', authenticateSuperadmin, async (req, res) => {
     res.json({ message: 'QA Health Trace Initialized in background.' });
   } catch(e) {
     res.status(500).json({ error: 'QA Initialization Failed' });
+  }
+});
+
+// Dynamic Packages Workflow
+router.get('/sandbox/packages', authenticateSuperadmin, async (req, res) => {
+  try {
+    const pkgs = await db.query('SELECT * FROM packages ORDER BY mrr_price ASC');
+    res.json(pkgs.rows);
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to fetch packages' });
+  }
+});
+
+router.post('/sandbox/packages', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { tier_name, mrr_price, max_ai_phase, features } = req.body;
+    if (!tier_name) return res.status(400).json({ error: 'tier_name required' });
+    
+    // Upsert package mapping
+    await db.query(`
+      INSERT INTO packages (tier_name, mrr_price, max_ai_phase, features)
+      VALUES ($1, $2, $3, $4)
+      ON CONFLICT (tier_name) DO UPDATE SET mrr_price = EXCLUDED.mrr_price, max_ai_phase = EXCLUDED.max_ai_phase, features = EXCLUDED.features
+    `, [tier_name.toLowerCase(), mrr_price || 0, max_ai_phase || 2, JSON.stringify(features || [])]);
+    res.json({ message: 'Package successfully mapped to engine.' });
+  } catch(e) {
+    res.status(500).json({ error: 'Failed to update packages database' });
+  }
+});
+
+router.delete('/sandbox/packages/:tier_name', authenticateSuperadmin, async (req, res) => {
+  try {
+    await db.query('DELETE FROM packages WHERE tier_name = $1', [req.params.tier_name]);
+    res.json({ message: 'Package structurally deleted' });
+  } catch(e) {
+    res.status(500).json({ error: 'Deletion failed. Ensure no campaigns are still using this tier.' });
   }
 });
 

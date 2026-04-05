@@ -24,3 +24,6 @@ frontend/tmp/
 frontend/out-tsc/
 frontend/bazel-out/
 .vercel
+
+backend/token.json
+backend/credentials.json

@@ -163,3 +163,132 @@ PMAgent Failed on Schedule ReferenceError: asanaService is not defined
     at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
     at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
     at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 3311ms | UX Score: 87. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Executing assigned logic for BacklinkAgent...
+[Backlinking Agent] 🧠 Thought: Reviewing published content to determine off-site backlink velocity... | ⚡ Action: Drafting outreach emails and target sites.
+--- [CRON] Starting Autonomous Outreach Prospecting Cycle ---
+[OutreachAgent] Initializing Global Prospecting Webhook...
+[OutreachAgent] Constructing outreach protocol for [autoresearch-sandbox.ai]
+[OutreachAgent] Draft formatted. Waiting for SuperAdmin Authorization. Payload routed for [searchengineland.com]
+[OutreachAgent] Constructing outreach protocol for [ishack.co.za]
+[OutreachAgent] Draft formatted. Waiting for SuperAdmin Authorization. Payload routed for [searchengineland.com]
+[OutreachAgent] Constructing outreach protocol for [ishackinnovationconsultancy.com]
+[OutreachAgent] Draft formatted. Waiting for SuperAdmin Authorization. Payload routed for [hubspot.com]
+[OutreachAgent] Constructing outreach protocol for [ishackinnovationconsultancy.com]
+[OutreachAgent] Draft formatted. Waiting for SuperAdmin Authorization. Payload routed for [hubspot.com]
+[OutreachAgent] Constructing outreach protocol for [autoresearch-sandbox.ai]
+[OutreachAgent] Draft formatted. Waiting for SuperAdmin Authorization. Payload routed for [techcrunch.com]
+--- [CRON] Outreach Prospecting Cycle Complete ---
+
+[Backlinking Agent] 🧠 Thought: Off-site outreach strategy built. | ⚡ Action: Saving to DB.
+ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:21:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+[Backlinking Agent] 🧠 Thought: Crash: asanaService is not defined | ⚡ Action: Failing Task
+PMAgent Failed on Schedule ReferenceError: asanaService is not defined
+    at BacklinkAgent.executeTask (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/backlinkAgent.js:27:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async PMAgent.tick (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/agents/pmAgent.js:48:11)
+    at async /Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/cron/scheduler.js:23:7
+    at async Timeout._onTimeout (/Users/wdbmacminipro/Desktop/iShack SEO AI  Agency/backend/node_modules/node-cron/dist/cjs/scheduler/runner.js:70:44)
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 950ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishack.co.za
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1074ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishack.co.za
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1868ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishack.co.za
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1502ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishack.co.za
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1924ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishack.co.za
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1128ms | UX Score: 100. Logs secured.
+⏰ Task Fired: PMAgent.tick()
+👔 [PM Agent] Running daily heartbeat orchestrator...
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishack.co.za
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: ishackinnovationconsultancy.com
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+👔 [PM Agent] Evaluating Campaign: autoresearch-sandbox.ai
+👔 [PM Agent] Campaign paused. Awaiting manual human approval for backlink_outreach.
+⏰ Task Fired: qaAgent.runHealthCheck()
+🛡️ [QA Agent] Initializing Structural Health Sweep for https://ishackaeo.com
+🛡️ [QA Agent] Sweep Complete. Latency: 1000ms | UX Score: 100. Logs secured.

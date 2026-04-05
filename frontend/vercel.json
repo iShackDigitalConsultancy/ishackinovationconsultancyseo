@@ -1,6 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/blog/:path*",
+      "destination": "https://primary-production-62ed8.up.railway.app/:path*"
+    },
+    {
+      "source": "/wp-json/:path*",
+      "destination": "https://primary-production-62ed8.up.railway.app/wp-json/:path*"
+    },
+    {
+      "source": "/wp-admin/:path*",
+      "destination": "https://primary-production-62ed8.up.railway.app/wp-admin/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

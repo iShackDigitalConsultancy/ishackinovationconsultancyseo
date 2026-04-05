@@ -41,6 +41,26 @@ class VeraAgent extends BaseAgent {
       console.error("Vera Sharp failed to run daily report", e);
     }
   }
+
+  async notifyLead(email, domain, score) {
+    console.log(`📝 [Vera Sharp] New CRM Lead Acquired: ${email} | ${domain} | Score: ${score}`);
+    try {
+      // Instantly dispatch to the Admin via email (acting as Telegram bridging layer for now)
+      const alertHtml = `
+        <h2>🚨 New High-Intent SEO Lead!</h2>
+        <p>A new prospect has just executed the Autonomous AI SEO Audit on the dashboard.</p>
+        <ul>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Domain:</strong> ${domain}</li>
+          <li><strong>Technical Score:</strong> ${score}/100</li>
+        </ul>
+        <p><em>Reach out immediately to convert this lead. Log into the Super Admin dashboard to view full CRM metrics.</em></p>
+      `;
+      await mailService.sendDailyReport(`🚨 NEW SEO LEAD: ${domain} (${score}/100)`, alertHtml);
+    } catch (e) {
+      console.error("Vera Sharp failed to transmit Lead Alert", e);
+    }
+  }
 }
 
 module.exports = new VeraAgent();

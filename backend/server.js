@@ -4,6 +4,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
+const db = require('./db');
+const veraAgent = require('./agents/veraAgent');
 const authRouter = require('./auth');
 const widgetRouter = require('./widget');
 
@@ -362,6 +364,21 @@ app.post('/api/openclaw/trigger', async (req, res) => {
       advice.push(`We detected your competitors or you are heavily investing ~$${semrushData.adCost}/mo acquiring ${semrushData.adTraffic} ad clicks. We can consult on reallocating 20% of this budget into equivalent organic assets to permanently lower your Blended Customer Acquisition Cost.`);
     } else {
       advice.push(`We found zero Paid Search (AdWords) momentum surrounding this domain profile. This is highly risky as competitors can easily bid on your exact brand terms. Expanding into a dual Organic & Paid SEO strategy is advised.`);
+    }
+
+    // === 4. CRM LEAD LOGGING & VERA SHARP DISPATCH ===
+    try {
+      const prospectEmail = req.body?.payload?.email || req.body?.email;
+      if (prospectEmail && prospectEmail.trim() !== '') {
+        await db.query(
+          "INSERT INTO leads (email, target_domain, target_keyword, seo_score, status) VALUES ($1, $2, $3, $4, 'new')",
+          [prospectEmail, domain, targetKeyword, score]
+        );
+        // Trigger live ping to executive admin
+        veraAgent.notifyLead(prospectEmail, domain, score).catch(e => console.error("Vera ping error:", e));
+      }
+    } catch(crmErr) {
+      console.error("Failed to securely log CRM lead:", crmErr.message);
     }
 
     res.status(200).json({ 

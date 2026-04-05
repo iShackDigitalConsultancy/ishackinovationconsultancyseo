@@ -1,13 +1,19 @@
 const db = require('./db');
 
 try {
-  // Try adding column, ignore if it already exists
-  db.exec('ALTER TABLE agencies ADD COLUMN role TEXT DEFAULT "free"');
-  console.log('Migration successful: Added role column');
+  // DB Migrations for CRM
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS leads (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR(255) NOT NULL,
+      target_domain VARCHAR(255) NOT NULL,
+      target_keyword VARCHAR(255),
+      seo_score INTEGER,
+      status VARCHAR(50) DEFAULT 'new',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  console.log('Migration successful: Created leads table');
 } catch(e) {
-  if (e.message.includes('duplicate column name')) {
-    console.log('Migration skipped: role column already exists');
-  } else {
-    console.log('Migration error:', e.message);
-  }
+  console.log('Migration error:', e.message);
 }

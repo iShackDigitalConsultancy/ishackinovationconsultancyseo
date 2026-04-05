@@ -30,7 +30,7 @@ class PMAgent {
         await db.query(`
           INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type, payload)
           VALUES ($1, $2, $3, $4)
-        `, [campaign.id, 'ResearchAgent', 'Phase 1: Keyword Research', JSON.stringify({ domain: campaign.client_domain, asanaTaskGid })]);
+        `, [campaign.id, 'ResearchAgent', 'Phase 1: Keyword Research', JSON.stringify({ domain: campaign.client_domain, asanaTaskGid, target_territory: campaign.target_territory })]);
         continue;
       }
 
@@ -62,51 +62,80 @@ class PMAgent {
       }
       else if (activeTask.status === 'completed') {
         // PROGRESSION PHASE (Determine Next Step)
-        const tier = campaign.package_tier || 'basic';
+        const tierName = campaign.package_tier || 'basic';
+        const { rows: pkgs } = await db.query("SELECT max_ai_phase FROM packages WHERE tier_name = $1", [tierName.toLowerCase()]);
+        const max_ai_phase = pkgs.length > 0 ? pkgs[0].max_ai_phase : 2;
+
         const targetAsanaProject = process.env.ASANA_PROJECT_GID || campaign.asana_project_id;
 
-        if (activeTask.assigned_agent === 'ResearchAgent') {
+        if (activeTask.task_type.includes('Phase 1')) {
           console.log(`👔 [PM Agent] Phase 1 Approved. Assigning Phase 2 to ImplementationAgent.`);
           await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Write Onsite Tags`, 'Using the new keywords, write the title tags.', 'ImplementationAgent');
           await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type, payload) VALUES ($1, $2, $3, $4)`, 
             [campaign.id, 'ImplementationAgent', 'Phase 2: Onsite Implementation', activeTask.result_payload]);
 
-        } else if (activeTask.assigned_agent === 'ImplementationAgent') {
-          if (tier === 'basic') {
-            console.log(`👔 [PM Agent] Basic Tier complete for ${campaign.client_domain}. Marking campaign finished.`);
+        } else if (activeTask.task_type.includes('Phase 2')) {
+          if (max_ai_phase < 3) {
+            console.log(`👔 [PM Agent] Max AI limits reached. Marking campaign finished.`);
             await db.query("UPDATE campaigns SET status = 'completed' WHERE id = $1", [campaign.id]);
           } else {
-            console.log(`👔 [PM Agent] Escalating to Phase 3 (Pro Tier) Backlinking for ${campaign.client_domain}.`);
+            console.log(`👔 [PM Agent] Escalating to Phase 3 Backlinking for ${campaign.client_domain}.`);
             await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Backlink Procurement`, 'Generate 5 high DR link targets and an outreach email.', 'BacklinkAgent');
             await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type, payload) VALUES ($1, $2, $3, $4)`, 
               [campaign.id, 'BacklinkAgent', 'Phase 3: Offsite Link Building Outreach', activeTask.result_payload]);
           }
 
-        } else if (activeTask.assigned_agent === 'BacklinkAgent') {
-          if (tier === 'pro') {
-            console.log(`👔 [PM Agent] Pro Tier complete for ${campaign.client_domain}. Marking campaign finished.`);
+        } else if (activeTask.task_type.includes('Phase 3')) {
+          if (max_ai_phase < 4) {
+            console.log(`👔 [PM Agent] Max AI limits reached. Marking campaign finished.`);
             await db.query("UPDATE campaigns SET status = 'completed' WHERE id = $1", [campaign.id]);
           } else {
-            console.log(`👔 [PM Agent] Escalating to Phase 4 (Enterprise Tier) Guru Audit for ${campaign.client_domain}.`);
+            console.log(`👔 [PM Agent] Escalating to Phase 4 Guru Audit for ${campaign.client_domain}.`);
             await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Enterprise Guru Audit`, 'Perform historical RAG audit against iShack guidelines.', 'GuruAgent');
             await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type) VALUES ($1, $2, $3)`, 
               [campaign.id, 'GuruAgent', 'Phase 4: RAG Expert Audit']);
           }
 
-        } else if (activeTask.assigned_agent === 'GuruAgent') {
-          console.log(`👔 [PM Agent] Escalating to Phase 5: Autonomous ML Optimization for ${campaign.client_domain}.`);
-          await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] PyTorch Model Optimization (AutoResearch)`, 'Spawn Karpathy AutoResearch loop for 5-minute training epoch analysis.', 'AutoResearchAgent');
-          await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type) VALUES ($1, $2, $3)`, 
-            [campaign.id, 'AutoResearchAgent', 'Phase 5: Autonomous ML Parameter Iteration']);
+        } else if (activeTask.task_type.includes('Phase 4')) {
+          if (max_ai_phase < 5) {
+            await db.query("UPDATE campaigns SET status = 'completed' WHERE id = $1", [campaign.id]);
+          } else {
+            console.log(`👔 [PM Agent] Escalating to Phase 5: Autonomous ML Optimization for ${campaign.client_domain}.`);
+            await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] PyTorch Model Optimization (AutoResearch)`, 'Spawn Karpathy AutoResearch loop for 5-minute training epoch analysis.', 'AutoResearchAgent');
+            await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type) VALUES ($1, $2, $3)`, 
+              [campaign.id, 'AutoResearchAgent', 'Phase 5: Autonomous ML Parameter Iteration']);
+          }
 
-        } else if (activeTask.assigned_agent === 'AutoResearchAgent') {
-          console.log(`👔 [PM Agent] ML Optimization completed for ${campaign.client_domain}. Triggering SEMrush Telemetry.`);
-          await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type) VALUES ($1, $2, $3)`, 
-            [campaign.id, 'AnalyticsAgent', 'Phase 6: Live Data Hooked to SEMrush']);
+        } else if (activeTask.task_type.includes('Phase 5')) {
+          if (max_ai_phase < 6) {
+            await db.query("UPDATE campaigns SET status = 'completed' WHERE id = $1", [campaign.id]);
+          } else {
+            console.log(`👔 [PM Agent] ML Optimization completed for ${campaign.client_domain}. Triggering SEMrush Telemetry.`);
+            await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type) VALUES ($1, $2, $3)`, 
+              [campaign.id, 'AnalyticsAgent', 'Phase 6: Live Data Hooked to SEMrush']);
+          }
 
-        } else if (activeTask.assigned_agent === 'AnalyticsAgent') {
-          console.log(`👔 [PM Agent] SEMrush Telemetry successfully mapped. Enterprise Tier officially completed for ${campaign.client_domain}.`);
-          await db.query("UPDATE campaigns SET status = 'completed' WHERE id = $1", [campaign.id]);
+        } else if (activeTask.task_type.includes('Phase 6')) {
+          if (max_ai_phase < 7) {
+            console.log(`👔 [PM Agent] SEMrush Telemetry successfully mapped. Flow completed for ${campaign.client_domain}.`);
+            await db.query("UPDATE campaigns SET status = 'completed' WHERE id = $1", [campaign.id]);
+          } else {
+            console.log(`👔 [PM Agent] Entering Continuous Autonomous Loop (Phase 7+) for ${campaign.client_domain}.`);
+             await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Continuous Growth Advisory`, 'Research new AEO/SEO techniques and identify progression mechanics.', 'ResearchAgent');
+             await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type) VALUES ($1, $2, $3)`, 
+               [campaign.id, 'ResearchAgent', 'Phase 7: Continuous Optimization Advisory']);
+             await db.query("UPDATE campaigns SET status = 'optimizing' WHERE id = $1", [campaign.id]);
+          }
+          
+        } else if (activeTask.task_type.includes('Phase 7')) {
+            console.log(`👔 [PM Agent] Advisory Loop Complete. Queuing Implementation of New Techniques.`);
+            await asanaService.assignTaskToAgent(targetAsanaProject, `[${campaign.client_domain}] Rollout New Advised Techniques`, 'Deploy newfound AEO/SEO strategies onsite.', 'ImplementationAgent');
+            await db.query(`INSERT INTO agent_tasks (campaign_id, assigned_agent, task_type, payload) VALUES ($1, $2, $3, $4)`, 
+               [campaign.id, 'ImplementationAgent', 'Phase 8: Continuous Action Pipeline', activeTask.result_payload]);
+               
+        } else if (activeTask.task_type.includes('Phase 8') || activeTask.task_type.includes('Ad-Hoc')) {
+            // Drop back into optimizing status where it will hang until SuperAdmin manually triggers another check
+            await db.query("UPDATE campaigns SET status = 'completed' WHERE id = $1", [campaign.id]);
         }
       }
     }

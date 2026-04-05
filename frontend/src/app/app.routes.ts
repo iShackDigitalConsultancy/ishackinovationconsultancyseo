@@ -14,6 +14,7 @@ export const routes: Routes = [
   { path: 'register', component: Register },
   { path: 'dashboard', component: Dashboard },
   { path: 'admin', component: AdminDashboard },
+  { path: 'admin/:tab', component: AdminDashboard },
   { path: 'white-label-seo', component: WhiteLabelSeo },
   { path: 'ai-seo-software', component: AiSeoSoftware },
   { path: 'terms', component: TermsComponent },

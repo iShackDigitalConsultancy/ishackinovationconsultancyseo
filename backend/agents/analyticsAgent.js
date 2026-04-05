@@ -1,69 +1,91 @@
-require('dotenv').config();
-const axios = require('axios');
-const db = require('../db');
 const BaseAgent = require('./baseAgent');
+const db = require('../db');
+const semrushService = require('../services/semrushService');
 
 class AnalyticsAgent extends BaseAgent {
   constructor() {
     super(
-      'AnalyticsAgent',
-      'You are the Senior Data Scientist Agent. You format API data into clean JSON metrics.'
+      'Analytics AI Agent',
+      'You are Vera Sharp, an expert AI SEO and Conversion Rate Optimization (CRO) strategist. You review raw Google Analytics data and reply EXCLUSIVELY with actionable advice to improve traffic and conversions in strict JSON format mapping to an array of objects: [{ "title": "Recommendation Title", "description": "Actionable explanation" }]. Do not include markdown formatting like ```json.'
     );
   }
 
-  async fetchSemrushData(domain) {
-    const apiKey = process.env.SEMRUSH_API_KEY;
-    if (!apiKey) throw new Error("SEMRUSH_API_KEY is missing from environment variables.");
-
+  async executeTask(campaignId, domain) {
+    await this.logThought(campaignId, `Commencing rigorous data scrape for domain: [${domain}]. Querying live organic domain traffic...`, 'Executing SEMrush Network hook.');
+    
     try {
-      // Query SEMrush Domain Ranks API
-      const url = `https://api.semrush.com/?type=domain_ranks&key=${apiKey}&export_columns=Ot,Or&domain=${domain}&database=us`;
-      const response = await axios.get(url, { timeout: 10000 });
+      // Pull target territory and GA property ID from campaigns if available
+      const { rows: camps } = await db.query('SELECT target_territory, ga_property_id FROM campaigns WHERE id = $1', [campaignId]);
+      const territory = (camps.length > 0 && camps[0].target_territory) ? camps[0].target_territory : 'us';
+      const gaPropertyId = (camps.length > 0) ? camps[0].ga_property_id : null;
+
+      // Pull actual organic macro analytics (Traffic, Keywords) from Semrush
+      const analytics = await semrushService.getDomainAnalytics(domain, territory);
       
-      const lines = response.data.split('\n');
+      // Pull Google Analytics retention pipeline specifically for this domain
+      const googleAnalyticsService = require('../services/googleAnalyticsService');
+      const gaMetrics = await googleAnalyticsService.getDashboardMetrics(gaPropertyId);
+
+      // Also pull the latest Top Organic Keywords CSV to parse into JSON
+      const keywordsCsv = await semrushService.getDomainOrganicKeywords(domain, territory, 50);
+      
+      // Parse CSV into JSON array
+      const lines = keywordsCsv.trim().split('\n');
+      const uniqueKwMap = new Map();
       if (lines.length > 1) {
-        const values = lines[1].split(';');
-        // Ot = Organic Traffic, Or = Organic Keywords
-        return {
-          organic_traffic: parseInt(values[0]) || 0,
-          organic_keywords: parseInt(values[1]) || 0,
-          domain_rating: Math.floor(Math.random() * (80 - 20 + 1)) + 20 // Fallback proxy DR if Semrush Authority Score endpoint unavailable
-        };
-      } else {
-        throw new Error("Invalid SEMrush Line Parse");
+         for (let i = 1; i < lines.length; i++) {
+           let cols = lines[i].split(';');
+           if (cols.length >= 6) {
+              const kw = cols[0];
+              const pos = parseInt(cols[1]) || 100;
+              if (kw) {
+                 const keyStr = String(kw).toLowerCase();
+                 if (!uniqueKwMap.has(keyStr) || uniqueKwMap.get(keyStr).position > pos) {
+                    uniqueKwMap.set(keyStr, {
+                      keyword: kw,
+                      position: pos,
+                      volume: parseInt(cols[2]) || 0,
+                      cpc: parseFloat(cols[3]) || 0,
+                      url: cols[4]
+                    });
+                 }
+              }
+           }
+         }
       }
+      const topKeywords = Array.from(uniqueKwMap.values());
+
+      await this.logThought(campaignId, `SEMrush Data: [${analytics.organic_traffic} Traffic]. GA Data: [${gaMetrics.activeUsers} Users]. Synchronizing to persistence layer...`, 'PostgreSQL Multi-Pipeline Serialization');
+
+      // Securely insert to the core campaign metrics structure WITHOUT hallucinating
+      await db.query(`
+        INSERT INTO campaign_metrics (campaign_id, organic_traffic, organic_keywords, top_keywords, ga_users, ga_sessions, ga_bounce_rate, ga_avg_duration)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [campaignId, analytics.organic_traffic, analytics.organic_keywords, JSON.stringify(topKeywords), gaMetrics.activeUsers, gaMetrics.pageViews, gaMetrics.bounceRate, gaMetrics.averageSessionDuration]);
+
+      console.log(`[AnalyticsAgent] Successfully synchronized hard metrics for Campaign ${campaignId}.`);
     } catch (e) {
-      console.warn(`[AnalyticsAgent] SEMrush API restricted or failed. Falling back to internal heuristic models for ${domain}`);
-      // Fallback generator mimicking realistic progression metrics for the presentation
-      return {
-        organic_traffic: Math.floor(Math.random() * 5000) + 500,
-        organic_keywords: Math.floor(Math.random() * 800) + 100,
-        domain_rating: Math.floor(Math.random() * 40) + 10
-      };
+       console.error(`[AnalyticsAgent] Failed to synchronize accurate data for Campaign ${campaignId}:`, e.message);
+       await this.logThought(campaignId, `SEMrush Network sync failure: ${e.message}.`, 'Action Aborted');
     }
   }
 
-  async executeTask(campaignId, domain) {
-    await this.logThought(campaignId, `Tracking telemetry request received for ${domain}.`, `Querying SEMrush Analytics Engine...`);
+  async generateInsights(metricsPayload) {
+    const prompt = `Review the following Google Analytics data (last 30 days). Identify potential bottlenecks and suggest exactly 3 high-impact, actionable strategies to improve conversion rates and traffic retention. Return ONLY a valid JSON array.`;
+    
+    const resultString = await this.think(prompt, metricsPayload);
     
     try {
-      const liveData = await this.fetchSemrushData(domain);
-      
-      // Perform AI-driven categorization on top-keywords
-      const prompt = `Assume this domain (${domain}) has generated ${liveData.organic_traffic} traffic. Generate exactly 3 highly relevant ranking keywords with projected positions (e.g "keyword": "digital marketing", "position": 4, "previous": 12). Output only a JSON array.`;
-      const keywordsRes = await this.think(prompt, { traffic: liveData.organic_traffic });
-      const topKeywords = JSON.parse(keywordsRes.replace(/```json\n?|\n?```/g, ''));
-
-      await db.query(`
-        INSERT INTO campaign_metrics (campaign_id, organic_traffic, organic_keywords, domain_rating, top_keywords)
-        VALUES ($1, $2, $3, $4, $5)
-      `, [campaignId, liveData.organic_traffic, liveData.organic_keywords, liveData.domain_rating, JSON.stringify(topKeywords)]);
-
-      await this.logThought(campaignId, `Live analytics bound to DB successfully. Traffic: ${liveData.organic_traffic}, Keywords: ${liveData.organic_keywords}`, `Epoch snapshot saved.`);
-      
+      // Parse out potential markdown code blocks if the AI disobeys
+      const cleanString = resultString.replace(/```json\n?|```/g, '').trim();
+      const resultObj = JSON.parse(cleanString);
+      return Array.isArray(resultObj) ? resultObj : [];
     } catch (e) {
-      console.error(e);
-      await this.logThought(campaignId, `Data Extraction Failed: ${e.message}`, `Aborting Analytics Polling.`);
+      console.error('[AnalyticsAgent] Failed to parse insights as JSON:', e);
+      return [{
+        title: "Metrics Acknowledged",
+        description: "The AI reviewed the metrics but failed to format the response correctly. Try generating insights again."
+      }];
     }
   }
 }

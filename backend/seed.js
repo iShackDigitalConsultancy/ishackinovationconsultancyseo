@@ -4,11 +4,16 @@ const db = require('./db');
 const run = async () => {
   try {
     const passwordHash = await bcrypt.hash('admin123', 10);
-    const insert = db.prepare('INSERT INTO agencies (agency_name, email, password_hash, role) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING');
-    insert.run('iShack Admin', 'admin@ishack.co.za', passwordHash, 'superadmin');
-    console.log('Superadmin seeded!');
+    const query = 'INSERT INTO agencies (agency_name, email, password_hash, role) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING';
+    
+    await db.query(query, ['iShack Admin', 'admin@ishack.co.za', passwordHash, 'superadmin']);
+    await db.query(query, ['Wayne B.', 'wayneb@ishackventures.com', passwordHash, 'superadmin']);
+    
+    console.log('Superadmins seeded successfully!');
   } catch(e) {
     console.log('Error seeding:', e.message);
+  } finally {
+    process.exit(0);
   }
 };
 

@@ -39,6 +39,20 @@ const initSchema = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS packages (
+        tier_name VARCHAR(50) PRIMARY KEY,
+        mrr_price INTEGER NOT NULL DEFAULT 499,
+        max_ai_phase INTEGER NOT NULL DEFAULT 2,
+        features JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      INSERT INTO packages (tier_name, mrr_price, max_ai_phase) VALUES 
+        ('basic', 499, 2),
+        ('pro', 899, 3),
+        ('enterprise', 1499, 6)
+      ON CONFLICT (tier_name) DO NOTHING;
+
       CREATE TABLE IF NOT EXISTS campaigns (
         id SERIAL PRIMARY KEY,
         agency_id INTEGER NOT NULL REFERENCES agencies(id),
@@ -46,6 +60,11 @@ const initSchema = async () => {
         package_tier VARCHAR(50) DEFAULT 'basic',
         status VARCHAR(50) DEFAULT 'active',
         asana_project_id VARCHAR(255),
+        ga_property_id VARCHAR(50),
+        wp_url VARCHAR(255),
+        wp_username VARCHAR(255),
+        wp_password VARCHAR(255),
+        wp_publish_status VARCHAR(50) DEFAULT 'publish',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -84,7 +103,11 @@ const initSchema = async () => {
         organic_traffic INTEGER DEFAULT 0,
         organic_keywords INTEGER DEFAULT 0,
         domain_rating INTEGER DEFAULT 0,
-        top_keywords JSONB
+        top_keywords JSONB,
+        ga_users INTEGER DEFAULT 0,
+        ga_sessions INTEGER DEFAULT 0,
+        ga_bounce_rate VARCHAR(20) DEFAULT '0.00',
+        ga_avg_duration INTEGER DEFAULT 0
       );
 
       CREATE TABLE IF NOT EXISTS platform_health (
@@ -102,6 +125,16 @@ const initSchema = async () => {
         client_domain VARCHAR(255) NOT NULL,
         client_email VARCHAR(255) NOT NULL,
         audit_score INTEGER DEFAULT 0,
+        status VARCHAR(50) DEFAULT 'new',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS leads (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) NOT NULL,
+        target_domain VARCHAR(255) NOT NULL,
+        target_keyword VARCHAR(255),
+        seo_score INTEGER,
         status VARCHAR(50) DEFAULT 'new',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -128,7 +161,27 @@ const initSchema = async () => {
     } catch(e) {}
 
     try {
+      await client.query("ALTER TABLE agencies ADD COLUMN cms_url VARCHAR(255)");
+    } catch(e) {}
+
+    try {
+      await client.query("ALTER TABLE agencies ADD COLUMN cms_username VARCHAR(255)");
+    } catch(e) {}
+
+    try {
+      await client.query("ALTER TABLE agencies ADD COLUMN cms_password VARCHAR(255)");
+    } catch(e) {}
+
+    try {
       await client.query("ALTER TABLE campaigns ADD COLUMN package_tier VARCHAR(50) DEFAULT 'basic'");
+    } catch(e) {}
+    
+    try {
+      await client.query("ALTER TABLE campaigns ADD COLUMN backlink_keywords TEXT");
+    } catch(e) {}
+    
+    try {
+      await client.query("ALTER TABLE campaigns ADD COLUMN target_territory VARCHAR(10) DEFAULT 'us'");
     } catch(e) {}
     
     // Auto-migrate any dormant campaigns locked into the wrong initial phase

@@ -1,4 +1,5 @@
 const BaseAgent = require('./baseAgent');
+const asanaService = require('../services/asanaService');
 
 class BacklinkAgent extends BaseAgent {
   constructor() {
