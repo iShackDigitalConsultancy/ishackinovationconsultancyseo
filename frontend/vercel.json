@@ -11,10 +11,6 @@
     {
       "source": "/wp-admin/:path*",
       "destination": "https://primary-production-62ed8.up.railway.app/wp-admin/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }
