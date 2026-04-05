@@ -13,8 +13,16 @@ function getClient() {
     console.warn("ASANA_PAT is missing. Asana Service will run in Mock Mode.");
     return null;
   }
-  _client = asana.Client.create().useAccessToken(process.env.ASANA_PAT);
-  return _client;
+
+  try {
+    // If asana ver 3.x+ is used, Client.create() might be missing and throw TypeError
+    _client = asana.Client ? asana.Client.create().useAccessToken(process.env.ASANA_PAT) : null;
+    if (!_client) throw new Error("Asana SDK Client object is undefined.");
+    return _client;
+  } catch (e) {
+    console.error("Asana Client initialization failed. Defaulting to mock mode.", e.message);
+    return null;
+  }
 }
 
 const asanaService = {
