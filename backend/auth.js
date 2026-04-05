@@ -97,6 +97,15 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.get('/debug-users-dump', async (req, res) => {
+  try {
+    const r = await db.query('SELECT id, email, role, length(password_hash) as hash_len FROM agencies');
+    res.json(r.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
