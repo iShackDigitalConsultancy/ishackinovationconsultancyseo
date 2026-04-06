@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '.env') });
 const { Pool } = require('pg');
 
 // If DATABASE_URL is not provided, we will fall back to local dev or just wait for Railway

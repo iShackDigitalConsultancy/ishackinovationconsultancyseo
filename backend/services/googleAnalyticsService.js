@@ -2,33 +2,47 @@ const { BetaAnalyticsDataClient } = require('@google-analytics/data');
 const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 class GoogleAnalyticsService {
   constructor() {
     this.propertyId = process.env.GA_PROPERTY_ID;
     
+    // Support production env vars instead of relying solely on local git-ignored JSON files
+    const envCreds = process.env.GOOGLE_OAUTH_CREDENTIALS;
+    const envToken = process.env.GOOGLE_OAUTH_TOKEN;
+
     const tokenPath = path.join(__dirname, '../token.json');
     const credsPath = path.join(__dirname, '../credentials.json');
 
-    if (this.propertyId && fs.existsSync(tokenPath) && fs.existsSync(credsPath)) {
-      try {
-        const creds = JSON.parse(fs.readFileSync(credsPath, 'utf8'));
-        const { client_secret, client_id, redirect_uris } = creds.installed || creds.web;
-        const redirectUri = (redirect_uris && redirect_uris[0]) || 'urn:ietf:wg:oauth:2.0:oob';
-        
-        const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirectUri);
-        oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(tokenPath, 'utf8')));
+    try {
+      let creds, token;
 
-        this.analyticsDataClient = new BetaAnalyticsDataClient({ authClient: oAuth2Client });
-        this.isAuthenticated = true;
-        console.log("Vera Sharp is authenticated via OAuth2 to fetch Google Analytics.");
-      } catch (err) {
-        console.log("Error loading OAuth credentials for GA:", err);
-        this.isAuthenticated = false;
+      if (envCreds && envToken) {
+        // Priority 1: Secure Cloud Environment Variables
+        creds = JSON.parse(envCreds);
+        token = JSON.parse(envToken);
+      } else if (this.propertyId && fs.existsSync(tokenPath) && fs.existsSync(credsPath)) {
+        // Priority 2: Local Filesystem (Dev/Local testing)
+        creds = JSON.parse(fs.readFileSync(credsPath, 'utf8'));
+        token = JSON.parse(fs.readFileSync(tokenPath, 'utf8'));
+      } else {
+        throw new Error("Missing Google OAuth credentials entirely (checked env and local files).");
       }
-    } else {
+
+      const { client_secret, client_id, redirect_uris } = creds.installed || creds.web;
+      const redirectUri = (redirect_uris && redirect_uris[0]) || 'urn:ietf:wg:oauth:2.0:oob';
+      
+      const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirectUri);
+      oAuth2Client.setCredentials(token);
+
+      this.analyticsDataClient = new BetaAnalyticsDataClient({ authClient: oAuth2Client });
+      this.isAuthenticated = true;
+      console.log("Vera Sharp is authenticated via OAuth2 to fetch Google Analytics.");
+
+    } catch (err) {
+      console.warn("Google Analytics integration skipped. Reason:", err.message);
       this.isAuthenticated = false;
-      console.warn("Google Analytics OAuth credentials (token.json/credentials.json) or GA_PROPERTY_ID missing. Falling back to zeros.");
     }
   }
 
