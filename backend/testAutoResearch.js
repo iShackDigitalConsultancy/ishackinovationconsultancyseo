@@ -15,7 +15,7 @@ require('dotenv').config();
         }
         const agencyId = agencyRes.rows.length > 0 ? agencyRes.rows[0].id : 1;
 
-        // 2. Create a Mock Campaign for Log attachment
+        // 2. Create a Simulation Campaign for Log attachment
         const { rows } = await db.query(`
             INSERT INTO campaigns (agency_id, client_domain, package_tier, status) 
             VALUES ($1, 'autoresearch-sandbox.ai', 'enterprise', 'active') 

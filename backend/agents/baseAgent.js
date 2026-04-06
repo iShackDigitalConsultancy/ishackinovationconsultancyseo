@@ -10,7 +10,7 @@ class BaseAgent {
     if (process.env.OPENAI_API_KEY) {
       this.ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     } else {
-      console.warn(`[${this.name}] OPENAI_API_KEY missing. Agent will run in mock mode.`);
+      console.warn(`[${this.name}] OPENAI_API_KEY missing. Agent will run in simulation mode.`);
     }
   }
 
@@ -30,7 +30,7 @@ class BaseAgent {
 
   async think(prompt, payload = {}) {
     if (!this.ai) {
-      return `[MOCK RESPONSE from ${this.name}]: I acknowledge the prompt. Executing strategy.`;
+      return `[SIMULATION RESPONSE from ${this.name}]: I acknowledge the prompt. Executing strategy.`;
     }
 
     try {

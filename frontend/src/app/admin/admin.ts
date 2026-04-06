@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -147,7 +147,6 @@ import { environment } from '../../environments/environment';
             <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
             Google Analytics (30 Days)
           </h2>
-          <div *ngIf="metrics?.googleAnalytics?.isMock" class="text-xs bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full border border-orange-500/20 shadow-sm font-medium tracking-wide">Mock Data Mode</div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <div class="bg-slate-900 border border-white/5 rounded-2xl p-6 relative overflow-hidden group/card hover:border-white/10 transition-all">
@@ -1650,7 +1649,7 @@ import { environment } from '../../environments/environment';
     </div>
   `
 })
-export class AdminDashboard implements OnInit {
+export class AdminDashboard implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -1659,6 +1658,19 @@ export class AdminDashboard implements OnInit {
   metrics: any = null;
   recentAgencies: any[] = [];
   error = '';
+  
+  // Inactivity Timer State
+  inactivityTimer: any;
+  readonly TIMEOUT_MS = 60 * 60 * 1000; // 1 hour
+  
+  private resetInactivityTimer = () => {
+    if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
+    if (typeof window !== 'undefined') {
+      this.inactivityTimer = setTimeout(() => {
+        this.logout();
+      }, this.TIMEOUT_MS);
+    }
+  };
   
   // Observation Deck State
   activeTab: any = 'metrics';
@@ -1759,6 +1771,13 @@ export class AdminDashboard implements OnInit {
   }
 
   ngOnInit() {
+    if (typeof window !== 'undefined') {
+      ['mousemove', 'keydown', 'click', 'scroll'].forEach(evt => 
+        window.addEventListener(evt, this.resetInactivityTimer)
+      );
+      this.resetInactivityTimer();
+    }
+
     this.route.paramMap.subscribe(params => {
       const tab = params.get('tab');
       if (tab) {
@@ -1780,6 +1799,15 @@ export class AdminDashboard implements OnInit {
           this.fetchPlatformHealth();
         }
       }, 15000);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
+    if (typeof window !== 'undefined') {
+      ['mousemove', 'keydown', 'click', 'scroll'].forEach(evt => 
+        window.removeEventListener(evt, this.resetInactivityTimer)
+      );
     }
   }
 

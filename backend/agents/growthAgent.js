@@ -15,23 +15,23 @@ class GrowthAgent extends BaseAgent {
     await this.logThought(campaignId, 'Initializing Growth Matrix. Acquiring live Google Analytics telemetry and conversion data.', 'Ingesting GA4 Traffic Data');
     
     // Simulate analyzing GA data
-    const mockTraficData = {
+    const simulationTraficData = {
       sessions: Math.floor(Math.random() * 5000) + 1000,
       bounceRate: (Math.random() * 40 + 30).toFixed(2) + '%',
       conversionRate: (Math.random() * 2 + 0.5).toFixed(2) + '%'
     };
 
-    await this.logThought(campaignId, `GA4 Trajectory:\nSessions: ${mockTraficData.sessions}\nBounce Rate: ${mockTraficData.bounceRate}\nConversion Rate: ${mockTraficData.conversionRate}`, 'Executing Copywriting A/B Test Generation');
+    await this.logThought(campaignId, `GA4 Trajectory:\nSessions: ${simulationTraficData.sessions}\nBounce Rate: ${simulationTraficData.bounceRate}\nConversion Rate: ${simulationTraficData.conversionRate}`, 'Executing Copywriting A/B Test Generation');
 
     // Run AI Synthesis
-    const prompt = `Based on the current metrics (Sessions: ${mockTraficData.sessions}, Bounce: ${mockTraficData.bounceRate}, CVR: ${mockTraficData.conversionRate}), generate 3 aggressive B2B SaaS landing page headlines that leverage our 'Autonomous AI SEO' and '$899/mo Paystack checkout' value props.`;
+    const prompt = `Based on the current metrics (Sessions: ${simulationTraficData.sessions}, Bounce: ${simulationTraficData.bounceRate}, CVR: ${simulationTraficData.conversionRate}), generate 3 aggressive B2B SaaS landing page headlines that leverage our 'Autonomous AI SEO' and '$899/mo Paystack checkout' value props.`;
     
     try {
       const generatedCopy = await this.think(prompt);
       
       await this.logThought(campaignId, `Synthesized novel high-converting copy variants for live A/B testing deployment.`, 'A/B Test Deployed to Edge');
       
-      return { success: true, newCopy: generatedCopy, metrics: mockTraficData };
+      return { success: true, newCopy: generatedCopy, metrics: simulationTraficData };
     } catch (e) {
       console.error(e);
       await this.logThought(campaignId, `Fatal error during Growth Agent heuristic synthesis.`, 'Aborting Growth Loop');

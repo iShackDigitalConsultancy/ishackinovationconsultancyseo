@@ -10,7 +10,7 @@ let _client = null;
 function getClient() {
   if (_client) return _client;
   if (!process.env.ASANA_PAT) {
-    console.warn("ASANA_PAT is missing. Asana Service will run in Mock Mode.");
+    console.warn("ASANA_PAT is missing. Asana Service will run in Simulation Mode.");
     return null;
   }
 
@@ -20,7 +20,7 @@ function getClient() {
     if (!_client) throw new Error("Asana SDK Client object is undefined.");
     return _client;
   } catch (e) {
-    console.error("Asana Client initialization failed. Defaulting to mock mode.", e.message);
+    console.error("Asana Client initialization failed. Defaulting to simulation mode.", e.message);
     return null;
   }
 }
@@ -29,8 +29,8 @@ const asanaService = {
   createCampaignProject: async (clientDomain) => {
     const client = getClient();
     if (!client) {
-      console.log(`[MOCK ASANA] Built Project for Domain: ${clientDomain}`);
-      return `mock-project-${Date.now()}`;
+      console.log(`[SIMULATION ASANA] Built Project for Domain: ${clientDomain}`);
+      return `simulation-project-${Date.now()}`;
     }
 
     try {
@@ -58,8 +58,8 @@ const asanaService = {
   assignTaskToAgent: async (projectGid, taskName, instructions, aisName) => {
     const client = getClient();
     if (!client) {
-      console.log(`[MOCK ASANA] Created Task -> '${taskName}' inside Project (Assignee: ${aisName})`);
-      return `mock-task-${Date.now()}`;
+      console.log(`[SIMULATION ASANA] Created Task -> '${taskName}' inside Project (Assignee: ${aisName})`);
+      return `simulation-task-${Date.now()}`;
     }
 
     try {
@@ -78,11 +78,11 @@ const asanaService = {
   updateTaskCompletion: async (taskGid, completionNotes) => {
     const client = getClient();
     if (!client) {
-      console.log(`[MOCK ASANA] Completed Task -> Task ID: ${taskGid} | Notes: ${completionNotes.substring(0, 50)}...`);
+      console.log(`[SIMULATION ASANA] Completed Task -> Task ID: ${taskGid} | Notes: ${completionNotes.substring(0, 50)}...`);
       return true;
     }
     try {
-      if (!taskGid || taskGid.startsWith('mock-') || taskGid === 'sandbox_test_task') return true;
+      if (!taskGid || taskGid.startsWith('simulation-') || taskGid === 'sandbox_test_task') return true;
       await client.tasks.updateTask(taskGid, {
         completed: true,
         html_notes: `<body>${completionNotes.replace(/\\n/g, '<br>')}</body>`

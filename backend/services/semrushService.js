@@ -15,8 +15,8 @@ class SemrushService {
    */
   async getDomainOrganicKeywords(domain, database = 'us', limit = 10) {
     if (!this.apiKey) {
-      console.warn("[SEMRUSH] API Key missing. Falling back to Mock CSV.");
-      return "Keyword,Position,Search Volume,CPC,URL,Traffic (%)\nmock-keyword-1,1,1000,1.5,/,10\nmock-keyword-2,2,500,2.0,/about,5";
+      console.warn("[SEMRUSH] API Key missing. Falling back to Simulation CSV.");
+      return "Keyword,Position,Search Volume,CPC,URL,Traffic (%)\nsimulation-keyword-1,1,1000,1.5,/,10\nsimulation-keyword-2,2,500,2.0,/about,5";
     }
 
     try {
@@ -50,7 +50,7 @@ class SemrushService {
    */
   async getDomainAnalytics(domain, database = 'us') {
     if (!this.apiKey) {
-      console.warn("[SEMRUSH] API Key missing. Falling back to Mock Analytics.");
+      console.warn("[SEMRUSH] API Key missing. Falling back to Simulation Analytics.");
       return { organic_traffic: 12500, organic_keywords: 850, organic_cost: 4500 };
     }
 

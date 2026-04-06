@@ -121,7 +121,7 @@ export class Home implements OnInit {
   targetKeyword = signal('');
   promoCode = signal('');
   
-  mockReport = signal<any>(null);
+  seoReport = signal<any>(null);
 
   canViewPremium(): boolean {
     return this.isLoggedIn() || this.promoCode().toLowerCase() === 'evertonfc';
@@ -145,14 +145,14 @@ export class Home implements OnInit {
     }).subscribe({
       next: (res: any) => {
         if (res && res.success && res.report) {
-          this.mockReport.set(res.report);
+          this.seoReport.set(res.report);
         } else {
-          this.mockReport.set({ score: 0, issuesFound: 1, criticalErrors: 1, suggestions: ["Failed to generate valid report."] });
+          this.seoReport.set({ score: 0, issuesFound: 1, criticalErrors: 1, suggestions: ["Failed to generate valid report."] });
         }
         this.funnelState.set('report');
       },
       error: (err) => {
-        this.mockReport.set({ score: 0, issuesFound: 1, criticalErrors: 1, suggestions: [`API Error: ${err.message}`] });
+        this.seoReport.set({ score: 0, issuesFound: 1, criticalErrors: 1, suggestions: [`API Error: ${err.message}`] });
         this.funnelState.set('report');
       }
     });
@@ -171,6 +171,6 @@ export class Home implements OnInit {
   reset() {
     this.funnelState.set('input');
     this.websiteUrl.set('');
-    this.mockReport.set(null);
+    this.seoReport.set(null);
   }
 }

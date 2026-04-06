@@ -11,9 +11,9 @@ const mailService = {
     const pass = process.env.VERA_EMAIL_PASS;
 
     if (!pass) {
-      console.warn("VERA_EMAIL_PASS is missing. Vera Sharp will run in Mock Mode.");
-      console.log(`[MOCK EMAIL SEND] To: wayneb@ishack.co.za, richardb@ishack.co.za`);
-      console.log(`[MOCK EMAIL SUBJECT] ${subject}`);
+      console.warn("VERA_EMAIL_PASS is missing. Vera Sharp will run in Simulation Mode.");
+      console.log(`[SIMULATION EMAIL SEND] To: wayneb@ishack.co.za, richardb@ishack.co.za`);
+      console.log(`[SIMULATION EMAIL SUBJECT] ${subject}`);
       return true;
     }
 
@@ -48,7 +48,7 @@ const mailService = {
     const pass = process.env.VERA_EMAIL_PASS;
 
     if (!pass) {
-      console.log(`\n--- [MOCK OUTREACH DISPATCH] ---`);
+      console.log(`\n--- [SIMULATION OUTREACH DISPATCH] ---`);
       console.log(`TO: ${to}`);
       console.log(`SUBJECT: ${subject}`);
       console.log(`--------------------------------\n`);
