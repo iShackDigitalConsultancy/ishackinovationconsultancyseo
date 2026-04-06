@@ -13,15 +13,15 @@ import { environment } from '../../environments/environment';
   template: `
     <div class="min-h-screen bg-slate-950 font-sans text-slate-100 p-8">
       <div class="max-w-7xl mx-auto">
-        <div class="flex items-center justify-between mb-10 border-b border-white/10 pb-6">
-          <div class="flex items-center gap-4">
-            <div class="h-12 w-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg border border-white/10">IS</div>
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 md:mb-10 border-b border-white/10 pb-6 gap-6 md:gap-4">
+          <div class="flex items-center gap-3 md:gap-4">
+            <div class="h-12 w-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg border border-white/10 shrink-0">IS</div>
             <div>
-              <h1 class="text-3xl font-extrabold text-white tracking-tight">Super Admin Global Control</h1>
-              <p class="text-slate-400">iShack AEO and SEO partner services • Financials & Metrics</p>
+              <h1 class="text-xl md:text-3xl font-extrabold text-white tracking-tight leading-tight">Super Admin Global Control</h1>
+              <p class="text-xs md:text-sm text-slate-400 mt-1">iShack AEO and SEO partner services • Financials & Metrics</p>
             </div>
           </div>
-          <button (click)="logout()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2 rounded-xl text-sm font-bold transition-all">Exit to Sandbox</button>
+          <button (click)="logout()" class="w-full md:w-auto bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 md:py-2 rounded-xl text-sm font-bold transition-all flex justify-center">Exit to Sandbox</button>
         </div>
 
         <div *ngIf="error" class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl mb-8 font-medium">
@@ -29,11 +29,11 @@ import { environment } from '../../environments/environment';
         </div>
 
           <!-- Tabs Navigation -->
-          <div class="flex gap-4 mb-8">
+          <div class="flex gap-2 md:gap-4 mb-8 overflow-x-auto pb-4 custom-scrollbar snap-x [-webkit-overflow-scrolling:touch]">
             <button 
               (click)="setActiveTab('metrics')" 
               [ngClass]="activeTab === 'metrics' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
-              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
               <span class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
                 Financial Metrics
@@ -42,7 +42,7 @@ import { environment } from '../../environments/environment';
             <button 
               (click)="setActiveTab('clients')" 
               [ngClass]="activeTab === 'clients' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
-              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
               <span class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 Client OS
@@ -51,7 +51,7 @@ import { environment } from '../../environments/environment';
             <button 
               (click)="setActiveTab('agents')" 
               [ngClass]="activeTab === 'agents' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
-              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
               <span class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                 AI Observation Deck
@@ -60,7 +60,7 @@ import { environment } from '../../environments/environment';
             <button 
               (click)="setActiveTab('crm')" 
               [ngClass]="activeTab === 'crm' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
-              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
               <span class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 Campaign Portfolio CRM
@@ -69,7 +69,7 @@ import { environment } from '../../environments/environment';
             <button 
               (click)="setActiveTab('urls')" 
               [ngClass]="activeTab === 'urls' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
-              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
               <span class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                 Targeted URLs
@@ -78,7 +78,7 @@ import { environment } from '../../environments/environment';
             <button 
               (click)="setActiveTab('packages')" 
               [ngClass]="activeTab === 'packages' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
-              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
               <span class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                 Packages
@@ -87,7 +87,7 @@ import { environment } from '../../environments/environment';
             <button 
               (click)="setActiveTab('settings')" 
               [ngClass]="activeTab === 'settings' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
-              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all">
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
               <span class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 System & Billing
@@ -356,14 +356,14 @@ import { environment } from '../../environments/environment';
           <!-- Human-in-the-Loop Override Queue -->
           <div *ngIf="awaitingApprovals.length > 0" class="col-span-full bg-slate-900 border border-yellow-500/50 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 left-0 w-2 h-full bg-yellow-500 animate-pulse"></div>
-            <div class="flex items-center justify-between mb-4 pl-4">
-              <h2 class="text-xl font-extrabold text-white flex items-center gap-3">
-                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:pl-4 gap-4 md:gap-0">
+              <h2 class="text-lg md:text-xl font-extrabold text-white flex items-center gap-2 md:gap-3 leading-tight">
+                <svg class="w-5 h-5 md:w-6 md:h-6 text-yellow-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 Human-in-the-Loop: Awaiting Approvals
               </h2>
-              <div class="flex items-center gap-3">
-                <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{{ awaitingApprovals.length }} Pending Runbooks</span>
-                <button (click)="approveAllTasks()" [disabled]="isApprovingAll" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transition-colors flex items-center gap-1.5" [ngClass]="{'opacity-50 cursor-not-allowed': isApprovingAll}">
+              <div class="flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-3 w-full md:w-auto">
+                <span class="bg-yellow-500/20 text-yellow-300 px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider">{{ awaitingApprovals.length }} Pending Runbooks</span>
+                <button (click)="approveAllTasks()" [disabled]="isApprovingAll" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-full text-[10px] md:text-xs font-bold shadow-lg transition-colors flex items-center gap-1.5 ml-auto md:ml-0" [ngClass]="{'opacity-50 cursor-not-allowed': isApprovingAll}">
                   <span *ngIf="isApprovingAll" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                   <svg *ngIf="!isApprovingAll" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                   Accept All
@@ -1753,10 +1753,10 @@ import { environment } from '../../environments/environment';
       </div>
 
     <!-- Floating AI Assistant Chat -->
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end animate-fade-in font-sans">
+    <div class="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end animate-fade-in font-sans w-[calc(100vw-2rem)] md:w-auto pointer-events-none">
       <!-- Chat Window -->
-      <div *ngIf="isChatOpen" class="bg-slate-900 border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(30,58,138,0.3)] w-[360px] sm:w-[420px] mb-4 flex flex-col overflow-hidden animate-slide-up h-[500px]">
-         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 border-b border-white/10 flex justify-between items-center">
+      <div *ngIf="isChatOpen" class="pointer-events-auto bg-slate-900 border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(30,58,138,0.3)] w-full md:w-[420px] mb-4 flex flex-col overflow-hidden animate-slide-up h-[450px] md:h-[500px]">
+         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 border-b border-white/10 flex justify-between items-center shrink-0">
             <h3 class="text-white font-extrabold flex items-center gap-2">
                <span class="text-xl">✨</span> Vera Sharp AI Admin
             </h3>
@@ -1782,7 +1782,7 @@ import { environment } from '../../environments/environment';
          </div>
       </div>
       <!-- Chat Toggle Button -->
-      <button (click)="toggleChat()" class="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-white/20 transition-transform hover:scale-105 active:scale-95">
+      <button (click)="toggleChat()" class="pointer-events-auto w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-white/20 transition-transform hover:scale-105 active:scale-95">
          <svg *ngIf="!isChatOpen" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
          <svg *ngIf="isChatOpen" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
