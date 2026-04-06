@@ -336,6 +336,22 @@ import { environment } from '../../environments/environment';
 
         <!-- AI Agent War Room View -->
         <div *ngIf="activeTab === 'agents'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+
+          <!-- Simple Explanation Banner -->
+          <div class="col-span-full bg-blue-900/40 border border-blue-500/30 rounded-2xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-center">
+            <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+              <span class="text-3xl animate-bounce">🤖</span>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white mb-2">What am I looking at? What do I need to do?</h2>
+              <p class="text-blue-100/80 text-sm leading-relaxed">
+                Think of these "Agents" as your automated team of robot employees. They are working 24/7 in the background to improve your clients' Google rankings. They plan strategies, research keywords, and build links entirely on their own!
+                <br><br>
+                <strong class="text-white">Do you need to do anything here?</strong> Nope! You can just sit back and watch their actual "thoughts" scroll by live in the black Terminal box on the right. 
+                The <i>only</i> time they need your help is if a yellow "Awaiting Approvals" box pops up—that just means they want you to double-check their work before they publish it.
+              </p>
+            </div>
+          </div>
           
           <!-- Human-in-the-Loop Override Queue -->
           <div *ngIf="awaitingApprovals.length > 0" class="col-span-full bg-slate-900 border border-yellow-500/50 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
