@@ -379,6 +379,13 @@ import { environment } from '../../environments/environment';
                 </div>
                 <div class="font-bold text-white mb-2">{{ getTaskTitle(task.task_type) }}</div>
                 <div class="text-xs text-blue-200 mb-3 leading-relaxed">{{ getTaskDescription(task.task_type, task.status) }}</div>
+                <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-2.5 mb-3 flex items-start gap-2">
+                  <svg class="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  <div>
+                    <span class="text-[10px] uppercase font-black tracking-wider text-indigo-400 block mb-0.5">Core Benefit</span>
+                    <span class="text-xs text-indigo-200/80 leading-relaxed font-medium">{{ getTaskBenefits(task.task_type, task.status) }}</span>
+                  </div>
+                </div>
                 <div class="text-sm text-slate-400 mb-4 line-clamp-3 bg-[#0a0f18] p-2 rounded border border-white/5 font-mono">
                   <span *ngIf="task.result_payload">{{ task.result_payload | json }}</span>
                   <span *ngIf="!task.result_payload" class="italic opacity-50 flex items-center h-full">Neural payload committed directly to database or target node.</span>
@@ -1714,7 +1721,14 @@ import { environment } from '../../environments/environment';
                        <span class="text-[10px] uppercase font-bold tracking-wider" [ngClass]="{'text-green-400 bg-green-400/10 px-2 py-0.5 rounded': task.status === 'completed', 'text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded': task.status === 'pending'}">{{ task.status }}</span>
                     </div>
                     <div class="text-white font-bold mb-1">{{ getTaskTitle(task.task_type) }}</div>
-                    <div class="text-sm text-slate-400 mb-4 line-clamp-2 leading-relaxed">{{ getTaskDescription(task.task_type, task.status) }}</div>
+                    <div class="text-sm text-slate-400 mb-3 line-clamp-2 leading-relaxed">{{ getTaskDescription(task.task_type, task.status) }}</div>
+                    <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-2.5 mb-4 flex items-start gap-2">
+                      <svg class="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                      <div>
+                        <span class="text-[10px] uppercase font-black tracking-wider text-indigo-400 block mb-0.5">Core Benefit</span>
+                        <span class="text-xs text-indigo-200/80 leading-relaxed font-medium">{{ getTaskBenefits(task.task_type, task.status) }}</span>
+                      </div>
+                    </div>
                     <div class="bg-black/50 border border-white/5 rounded-lg p-3 text-xs font-mono text-slate-500 h-24 overflow-y-auto custom-scrollbar break-all flex flex-col justify-center">
                       <span *ngIf="task.result_payload">{{ task.result_payload | json }}</span>
                       <span *ngIf="!task.result_payload" class="italic opacity-50 block text-center">Neural payload committed internally.</span>
@@ -2161,6 +2175,24 @@ export class AdminDashboard implements OnInit, OnDestroy {
     if (type === 'Phase 1: Keyword Research' || type === 'Ad-Hoc: Force Keyword Target') return 'The AI found these keywords. If they look good for the client, approve them so the AI can start writing content using them!';
     if (type === 'backlink_outreach') return 'The AI wrote an email to ask a big website for a backlink. Read the email, and if it sounds polite and good, approve it so the AI can send it!';
     return 'The AI prepared this data. Please review and approve to let the AI continue its background work.';
+  }
+
+  getTaskBenefits(type: string, status: string = 'pending') {
+    if (status === 'completed') {
+       if (type === 'Phase 1: Keyword Research' || type === 'Ad-Hoc: Force Keyword Target') return 'Establishes the foundational traffic map, ensuring the client targets high-volume, low-competition queries that drive qualified leads directly to their funnel.';
+       if (type === 'backlink_outreach' || type.includes('Phase 3')) return 'Procures high Domain Authority (DR) backlinks, massively boosting the website\'s overall trust score and off-page SEO ranking power.';
+       if (type.includes('Phase 2')) return 'Directly injects optimized keywords into the site\'s meta layer, pushing the core pages higher up the Google SERP rankings.';
+       if (type.includes('Phase 4')) return 'Validates historical work against enterprise algorithmic guidelines, preventing catastrophic ranking drops caused by spam penalties or technical rot.';
+       if (type.includes('Phase 5')) return 'Uses machine learning to find micro-opportunities in search behavior, squeezing out competitive advantages that human analysts might miss.';
+       if (type.includes('Phase 6')) return 'Feeds live ranking telemetry back into the system, allowing the AI to prove real ROI and adapt strategies in real-time.';
+       if (type.includes('Phase 7')) return 'Identifies proactive growth vectors, ensuring the campaign scales indefinitely instead of plateauing after initial setup.';
+       if (type.includes('Phase 8')) return 'Instantly deploys discovered growth vectors without requiring manual human developer time.';
+       return 'This neural execution autonomously handled an infrastructural task, saving approximately 3-5 hours of manual agency labor while strictly adhering to best-in-class algorithmic guidelines.';
+    }
+
+    if (type === 'Phase 1: Keyword Research' || type === 'Ad-Hoc: Force Keyword Target') return 'By approving these parameters, the AI will lock in the semantic roadmap necessary to command high-traffic Google search verticals.';
+    if (type === 'backlink_outreach' || type.includes('Phase 3')) return 'Authorizing this outreach will autonomously initiate digital PR workflows, acquiring powerful backlinks without human labor.';
+    return 'By green-lighting this neural execution, you are progressing the campaign pipeline to automatically deploy SEO deliverables without manual intervention.';
   }
 
   // Campaign History Task State
