@@ -502,6 +502,20 @@ router.get('/agent-tasks', authenticateSuperadmin, async (req, res) => {
   }
 });
 
+router.get('/campaigns/:id/tasks', authenticateSuperadmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const tasks = await db.query(`
+      SELECT * FROM agent_tasks 
+      WHERE campaign_id = $1 
+      ORDER BY created_at DESC
+    `, [id]);
+    res.json(tasks.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch campaign task history' });
+  }
+});
+
 const pmAgent = require('./agents/pmAgent');
 const veraAgent = require('./agents/veraAgent');
 

@@ -411,12 +411,21 @@ import { environment } from '../../environments/environment';
                   <h3 class="text-white font-bold mb-1 text-sm">No Active Campaigns</h3>
                   <p class="text-slate-400 text-xs">To activate this War Room, you must deploy a Target Domain in the <span class="text-blue-400 font-bold">'Client Portfolio CRM'</span> tab.</p>
                 </div>
-                <div *ngFor="let cam of campaigns" class="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-blue-500/30 transition-colors">
-                  <div class="flex justify-between">
-                    <div class="font-bold text-white">{{ cam.client_domain }}</div>
-                    <div class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 shadow-sm">{{ cam.status }}</div>
+                <div *ngFor="let cam of campaigns" class="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-blue-500/50 hover:bg-slate-800/80 transition-all cursor-pointer shadow-sm hover:shadow-md group relative overflow-hidden" (click)="openHistoryModal(cam)">
+                  <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-colors"></div>
+                  <div class="flex justify-between items-start relative z-10">
+                    <div class="font-bold text-white group-hover:text-blue-300 transition-colors">{{ cam.client_domain }}</div>
+                    <div class="flex flex-col items-end gap-1">
+                      <div class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 shadow-sm uppercase font-bold tracking-wider">{{ cam.status }}</div>
+                    </div>
                   </div>
-                  <div class="text-xs text-slate-400 mt-2 font-medium">Agency: <span class="text-slate-300">{{ cam.agency_name }}</span></div>
+                  <div class="text-xs text-slate-400 mt-3 font-medium flex justify-between items-center relative z-10 border-t border-white/5 pt-3">
+                    <span>Agency: <span class="text-slate-200">{{ cam.agency_name }}</span></span>
+                    <span class="text-blue-400 opacity-80 group-hover:opacity-100 group-hover:-translate-x-1 transition-all flex items-center gap-1 font-bold">
+                      View History
+                      <svg class="w-3 h-3 group-hover:ml-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1647,6 +1656,82 @@ import { environment } from '../../environments/environment';
           </div>
         </div>
 
+        <!-- Campaign Task History Modal Overlay -->
+        <div *ngIf="isHistoryModalOpen" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+          <div class="bg-[#0A0D12] border border-white/10 rounded-2xl w-full max-w-5xl shadow-[0_0_50px_rgba(59,130,246,0.15)] animate-slide-up flex flex-col h-[85vh]">
+            <!-- Header -->
+            <div class="p-6 border-b border-white/5 bg-slate-900/50 flex justify-between items-center rounded-t-2xl relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+              <div class="relative z-10 w-full flex justify-between items-start">
+                <div>
+                  <h3 class="text-2xl font-black text-white flex items-center gap-3">
+                    <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Full AI Operational History
+                  </h3>
+                  <div class="flex items-center gap-2 mt-2">
+                    <span class="text-sm font-bold text-slate-300">{{ selectedCampaignHistory?.client_domain }}</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                    <span class="text-sm text-slate-500">{{ selectedCampaignHistory?.agency_name }}</span>
+                    <span class="ml-3 text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold uppercase tracking-wider">{{ selectedCampaignTasks.length }} Tasks Logged</span>
+                  </div>
+                </div>
+                <button (click)="closeHistoryModal()" class="text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-xl transition-colors">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Loader -->
+            <div *ngIf="isHistoryLoading" class="flex-1 flex flex-col items-center justify-center space-y-4">
+              <div class="w-10 h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+              <p class="text-slate-400 text-sm font-mono tracking-wider animate-pulse">Accessing Neural Archives...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!isHistoryLoading && selectedCampaignTasks.length === 0" class="flex-1 flex flex-col items-center justify-center p-8">
+              <div class="w-20 h-20 bg-slate-900 rounded-full border border-white/5 flex items-center justify-center mb-4">
+                <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+              </div>
+              <h4 class="text-white font-bold text-lg mb-2">No History Logged Yet</h4>
+              <p class="text-slate-400 text-sm text-center max-w-md">The AI agents have not yet completed any tasks for this campaign. As the month progresses, tasks will be logged here.</p>
+            </div>
+
+            <!-- Data Table -->
+            <div *ngIf="!isHistoryLoading && selectedCampaignTasks.length > 0" class="flex-1 overflow-y-auto p-6 custom-scrollbar bg-slate-950/30">
+              <div class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-800 before:to-transparent">
+                
+                <div *ngFor="let task of selectedCampaignTasks" class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                  <div class="flex items-center justify-center w-10 h-10 rounded-full border border-slate-800 bg-slate-900 text-slate-400 group-[.is-active]:bg-blue-900/20 group-[.is-active]:text-blue-400 group-[.is-active]:border-blue-500/30 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 relative z-10 font-bold text-xs uppercase tracking-wider">
+                    {{ task.assigned_agent.substring(0, 2) }}
+                  </div>
+                  
+                  <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl border border-white/5 bg-slate-900/50 hover:bg-slate-900 transition-colors shadow-lg">
+                    <div class="flex items-center justify-between mb-2">
+                       <time class="text-xs font-mono text-slate-500 font-bold bg-black/30 px-2 py-1 rounded inline-block">{{ task.created_at | date:'short' }}</time>
+                       <span class="text-[10px] uppercase font-bold tracking-wider" [ngClass]="{'text-green-400 bg-green-400/10 px-2 py-0.5 rounded': task.status === 'completed', 'text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded': task.status === 'pending'}">{{ task.status }}</span>
+                    </div>
+                    <div class="text-white font-bold mb-1">{{ getTaskTitle(task.task_type) }}</div>
+                    <div class="text-sm text-slate-400 mb-4 line-clamp-2 leading-relaxed">{{ getTaskDescription(task.task_type) }}</div>
+                    <div class="bg-black/50 border border-white/5 rounded-lg p-3 text-xs font-mono text-slate-500 h-24 overflow-y-auto custom-scrollbar break-all">
+                      {{ task.result_payload | json }}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+            <!-- Footer & Export -->
+            <div class="p-6 border-t border-white/5 bg-slate-900 flex justify-between items-center rounded-b-2xl">
+              <p class="text-xs text-slate-500 font-mono">End of Neural Log. Data is strictly internal.</p>
+              <button *ngIf="selectedCampaignTasks.length > 0" (click)="exportCampaignHistoryCSV()" class="bg-blue-600 hover:bg-blue-500 text-white font-extrabold px-6 py-3 rounded-xl shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Export Core CSV Report
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     <!-- Floating AI Assistant Chat -->
@@ -2060,6 +2145,71 @@ export class AdminDashboard implements OnInit, OnDestroy {
     if (type === 'Phase 1: Keyword Research' || type === 'Ad-Hoc: Force Keyword Target') return 'The AI found these keywords. If they look good for the client, approve them so the AI can start writing content using them!';
     if (type === 'backlink_outreach') return 'The AI wrote an email to ask a big website for a backlink. Read the email, and if it sounds polite and good, approve it so the AI can send it!';
     return 'The AI prepared this data. Please review and approve to let the AI continue its background work.';
+  }
+
+  // Campaign History Task State
+  isHistoryModalOpen = false;
+  selectedCampaignHistory: any = null;
+  selectedCampaignTasks: any[] = [];
+  isHistoryLoading = false;
+
+  openHistoryModal(campaign: any) {
+    this.selectedCampaignHistory = campaign;
+    this.isHistoryModalOpen = true;
+    this.isHistoryLoading = true;
+    this.selectedCampaignTasks = [];
+    
+    this.http.get<any[]>(`${environment.apiUrl}/admin/campaigns/${campaign.id}/tasks`, { headers: this.getHeaders() }).subscribe({
+      next: (tasks) => {
+        this.selectedCampaignTasks = tasks;
+        this.isHistoryLoading = false;
+      },
+      error: () => {
+        alert("Failed to load historical tasks.");
+        this.isHistoryLoading = false;
+      }
+    });
+  }
+
+  closeHistoryModal() {
+    this.isHistoryModalOpen = false;
+    this.selectedCampaignHistory = null;
+    this.selectedCampaignTasks = [];
+  }
+
+  exportCampaignHistoryCSV() {
+    if (!this.selectedCampaignTasks || this.selectedCampaignTasks.length === 0) {
+      return alert("No tasks to export!");
+    }
+    
+    const headers = ["Date Completed", "Phase / Task Type", "Assigned Agent", "Status", "Payload Summary"];
+    const rows = this.selectedCampaignTasks.map(task => {
+      const date = new Date(task.created_at).toLocaleString();
+      const type = task.task_type;
+      const agent = task.assigned_agent;
+      const status = task.status;
+      
+      // Clean JSON for CSV
+      let payload = "{}";
+      try {
+        payload = JSON.stringify(task.result_payload || {});
+      } catch (e) {}
+      payload = payload.replace(/"/g, '""'); // escape quotes for CSV
+      
+      return `"${date}","${type}","${agent}","${status}","${payload}"`;
+    });
+    
+    const csvContent = [headers.map(h => `"${h}"`).join(","), ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `ai_summary_${this.selectedCampaignHistory.client_domain.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   // Deep Dive State
