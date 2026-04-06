@@ -366,9 +366,13 @@ import { environment } from '../../environments/environment';
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4">
               <div *ngFor="let task of awaitingApprovals" class="bg-slate-950/50 border border-white/10 rounded-xl p-4 hover:border-yellow-500/50 transition-colors">
-                <div class="text-xs text-yellow-400 font-bold mb-1 tracking-wider uppercase">Phase Intercepted</div>
-                <div class="font-bold text-white mb-2">{{ task.task_type }}</div>
-                <div class="text-sm text-slate-400 mb-4 line-clamp-2">{{ task.result_payload | json }}</div>
+                <div class="text-xs text-yellow-400 font-bold mb-1 tracking-wider uppercase flex justify-between">
+                  <span>For: {{ task.client_domain }}</span>
+                  <span>Awaiting You</span>
+                </div>
+                <div class="font-bold text-white mb-2">{{ getTaskTitle(task.task_type) }}</div>
+                <div class="text-xs text-blue-200 mb-3 leading-relaxed">{{ getTaskDescription(task.task_type) }}</div>
+                <div class="text-sm text-slate-400 mb-4 line-clamp-3 bg-[#0a0f18] p-2 rounded border border-white/5 font-mono">{{ task.result_payload | json }}</div>
                 <button (click)="openApprovalModal(task)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold py-2 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                   Review & Approve JSON
@@ -1988,10 +1992,10 @@ export class AdminDashboard implements OnInit, OnDestroy {
   
   // Task Orchestration Engine
   submitApproval() {
-    if (!this.expandedCampaign) return;
+    if (!this.editingTask) return;
     try {
       const parsed = JSON.parse(this.editedPayloadString);
-      this.http.post(`${environment.apiUrl}/admin/sandbox/approve-task`, { campaignId: this.expandedCampaign, payload: parsed }, { headers: this.getHeaders() }).subscribe({
+      this.http.post(`${environment.apiUrl}/admin/tasks/${this.editingTask.id}/approve`, { edited_payload: parsed }, { headers: this.getHeaders() }).subscribe({
         next: () => {
           alert('Core Neural String saved. AI agents are progressing...');
           this.closeApprovalModal();
@@ -2002,6 +2006,18 @@ export class AdminDashboard implements OnInit, OnDestroy {
     } catch {
       alert("Invalid JSON strictly. Provide a proper JSON structure string.");
     }
+  }
+
+  getTaskTitle(type: string) {
+    if (type === 'Phase 1: Keyword Research' || type === 'Ad-Hoc: Force Keyword Target') return '🔍 Keyword Research';
+    if (type === 'backlink_outreach') return '💌 Guest Post Outreach';
+    return type;
+  }
+
+  getTaskDescription(type: string) {
+    if (type === 'Phase 1: Keyword Research' || type === 'Ad-Hoc: Force Keyword Target') return 'The AI found these keywords. If they look good for the client, approve them so the AI can start writing content using them!';
+    if (type === 'backlink_outreach') return 'The AI wrote an email to ask a big website for a backlink. Read the email, and if it sounds polite and good, approve it so the AI can send it!';
+    return 'The AI prepared this data. Please review and approve to let the AI continue its background work.';
   }
 
   // Deep Dive State

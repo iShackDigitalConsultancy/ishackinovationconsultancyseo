@@ -489,7 +489,13 @@ router.get('/leads', authenticateSuperadmin, async (req, res) => {
 
 router.get('/agent-tasks', authenticateSuperadmin, async (req, res) => {
   try {
-    const tasks = await db.query("SELECT * FROM agent_tasks ORDER BY created_at DESC LIMIT 50");
+    const tasks = await db.query(`
+      SELECT t.*, c.client_domain 
+      FROM agent_tasks t 
+      LEFT JOIN campaigns c ON t.campaign_id = c.id 
+      ORDER BY t.created_at DESC 
+      LIMIT 50
+    `);
     res.json(tasks.rows);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch agent tasks' });
