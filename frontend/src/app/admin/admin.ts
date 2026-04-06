@@ -398,6 +398,10 @@ import { environment } from '../../environments/environment';
                     Active AI Campaigns
                   </h2>
                 </div>
+                <p class="text-xs text-slate-400 font-normal ml-1 mt-1 tracking-wide leading-relaxed">
+                  Websites currently managed by your automated AI workforce. <br>
+                  <strong class="text-blue-300">"Completed"</strong> means the AI has finished its task quota for the <i>current billing month</i>. It will automatically reactivate next month!
+                </p>
               </div>
               <div class="p-5 space-y-4">
                 <div *ngIf="campaigns.length === 0" class="text-center p-6 bg-slate-900 border border-dashed border-white/20 rounded-xl my-2">
@@ -423,6 +427,9 @@ import { environment } from '../../environments/environment';
                   <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                   Orchestration Tasks
                 </h2>
+                <p class="text-xs text-slate-400 font-normal ml-1 mt-2 tracking-wide leading-relaxed">
+                  A high-level checklist showing what the Project Manager Agent is currently scheduling across all campaigns.
+                </p>
               </div>
               <div class="p-5 space-y-3 h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 <div *ngIf="agentTasks.length === 0" class="text-center p-6 bg-slate-950 border border-dashed border-white/10 rounded-xl mt-2">
@@ -452,6 +459,9 @@ import { environment } from '../../environments/environment';
                   <div class="w-3 h-3 rounded-full bg-green-500/80 border border-green-500"></div>
                 </div>
                 <div class="text-xs text-slate-400 font-mono tracking-wider mx-auto bg-black/20 px-4 py-1 rounded-md border border-white/5">swarm-agent-logs ~ zsh</div>
+              </div>
+              <div class="bg-blue-900/20 border-b border-blue-500/20 px-6 py-2 z-10">
+                <span class="text-[11px] text-blue-300 font-mono leading-relaxed inline-block">☝️ <strong>Live Terminal:</strong> Read this scrolling black box to watch your autonomous agents "think", query databases, and build algorithms in real-time.</span>
               </div>
 
               <!-- Live Memory Stream -->
