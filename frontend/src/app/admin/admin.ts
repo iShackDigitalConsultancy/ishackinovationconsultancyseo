@@ -1611,7 +1611,6 @@ import { environment } from '../../environments/environment';
         </div>
 
       </div>
-    </div>
 
     <!-- Floating AI Assistant Chat -->
     <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end animate-fade-in font-sans">
