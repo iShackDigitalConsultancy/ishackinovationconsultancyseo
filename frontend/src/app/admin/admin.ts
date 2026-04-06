@@ -361,7 +361,14 @@ import { environment } from '../../environments/environment';
                 <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 Human-in-the-Loop: Awaiting Approvals
               </h2>
-              <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{{ awaitingApprovals.length }} Pending Runbooks</span>
+              <div class="flex items-center gap-3">
+                <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{{ awaitingApprovals.length }} Pending Runbooks</span>
+                <button (click)="approveAllTasks()" [disabled]="isApprovingAll" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transition-colors flex items-center gap-1.5" [ngClass]="{'opacity-50 cursor-not-allowed': isApprovingAll}">
+                  <span *ngIf="isApprovingAll" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <svg *ngIf="!isApprovingAll" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  Accept All
+                </button>
+              </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4">
@@ -2006,6 +2013,31 @@ export class AdminDashboard implements OnInit, OnDestroy {
     } catch {
       alert("Invalid JSON strictly. Provide a proper JSON structure string.");
     }
+  }
+
+  isApprovingAll = false;
+
+  async approveAllTasks() {
+    if (this.awaitingApprovals.length === 0) return;
+    if (!confirm(`Are you sure you want to officially accept and execute all ${this.awaitingApprovals.length} pending runbooks?`)) return;
+    
+    this.isApprovingAll = true;
+    
+    // Process sequentially to be safe with DB connections & upstream Mailgun/Asana triggers
+    for (const task of this.awaitingApprovals) {
+      try {
+        await new Promise((resolve, reject) => {
+          this.http.post(`${environment.apiUrl}/admin/tasks/${task.id}/approve`, { edited_payload: task.result_payload }, { headers: this.getHeaders() })
+            .subscribe({ next: resolve, error: reject });
+        });
+      } catch (err) {
+        console.error(`Failed to approve task ${task.id}:`, err);
+      }
+    }
+    
+    this.isApprovingAll = false;
+    alert("Success! All pending AI runbooks have been accepted and dispatched to their respective pipelines.");
+    this.fetchAgentData();
   }
 
   getTaskTitle(type: string) {
