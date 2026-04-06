@@ -42,6 +42,26 @@ app.use('/api/client', clientRouter);
 const paymentsRouter = require('./payments');
 app.use('/api/payments', paymentsRouter);
 
+// Public Contact Forms
+const mailService = require('./services/mailService');
+app.post('/api/contact/partner', async (req, res) => {
+  try {
+    const data = req.body;
+    if (!data.email || !data.name) {
+      return res.status(400).json({ error: 'Name and email are required fields.' });
+    }
+    const success = await mailService.sendPartnerInquiry(data);
+    if (success) {
+      return res.json({ success: true, message: 'Inquiry dispatched to partnership team.' });
+    } else {
+      return res.status(500).json({ error: 'Internal error dispatching inquiry.' });
+    }
+  } catch (error) {
+    console.error('Contact endpoint err:', error);
+    return res.status(500).json({ error: 'System error.' });
+  }
+});
+
 // Real SEMRush & HTML Audit Integration
 app.post('/api/openclaw/trigger', async (req, res) => {
   const { eventType, payload } = req.body;
