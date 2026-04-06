@@ -6,7 +6,7 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 class GoogleAnalyticsService {
   constructor() {
-    this.propertyId = process.env.GA_PROPERTY_ID;
+    this.propertyId = process.env.GA_PROPERTY_ID || '530530568';
     
     // Support production env vars instead of relying solely on local git-ignored JSON files
     const envCreds = process.env.GOOGLE_OAUTH_CREDENTIALS;

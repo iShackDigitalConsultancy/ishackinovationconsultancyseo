@@ -332,6 +332,7 @@ import { environment } from '../../environments/environment';
               </table>
             </div>
           </div>
+        </div>
 
         <!-- AI Agent War Room View -->
         <div *ngIf="activeTab === 'agents'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
@@ -1835,6 +1836,7 @@ export class AdminDashboard implements OnInit, OnDestroy {
     }
     if (tab === 'urls') {
       this.fetchTargetedUrls();
+      this.fetchPackages();
       this.fetchAgencyLeads();
       this.fetchiShackLeads();
     }
