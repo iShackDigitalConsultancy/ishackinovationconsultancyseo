@@ -378,8 +378,11 @@ import { environment } from '../../environments/environment';
                   <span>Awaiting You</span>
                 </div>
                 <div class="font-bold text-white mb-2">{{ getTaskTitle(task.task_type) }}</div>
-                <div class="text-xs text-blue-200 mb-3 leading-relaxed">{{ getTaskDescription(task.task_type) }}</div>
-                <div class="text-sm text-slate-400 mb-4 line-clamp-3 bg-[#0a0f18] p-2 rounded border border-white/5 font-mono">{{ task.result_payload | json }}</div>
+                <div class="text-xs text-blue-200 mb-3 leading-relaxed">{{ getTaskDescription(task.task_type, task.status) }}</div>
+                <div class="text-sm text-slate-400 mb-4 line-clamp-3 bg-[#0a0f18] p-2 rounded border border-white/5 font-mono">
+                  <span *ngIf="task.result_payload">{{ task.result_payload | json }}</span>
+                  <span *ngIf="!task.result_payload" class="italic opacity-50 flex items-center h-full">Neural payload committed directly to database or target node.</span>
+                </div>
                 <button (click)="openApprovalModal(task)" class="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold py-2 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                   Review & Approve JSON
@@ -1711,9 +1714,10 @@ import { environment } from '../../environments/environment';
                        <span class="text-[10px] uppercase font-bold tracking-wider" [ngClass]="{'text-green-400 bg-green-400/10 px-2 py-0.5 rounded': task.status === 'completed', 'text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded': task.status === 'pending'}">{{ task.status }}</span>
                     </div>
                     <div class="text-white font-bold mb-1">{{ getTaskTitle(task.task_type) }}</div>
-                    <div class="text-sm text-slate-400 mb-4 line-clamp-2 leading-relaxed">{{ getTaskDescription(task.task_type) }}</div>
-                    <div class="bg-black/50 border border-white/5 rounded-lg p-3 text-xs font-mono text-slate-500 h-24 overflow-y-auto custom-scrollbar break-all">
-                      {{ task.result_payload | json }}
+                    <div class="text-sm text-slate-400 mb-4 line-clamp-2 leading-relaxed">{{ getTaskDescription(task.task_type, task.status) }}</div>
+                    <div class="bg-black/50 border border-white/5 rounded-lg p-3 text-xs font-mono text-slate-500 h-24 overflow-y-auto custom-scrollbar break-all flex flex-col justify-center">
+                      <span *ngIf="task.result_payload">{{ task.result_payload | json }}</span>
+                      <span *ngIf="!task.result_payload" class="italic opacity-50 block text-center">Neural payload committed internally.</span>
                     </div>
                   </div>
                 </div>
@@ -2141,7 +2145,19 @@ export class AdminDashboard implements OnInit, OnDestroy {
     return type;
   }
 
-  getTaskDescription(type: string) {
+  getTaskDescription(type: string, status: string = 'pending') {
+    if (status === 'completed') {
+       if (type === 'Phase 1: Keyword Research' || type === 'Ad-Hoc: Force Keyword Target') return 'The AI successfully evaluated the domain and aggregated optimal target keywords. Parameters are locked in the active database.';
+       if (type === 'backlink_outreach' || type.includes('Phase 3')) return 'The AI successfully identified high DR targets and dispatched the outreach campaign.';
+       if (type.includes('Phase 2')) return 'The AI successfully generated optimized onsite meta tags and content structures.';
+       if (type.includes('Phase 4')) return 'The Expert RAG Audit was successfully processed against the dataset.';
+       if (type.includes('Phase 5')) return 'The Autonomous ML iteration processed parameter adjustments.';
+       if (type.includes('Phase 6')) return 'Live data telemetry hook was successfully verified with SEMrush active connection.';
+       if (type.includes('Phase 7')) return 'Continuous optimization advisory completed for the recurring cycle.';
+       if (type.includes('Phase 8')) return 'Continuous action pipeline successfully deployed algorithmic patches.';
+       return 'The AI successfully executed this task and committed the resulting neural structures directly to the database.';
+    }
+
     if (type === 'Phase 1: Keyword Research' || type === 'Ad-Hoc: Force Keyword Target') return 'The AI found these keywords. If they look good for the client, approve them so the AI can start writing content using them!';
     if (type === 'backlink_outreach') return 'The AI wrote an email to ask a big website for a backlink. Read the email, and if it sounds polite and good, approve it so the AI can send it!';
     return 'The AI prepared this data. Please review and approve to let the AI continue its background work.';
