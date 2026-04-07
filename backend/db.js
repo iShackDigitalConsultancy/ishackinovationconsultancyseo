@@ -95,6 +95,8 @@ const initSchema = async () => {
       CREATE TABLE IF NOT EXISTS onboarding_leads (
         id SERIAL PRIMARY KEY,
         search_query VARCHAR(255),
+        business_context JSONB,
+        priority_product VARCHAR(255),
         selected_keywords JSONB,
         selected_articles JSONB,
         email VARCHAR(255),
@@ -103,6 +105,20 @@ const initSchema = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      DO $$ 
+      BEGIN
+          BEGIN
+              ALTER TABLE onboarding_leads ADD COLUMN business_context JSONB;
+          EXCEPTION
+              WHEN duplicate_column THEN null;
+          END;
+          BEGIN
+              ALTER TABLE onboarding_leads ADD COLUMN priority_product VARCHAR(255);
+          EXCEPTION
+              WHEN duplicate_column THEN null;
+          END;
+      END $$;
 
       CREATE TABLE IF NOT EXISTS campaign_metrics (
         id SERIAL PRIMARY KEY,

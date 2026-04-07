@@ -77,26 +77,88 @@ app.post('/api/onboarding/start', async (req, res) => {
   }
 });
 
+app.post('/api/onboarding/analyze-site', async (req, res) => {
+  try {
+    const { leadId, url } = req.body;
+    
+    // Setup default fallback config
+    let businessContext = {
+      brandName: url.replace(/^https?:\/\//, '').split('/')[0],
+      description: "A business operating at " + url,
+      language: "English",
+      country: "United States",
+      customerReach: "Nationwide or wide area",
+      whatYouSell: ["Core Service 1", "Core Service 2", "Core Product"],
+      whatYouDontSell: ["Unrelated Service", "Competitor Product"]
+    };
+    
+    try {
+      const researchAgent = require('./agents/researchAgent');
+      const prompt = `You are evaluating a new client for SEO automation. Their website is: "${url}".
+Analyze this URL/domain. Guess their brand name. Write a 1-sentence description of what they do.
+Identify up to 5 core products or services they offer ("whatYouSell").
+Identify 2 services they likely DO NOT offer that are closely related (negative SEO terms, "whatYouDontSell").
+Return EXACTLY a JSON object with this shape:
+{
+  "brandName": "string",
+  "description": "string",
+  "whatYouSell": ["string", "string"],
+  "whatYouDontSell": ["string", "string"]
+}
+Do NOT return anything but this JSON object.`;
+
+      const rawResponse = await researchAgent.think(prompt, { directive: "Funnel Site Analysis" });
+      const match = rawResponse.match(/\{[\s\S]*\}/);
+      if (match) {
+        const parsed = JSON.parse(match[0]);
+        if (parsed.brandName && parsed.whatYouSell) {
+          businessContext = { ...businessContext, ...parsed };
+        }
+      }
+    } catch (agentErr) {
+      console.warn('AI Agent failed to analyze site, using fallback:', agentErr);
+    }
+    
+    await db.query(
+      `UPDATE onboarding_leads SET business_context = $1 WHERE id = $2`,
+      [JSON.stringify(businessContext), leadId]
+    );
+
+    res.json({ success: true, businessContext });
+  } catch (error) {
+    console.error('Onboarding analyze error:', error);
+    res.status(500).json({ error: 'Internal system error' });
+  }
+});
+
 app.post('/api/onboarding/keywords', async (req, res) => {
   try {
-    const { leadId, searchQuery } = req.body;
+    const { leadId, businessContext, priorityProduct } = req.body;
     
-    // Attempt actual AI keyword research
+    // Attempt actual AI keyword research based on complex data
     let mockKeywords = [
-      searchQuery,
-      `best ${searchQuery.split(' ').slice(0, 2).join(' ')}`,
-      `affordable ${searchQuery.split(' ')[0]} solutions`,
-      `${searchQuery} strategies 2026`,
-      `how to improve ${searchQuery.split(' ')[1] || 'SEO'}`
+      priorityProduct,
+      `best ${priorityProduct}`,
+      `${priorityProduct} services near me`,
+      `affordable ${businessContext.whatYouSell[0]}`,
+      `${businessContext.whatYouSell[1]} strategies 2026`
     ];
     
     try {
       const researchAgent = require('./agents/researchAgent');
-      const prompt = `The user entered the following search query or target website in an onboarding form: "${searchQuery}". 
-Analyze this query, understand the core business niche, and return EXACTLY 5 highly relevant, high-value SEO keyword phrases they should target. 
-Do not return any conversational text, numbers, or bullet points. Just return a raw JSON array of 5 strings. Example: ["keyword one", "keyword two", "keyword three", "keyword four", "keyword five"]`;
+      const prompt = `You are a Master SEO Strategist. 
+Client Brand: ${businessContext.brandName}
+Client Description: ${businessContext.description}
+Core Products/Services: ${JSON.stringify(businessContext.whatYouSell)}
+Negative Products (DO NOT target): ${JSON.stringify(businessContext.whatYouDontSell)}
+Target Market: ${businessContext.country} (${businessContext.customerReach})
+Target Language: ${businessContext.language}
+#1 Priority Product to Focus On: ${priorityProduct}
 
-      const rawResponse = await researchAgent.think(prompt, { directive: "Funnel Onboarding" });
+Generate EXACTLY 5 highly relevant, high-value SEO keyword phrases they should target based primarily on the Priority Product but keeping the full business context in mind. Ensure you avoid anything related to the negative products.
+Return a raw JSON array of 5 strings. Example: ["keyword one", "keyword two", ...]`;
+
+      const rawResponse = await researchAgent.think(prompt, { directive: "Funnel Keyword Generation" });
       const match = rawResponse.match(/\[[\s\S]*?\]/);
       if (match) {
         const parsed = JSON.parse(match[0]);
@@ -105,12 +167,12 @@ Do not return any conversational text, numbers, or bullet points. Just return a 
         }
       }
     } catch (agentErr) {
-      console.warn('AI Research Agent failed during onboarding, falling back to basic generation', agentErr);
+      console.warn('AI Research Agent failed during complex keyword gen, falling back:', agentErr);
     }
     
     await db.query(
-      `UPDATE onboarding_leads SET selected_keywords = $1, current_step = 2, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
-      [JSON.stringify(mockKeywords), leadId]
+      `UPDATE onboarding_leads SET business_context = $1, priority_product = $2, selected_keywords = $3, current_step = 2, updated_at = CURRENT_TIMESTAMP WHERE id = $4`,
+      [JSON.stringify(businessContext), priorityProduct, JSON.stringify(mockKeywords), leadId]
     );
     
     res.json({ success: true, keywords: mockKeywords });
