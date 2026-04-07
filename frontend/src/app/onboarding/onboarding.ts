@@ -73,11 +73,11 @@ import { environment } from '../../environments/environment';
           <div class="mt-8 space-y-3 font-medium text-slate-600 text-[15px]">
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-              216% Avg Traffic Increase
+              267% Avg Traffic Increase
             </div>
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-              1,295+ Businesses Growing
+              180+ Businesses Growing
             </div>
             <div class="flex items-center gap-3">
               <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
