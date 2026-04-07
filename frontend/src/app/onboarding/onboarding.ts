@@ -32,28 +32,66 @@ import { environment } from '../../environments/environment';
       <div class="max-w-xl mx-auto w-full px-4">
         
         <!-- STEP 1: Search Query -->
-        <div *ngIf="currentStep === 1" class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 border border-slate-100 mt-12 animate-fade-in text-center">
-          <div class="mb-8">
-             <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="h-10 mx-auto drop-shadow-sm">
+        <div *ngIf="currentStep === 1" class="mt-8 mb-12 animate-fade-in text-left">
+          
+          <h1 class="text-[32px] md:text-5xl font-black text-slate-900 leading-[1.1] md:leading-tight mb-6 tracking-tight">
+            Get Found &<br class="hidden md:block"/> Recommended by<br/>
+            <span class="text-[#10a37f]">ChatGPT</span>, <span class="text-[#10a37f]">Perplexity</span><br/>
+            AND <span class="text-[#10a37f]">Google</span>
+          </h1>
+          
+          <div class="space-y-3 text-[15px] md:text-base text-slate-800 font-medium mb-6">
+            <p class="flex items-start gap-2">
+              <span class="shrink-0 text-xl">⏰</span>
+              <span>You're 2.5 years behind competitors who do SEO.</span>
+            </p>
+            <p class="flex items-start gap-2">
+              <span class="shrink-0 text-xl">📚</span>
+              <span>We catch you up with 1 expert article daily + building trust (backlinks).</span>
+            </p>
+            <p class="font-bold text-slate-900 mt-4 mb-2">
+              Get more customers from ChatGPT & Google on autopilot 👇
+            </p>
           </div>
-          <p class="text-slate-400 text-sm mb-6 uppercase tracking-wider font-bold">Initiate Automated Growth</p>
-          <form (ngSubmit)="startOnboarding()">
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+
+          <form (ngSubmit)="startOnboarding()" class="w-full">
+            <div class="flex items-center w-full border-2 border-orange-500 rounded-xl overflow-hidden focus-within:ring-4 focus-within:ring-orange-500/20 transition-all bg-white mb-4">
+              <div class="bg-slate-50 text-slate-400 font-medium px-4 py-4 border-r border-slate-200 shrink-0">
+                https://
               </div>
               <input type="text" [(ngModel)]="searchQuery" name="query" required
-                     class="block w-full pl-11 pr-4 py-4 bg-white border border-slate-200 rounded-full text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-lg transition-all" 
-                     placeholder="estate management software South Africa">
+                     class="w-full flex-1 px-4 py-4 text-slate-900 placeholder-slate-400 focus:outline-none font-medium text-lg bg-transparent" 
+                     placeholder="yourwebsite.com">
             </div>
-            <p class="text-slate-400 text-xs mt-4">Your articles could show up right here</p>
+            
             <button type="submit" [disabled]="isLoading || !searchQuery" 
-                    class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition-all flex justify-center items-center gap-2"
-                    [ngClass]="{'opacity-75 cursor-not-allowed': isLoading || !searchQuery}">
+                    class="w-full bg-[#7038e0] hover:bg-[#5b2ab8] text-white font-bold text-[17px] py-4 rounded-xl shadow-[0_8px_20px_rgba(112,56,224,0.3)] transition-all flex justify-center items-center gap-2"
+                    [ngClass]="{'opacity-70 cursor-not-allowed': isLoading || !searchQuery}">
               <span *ngIf="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-              {{ isLoading ? 'Analyzing Market...' : 'Generate SEO Strategy &rarr;' }}
+              {{ isLoading ? 'Analyzing Architecture...' : 'Get 5 Articles + 30-Day Content Plan &rarr;' }}
             </button>
           </form>
+
+          <div class="mt-8 space-y-3 font-medium text-slate-600 text-[15px]">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              216% Avg Traffic Increase
+            </div>
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              1,295+ Businesses Growing
+            </div>
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              Zero Technical Skills Needed
+            </div>
+          </div>
+
+          <div class="mt-8 flex items-start gap-2 text-sm text-slate-500">
+            <span class="shrink-0 text-lg mt-0.5">🌐</span>
+            <span class="leading-snug">We write SEO articles in 🇬🇧 English, 🇪🇸 Spanish, 🇫🇷 French and 97 other languages</span>
+          </div>
+
         </div>
 
         <!-- STEP 2: Keywords -->
