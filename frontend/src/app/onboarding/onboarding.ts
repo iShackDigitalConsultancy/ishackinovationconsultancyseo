@@ -87,11 +87,6 @@ import { environment } from '../../environments/environment';
             </div>
           </div>
 
-          <div class="mt-8 flex items-start gap-2 text-sm text-slate-500">
-            <span class="shrink-0 text-lg mt-0.5">🌐</span>
-            <span class="leading-snug">We write SEO articles in 🇬🇧 English, 🇪🇸 Spanish, 🇫🇷 French and 97 other languages</span>
-          </div>
-
         </div>
 
         <!-- STEP 2: Keywords -->
