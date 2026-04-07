@@ -80,14 +80,33 @@ app.post('/api/onboarding/start', async (req, res) => {
 app.post('/api/onboarding/keywords', async (req, res) => {
   try {
     const { leadId, searchQuery } = req.body;
-    // Call AI to generate 5 keywords based on searchQuery (simplified simulation for speed)
-    const mockKeywords = [
+    
+    // Attempt actual AI keyword research
+    let mockKeywords = [
       searchQuery,
       `best ${searchQuery.split(' ').slice(0, 2).join(' ')}`,
       `affordable ${searchQuery.split(' ')[0]} solutions`,
       `${searchQuery} strategies 2026`,
       `how to improve ${searchQuery.split(' ')[1] || 'SEO'}`
     ];
+    
+    try {
+      const researchAgent = require('./agents/researchAgent');
+      const prompt = `The user entered the following search query or target website in an onboarding form: "${searchQuery}". 
+Analyze this query, understand the core business niche, and return EXACTLY 5 highly relevant, high-value SEO keyword phrases they should target. 
+Do not return any conversational text, numbers, or bullet points. Just return a raw JSON array of 5 strings. Example: ["keyword one", "keyword two", "keyword three", "keyword four", "keyword five"]`;
+
+      const rawResponse = await researchAgent.think(prompt, { directive: "Funnel Onboarding" });
+      const match = rawResponse.match(/\[[\s\S]*?\]/);
+      if (match) {
+        const parsed = JSON.parse(match[0]);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          mockKeywords = parsed.slice(0, 5);
+        }
+      }
+    } catch (agentErr) {
+      console.warn('AI Research Agent failed during onboarding, falling back to basic generation', agentErr);
+    }
     
     await db.query(
       `UPDATE onboarding_leads SET selected_keywords = $1, current_step = 2, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
