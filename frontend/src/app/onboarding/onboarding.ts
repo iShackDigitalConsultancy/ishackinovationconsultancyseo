@@ -35,7 +35,7 @@ import { environment } from '../../environments/environment';
         <div *ngIf="currentStep === 1" class="mt-8 mb-12 animate-fade-in text-left">
           
           <h1 class="text-[32px] md:text-5xl font-black text-slate-900 leading-[1.1] md:leading-tight mb-6 tracking-tight">
-            Get Found &<br class="hidden md:block"/> Recommended by<br/>
+            Rank & Get<br class="hidden md:block"/> Recommended by<br/>
             <span class="text-blue-600">ChatGPT</span>, <span class="text-blue-600">Perplexity</span><br/>
             AND <span class="text-blue-600">Google</span>
           </h1>
