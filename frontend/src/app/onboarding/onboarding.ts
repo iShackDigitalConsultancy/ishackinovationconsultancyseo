@@ -14,7 +14,7 @@ import { environment } from '../../environments/environment';
       
       <!-- Top Navigation & Progress -->
       <div class="max-w-2xl mx-auto w-full px-6 mb-8 text-center relative">
-         <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-2 tracking-tight">AutoSEO</h1>
+         <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-2 tracking-tight">iShackAEO</h1>
          <!-- Progress Bar (Steps 2-5) -->
          <div *ngIf="currentStep > 1 && currentStep <= 5" class="flex items-center justify-center gap-2 mt-6">
            <ng-container *ngFor="let step of [2,3,3.5,4,5]; let i = index">
@@ -65,7 +65,7 @@ import { environment } from '../../environments/environment';
             </div>
             
             <button type="submit" [disabled]="isLoading || !searchQuery" 
-                    class="w-full bg-[#7038e0] hover:bg-[#5b2ab8] text-white font-bold text-[17px] py-4 rounded-xl shadow-[0_8px_20px_rgba(112,56,224,0.3)] transition-all flex justify-center items-center gap-2"
+                    class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-[17px] py-4 rounded-xl shadow-[0_8px_20px_rgba(59,130,246,0.3)] transition-all flex justify-center items-center gap-2"
                     [ngClass]="{'opacity-70 cursor-not-allowed': isLoading || !searchQuery}">
               <span *ngIf="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
               {{ isLoading ? 'Analyzing Architecture...' : 'Get 5 Articles + 30-Day Content Plan &rarr;' }}
@@ -196,7 +196,7 @@ import { environment } from '../../environments/environment';
           <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
              <div class="flex items-center gap-2">
                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
-               <span class="font-extrabold text-blue-600 text-lg">AutoSEO</span>
+               <span class="font-extrabold text-blue-600 text-lg">iShackAEO</span>
              </div>
              <div class="bg-red-50 text-red-600 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-red-200">
                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -341,7 +341,7 @@ export class OnboardingFunnel implements OnInit {
   completionMessage = '';
 
   ngOnInit() {
-    this.titleService.setTitle('Start Growth - AutoSEO');
+    this.titleService.setTitle('Start Growth - iShackAEO');
   }
 
   getStepClass(stepNum: number) {
