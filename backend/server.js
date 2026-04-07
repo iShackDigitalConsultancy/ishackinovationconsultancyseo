@@ -62,6 +62,80 @@ app.post('/api/contact/partner', async (req, res) => {
   }
 });
 
+// Onboarding Funnel API
+app.post('/api/onboarding/start', async (req, res) => {
+  try {
+    const { searchQuery } = req.body;
+    const result = await db.query(
+      `INSERT INTO onboarding_leads (search_query, current_step) VALUES ($1, 1) RETURNING id`,
+      [searchQuery]
+    );
+    res.json({ success: true, leadId: result.rows[0].id });
+  } catch (error) {
+    console.error('Onboarding start error:', error);
+    res.status(500).json({ error: 'Internal system error' });
+  }
+});
+
+app.post('/api/onboarding/keywords', async (req, res) => {
+  try {
+    const { leadId, searchQuery } = req.body;
+    // Call AI to generate 5 keywords based on searchQuery (simplified simulation for speed)
+    const mockKeywords = [
+      searchQuery,
+      `best ${searchQuery.split(' ').slice(0, 2).join(' ')}`,
+      `affordable ${searchQuery.split(' ')[0]} solutions`,
+      `${searchQuery} strategies 2026`,
+      `how to improve ${searchQuery.split(' ')[1] || 'SEO'}`
+    ];
+    
+    await db.query(
+      `UPDATE onboarding_leads SET selected_keywords = $1, current_step = 2, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+      [JSON.stringify(mockKeywords), leadId]
+    );
+    
+    res.json({ success: true, keywords: mockKeywords });
+  } catch (error) {
+    console.error('Onboarding keywords error:', error);
+    res.status(500).json({ error: 'Internal system error' });
+  }
+});
+
+app.post('/api/onboarding/articles', async (req, res) => {
+  try {
+    const { leadId, approvedKeywords } = req.body;
+    
+    // Simulate generation of 5 article titles
+    const articleTitles = approvedKeywords.map(kw => `The Ultimate Guide to ${kw.charAt(0).toUpperCase() + kw.slice(1)}`);
+    
+    await db.query(
+      `UPDATE onboarding_leads SET selected_keywords = $1, selected_articles = $2, current_step = 3, updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
+      [JSON.stringify(approvedKeywords), JSON.stringify(articleTitles), leadId]
+    );
+    
+    res.json({ success: true, articles: articleTitles });
+  } catch (error) {
+    console.error('Onboarding articles error:', error);
+    res.status(500).json({ error: 'Internal system error' });
+  }
+});
+
+app.post('/api/onboarding/complete', async (req, res) => {
+  try {
+    const { leadId, email, approvedArticles } = req.body;
+    
+    await db.query(
+      `UPDATE onboarding_leads SET email = $1, selected_articles = $2, current_step = 5, status = 'converted', updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
+      [email, JSON.stringify(approvedArticles), leadId]
+    );
+    
+    res.json({ success: true, message: 'Account completed and ready for checkout' });
+  } catch (error) {
+    console.error('Onboarding complete error:', error);
+    res.status(500).json({ error: 'Internal system error' });
+  }
+});
+
 // Real SEMRush & HTML Audit Integration
 app.post('/api/openclaw/trigger', async (req, res) => {
   const { eventType, payload } = req.body;

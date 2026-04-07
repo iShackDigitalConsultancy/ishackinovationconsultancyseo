@@ -76,6 +76,15 @@ import { environment } from '../../environments/environment';
               </span>
             </button>
             <button 
+              (click)="setActiveTab('funnels')" 
+              [ngClass]="activeTab === 'funnels' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
+              class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                Funnel Leads
+              </span>
+            </button>
+            <button 
               (click)="setActiveTab('packages')" 
               [ngClass]="activeTab === 'packages' ? 'bg-primary text-white border-primary' : 'bg-transparent text-slate-400 border-white/10 hover:text-white hover:border-white/20'"
               class="px-6 py-2.5 rounded-xl text-sm font-bold border transition-all shrink-0 whitespace-nowrap snap-start">
@@ -742,6 +751,58 @@ import { environment } from '../../environments/environment';
           </div>
         </div>
 
+        </div>
+
+        <!-- Funnel Leads Master View -->
+        <div *ngIf="activeTab === 'funnels'" class="animate-fade-in font-sans">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+              <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+              Onboarding Funnel CRM
+            </h1>
+          </div>
+          
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-950/50 text-slate-400 text-xs uppercase tracking-wider font-bold border-b border-slate-800/50">
+                  <th class="p-4">Search/Query</th>
+                  <th class="p-4">Email</th>
+                  <th class="p-4">Step</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4">Timestamps</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/50 text-slate-300 text-sm">
+                <tr *ngFor="let lead of funnelLeads" class="hover:bg-slate-800/20 transition-colors">
+                  <td class="p-4 font-medium text-white">{{ lead.search_query }}</td>
+                  <td class="p-4">{{ lead.email || 'N/A' }}</td>
+                  <td class="p-4">
+                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold"
+                           [ngClass]="lead.current_step === 5 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'">
+                       Step {{ lead.current_step }}/5
+                     </span>
+                  </td>
+                  <td class="p-4">
+                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider border"
+                           [ngClass]="lead.status === 'converted' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'">
+                       {{ lead.status }}
+                     </span>
+                  </td>
+                  <td class="p-4 text-xs font-mono text-slate-500 whitespace-nowrap">
+                    Last: {{ lead.updated_at | date:'MMM d, h:mm a' }}
+                  </td>
+                </tr>
+                <tr *ngIf="funnelLeads.length === 0">
+                  <td colspan="5" class="p-12 text-center text-slate-500">
+                    <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <p class="font-bold text-lg">No Funnel Leads Yet</p>
+                    <p class="text-sm mt-1">Direct traffic to the $1 Onboarding Trial.</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- Targeted URLs Master View -->
@@ -1797,6 +1858,7 @@ export class AdminDashboard implements OnInit, OnDestroy {
 
   metrics: any = null;
   recentAgencies: any[] = [];
+  funnelLeads: any[] = [];
   error = '';
   
   // Inactivity Timer State
@@ -1973,12 +2035,23 @@ export class AdminDashboard implements OnInit, OnDestroy {
       this.fetchPromoCodes();
       this.fetchPlatformHealth();
     }
+    if (tab === 'funnels') {
+      this.fetchFunnelLeads();
+    }
     if (tab === 'urls') {
       this.fetchTargetedUrls();
       this.fetchPackages();
       this.fetchAgencyLeads();
       this.fetchiShackLeads();
     }
+  }
+
+  fetchFunnelLeads() {
+    this.http.get<any[]>(`${environment.apiUrl}/admin/funnel-leads`, { headers: this.getHeaders() })
+      .subscribe({
+        next: (data) => this.funnelLeads = data,
+        error: (err) => console.error('Failed to load funnel leads', err)
+      });
   }
 
   fetchPlatformHealth() {

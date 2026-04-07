@@ -114,6 +114,17 @@ router.get('/metrics', authenticateSuperadmin, async (req, res) => {
   }
 });
 
+// Funnel Leads API
+router.get('/funnel-leads', authenticateSuperadmin, async (req, res) => {
+  try {
+    const leads = await db.query('SELECT * FROM onboarding_leads ORDER BY updated_at DESC');
+    res.json(leads.rows);
+  } catch (err) {
+    console.error('Funnel leads err:', err);
+    res.status(500).json({ error: 'Failed to fetch funnel leads' });
+  }
+});
+
 const analyticsAgent = require('./agents/analyticsAgent');
 
 router.get('/metrics/insights', authenticateSuperadmin, async (req, res) => {

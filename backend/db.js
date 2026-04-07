@@ -92,6 +92,18 @@ const initSchema = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS onboarding_leads (
+        id SERIAL PRIMARY KEY,
+        search_query VARCHAR(255),
+        selected_keywords JSONB,
+        selected_articles JSONB,
+        email VARCHAR(255),
+        current_step INTEGER DEFAULT 1,
+        status VARCHAR(50) DEFAULT 'in-progress',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       CREATE TABLE IF NOT EXISTS campaign_metrics (
         id SERIAL PRIMARY KEY,
         campaign_id INTEGER REFERENCES campaigns(id) ON DELETE CASCADE,
