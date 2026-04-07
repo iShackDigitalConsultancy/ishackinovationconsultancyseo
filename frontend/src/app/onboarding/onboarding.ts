@@ -36,8 +36,8 @@ import { environment } from '../../environments/environment';
           
           <h1 class="text-[32px] md:text-5xl font-black text-slate-900 leading-[1.1] md:leading-tight mb-6 tracking-tight">
             Get Found &<br class="hidden md:block"/> Recommended by<br/>
-            <span class="text-[#10a37f]">ChatGPT</span>, <span class="text-[#10a37f]">Perplexity</span><br/>
-            AND <span class="text-[#10a37f]">Google</span>
+            <span class="text-blue-600">ChatGPT</span>, <span class="text-blue-600">Perplexity</span><br/>
+            AND <span class="text-blue-600">Google</span>
           </h1>
           
           <div class="space-y-3 text-[15px] md:text-base text-slate-800 font-medium mb-6">
@@ -55,7 +55,7 @@ import { environment } from '../../environments/environment';
           </div>
 
           <form (ngSubmit)="startOnboarding()" class="w-full">
-            <div class="flex items-center w-full border-2 border-orange-500 rounded-xl overflow-hidden focus-within:ring-4 focus-within:ring-orange-500/20 transition-all bg-white mb-4">
+            <div class="flex items-center w-full border-2 border-blue-500 rounded-xl overflow-hidden focus-within:ring-4 focus-within:ring-blue-500/20 transition-all bg-white mb-4">
               <div class="bg-slate-50 text-slate-400 font-medium px-4 py-4 border-r border-slate-200 shrink-0">
                 https://
               </div>
@@ -74,15 +74,15 @@ import { environment } from '../../environments/environment';
 
           <div class="mt-8 space-y-3 font-medium text-slate-600 text-[15px]">
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
               216% Avg Traffic Increase
             </div>
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
               1,295+ Businesses Growing
             </div>
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
               Zero Technical Skills Needed
             </div>
           </div>
