@@ -41,16 +41,14 @@ import { environment } from '../../environments/environment';
           </h1>
           
           <div class="space-y-3 text-[15px] md:text-base text-slate-800 font-medium mb-6">
-            <p class="flex items-start gap-2">
-              <span class="shrink-0 text-xl">⏰</span>
-              <span>You're 2.5 years behind competitors who do SEO.</span>
+            <p>
+              You're 1.8 months behind competitors who do SEO.
             </p>
-            <p class="flex items-start gap-2">
-              <span class="shrink-0 text-xl">📚</span>
-              <span>We catch you up with 1 expert article daily + building trust (backlinks).</span>
+            <p>
+              We catch you up with 1 expert article daily + building trust (backlinks).
             </p>
             <p class="font-bold text-slate-900 mt-4 mb-2">
-              Get more customers from ChatGPT & Google on autopilot 👇
+              Get more customers from ChatGPT & Google on autopilot
             </p>
           </div>
 
