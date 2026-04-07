@@ -124,19 +124,30 @@ app.post('/api/onboarding/articles', async (req, res) => {
   try {
     const { leadId, approvedKeywords } = req.body;
     
-    let articleTitles = approvedKeywords.map(kw => `The Ultimate Guide to ${kw.charAt(0).toUpperCase() + kw.slice(1)}`);
+    let articleTitles = approvedKeywords.map(kw => ({
+      title: `The Ultimate Guide to ${kw.charAt(0).toUpperCase() + kw.slice(1)}`,
+      intent: 'Informational',
+      target_wc: '1,500+ words',
+      synopsis: `An introductory guide outlining the most important aspects of ${kw}.`,
+    }));
     
     try {
       const researchAgent = require('./agents/researchAgent');
       const prompt = `The user has approved the following ${approvedKeywords.length} SEO keywords: ${JSON.stringify(approvedKeywords)}.
-You are an expert SEO Content Strategist. Your task is to write one highly compelling, click-worthy, modern SEO article title for each keyword. These titles must be varied, authoritative, and perfectly optimized for search engines. Do not use generic prefixes like "The Ultimate Guide to" repeatedly. 
-Return EXACTLY an array of ${approvedKeywords.length} strings containing just the article titles. Return ONLY a valid JSON array. For example: ["Title 1", "Title 2", ...]`;
+You are an expert SEO Content Strategist. Your task is to write one highly compelling, click-worthy, modern SEO article title for each keyword, along with a content strategy brief.
+Return EXACTLY a JSON array of objects. EVERY object must have the following keys:
+"title": (string) The highly click-worthy article title.
+"intent": (string) E.g., "Informational", "Commercial", etc.
+"target_wc": (string) E.g., "1,500+ words", "2,000+ words".
+"synopsis": (string) A strict 1-sentence SEO meta description outlining exactly the angle of the article.
+
+Return ONLY the raw JSON array. Example: [{"title":"...", "intent":"...", "target_wc":"...", "synopsis":"..."}, ...]`;
 
       const rawResponse = await researchAgent.think(prompt, { directive: "Funnel Onboarding Content Strategy" });
       const match = rawResponse.match(/\[[\s\S]*?\]/);
       if (match) {
         const parsed = JSON.parse(match[0]);
-        if (Array.isArray(parsed) && parsed.length === approvedKeywords.length) {
+        if (Array.isArray(parsed) && parsed.length === approvedKeywords.length && parsed[0].title) {
           articleTitles = parsed;
         }
       }

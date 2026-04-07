@@ -102,20 +102,42 @@ import { environment } from '../../environments/environment';
           </div>
           
           <div class="bg-white border border-slate-200 rounded-3xl p-4 space-y-3 mb-24 shadow-sm">
-             <div *ngFor="let art of articles; let i = index" class="border border-slate-100 text-slate-800 px-4 py-3.5 rounded-2xl flex items-center justify-between gap-4 w-full shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-               <div class="flex items-center gap-3 w-full overflow-hidden">
-                 <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                 <span *ngIf="editingArticleIndex !== i" class="font-bold text-[14px] leading-snug truncate cursor-pointer hover:text-blue-600" (click)="editArticle(i)">{{ art }}</span>
-                 <input *ngIf="editingArticleIndex === i" type="text" [(ngModel)]="articles[i]" (blur)="stopEditing()" (keyup.enter)="stopEditing()" class="flex-1 w-full border-b border-blue-500 pb-1 focus:outline-none font-bold text-[14px] leading-snug bg-transparent text-blue-800">
-               </div>
-               <div class="flex items-center gap-1 shrink-0">
-                 <button (click)="editingArticleIndex === i ? stopEditing() : editArticle(i)" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors border border-transparent hover:border-slate-200">
-                   <svg *ngIf="editingArticleIndex !== i" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                   <svg *ngIf="editingArticleIndex === i" class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                 </button>
-                 <button (click)="removeArticle(i)" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors border border-transparent hover:border-red-200">
-                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                 </button>
+             <div *ngFor="let art of articles; let i = index" class="border border-slate-100 text-slate-800 p-5 rounded-2xl flex flex-col gap-4 w-full shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative group hover:shadow-md transition-shadow">
+               <div class="flex items-start justify-between gap-4 w-full overflow-hidden">
+                 <div class="flex gap-3 w-full">
+                   <div class="mt-0.5">
+                     <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                   </div>
+                   <div class="flex-1">
+                     <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                       <span *ngIf="editingArticleIndex !== i" class="font-extrabold text-[15px] leading-snug cursor-pointer group-hover:text-blue-600 transition-colors" (click)="editArticle(i)">{{ art.title }}</span>
+                       <input *ngIf="editingArticleIndex === i" type="text" [(ngModel)]="articles[i].title" (blur)="stopEditing()" (keyup.enter)="stopEditing()" class="flex-1 w-full border-b border-blue-500 pb-1 focus:outline-none font-extrabold text-[15px] leading-snug bg-transparent text-blue-800" autofocus>
+                       
+                       <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200">
+                         {{ art.intent }} 
+                       </span>
+                     </div>
+                     <p class="text-sm text-slate-500 font-medium leading-relaxed mb-3">
+                       {{ art.synopsis }}
+                     </p>
+                     <div class="flex items-center gap-4 text-xs font-bold text-slate-400">
+                       <div class="flex items-center gap-1.5">
+                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                         WC: {{ art.target_wc }}
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+                 
+                 <div class="flex flex-col items-center gap-1 shrink-0 bg-white/80 backdrop-blur top-4 right-4 absolute opacity-0 group-hover:opacity-100 transition-opacity">
+                   <button (click)="editingArticleIndex === i ? stopEditing() : editArticle(i)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors border border-transparent hover:border-blue-200 shadow-sm bg-white">
+                     <svg *ngIf="editingArticleIndex !== i" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                     <svg *ngIf="editingArticleIndex === i" class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                   </button>
+                   <button (click)="removeArticle(i)" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors border border-transparent hover:border-red-200 shadow-sm bg-white">
+                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                   </button>
+                 </div>
                </div>
              </div>
           </div>
@@ -275,7 +297,7 @@ export class OnboardingFunnel implements OnInit {
   agreedToTerms = false;
   
   keywords: string[] = [];
-  articles: string[] = [];
+  articles: any[] = [];
   editingArticleIndex: number | null = null;
   
   completionMessage = '';
