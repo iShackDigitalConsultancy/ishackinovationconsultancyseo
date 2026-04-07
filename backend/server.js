@@ -124,8 +124,25 @@ app.post('/api/onboarding/articles', async (req, res) => {
   try {
     const { leadId, approvedKeywords } = req.body;
     
-    // Simulate generation of 5 article titles
-    const articleTitles = approvedKeywords.map(kw => `The Ultimate Guide to ${kw.charAt(0).toUpperCase() + kw.slice(1)}`);
+    let articleTitles = approvedKeywords.map(kw => `The Ultimate Guide to ${kw.charAt(0).toUpperCase() + kw.slice(1)}`);
+    
+    try {
+      const researchAgent = require('./agents/researchAgent');
+      const prompt = `The user has approved the following ${approvedKeywords.length} SEO keywords: ${JSON.stringify(approvedKeywords)}.
+You are an expert SEO Content Strategist. Your task is to write one highly compelling, click-worthy, modern SEO article title for each keyword. These titles must be varied, authoritative, and perfectly optimized for search engines. Do not use generic prefixes like "The Ultimate Guide to" repeatedly. 
+Return EXACTLY an array of ${approvedKeywords.length} strings containing just the article titles. Return ONLY a valid JSON array. For example: ["Title 1", "Title 2", ...]`;
+
+      const rawResponse = await researchAgent.think(prompt, { directive: "Funnel Onboarding Content Strategy" });
+      const match = rawResponse.match(/\[[\s\S]*?\]/);
+      if (match) {
+        const parsed = JSON.parse(match[0]);
+        if (Array.isArray(parsed) && parsed.length === approvedKeywords.length) {
+          articleTitles = parsed;
+        }
+      }
+    } catch (agentErr) {
+      console.warn('AI Agent failed to craft titles, falling back to static generation', agentErr);
+    }
     
     await db.query(
       `UPDATE onboarding_leads SET selected_keywords = $1, selected_articles = $2, current_step = 3, updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
