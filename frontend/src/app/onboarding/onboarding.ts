@@ -36,8 +36,8 @@ import { environment } from '../../environments/environment';
           
           <h1 class="text-[32px] md:text-5xl font-black text-slate-900 leading-[1.1] md:leading-tight mb-6 tracking-tight">
             Rank & Get<br class="hidden md:block"/> Recommended by<br/>
-            <span class="text-blue-600">ChatGPT</span>, <span class="text-blue-600">Perplexity</span><br/>
-            AND <span class="text-blue-600">Google</span>
+            <span class="text-blue-600">Google</span>, <span class="text-blue-600">ChatGPT</span><br/>
+            AND <span class="text-blue-600">Perplexity</span>
           </h1>
           
           <div class="space-y-3 text-[15px] md:text-base text-slate-800 font-medium mb-6">
