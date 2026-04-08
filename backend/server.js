@@ -62,6 +62,36 @@ app.post('/api/contact/partner', async (req, res) => {
   }
 });
 
+// Public Blog Ecosystem (AEO News & Views)
+app.get('/api/blog/posts', async (req, res) => {
+  try {
+    // Specifically fetch blogs linked to the ishackaeo.com umbrella
+    const postsQuery = await db.query(`
+      SELECT cb.id, cb.title, cb.html_content, cb.created_at, c.client_domain 
+      FROM campaign_blogs cb
+      JOIN campaigns c ON cb.campaign_id = c.id
+      WHERE c.client_domain = 'ishackaeo.com'
+      ORDER BY cb.created_at DESC
+      LIMIT 12
+    `);
+    
+    // We package it to resemble standard WP REST response loosely for the frontend
+    const formatted = postsQuery.rows.map(post => ({
+      id: post.id,
+      title: post.title,
+      content: post.html_content,
+      date: post.created_at,
+      excerpt: post.html_content.substring(0, 250).replace(/<[^>]+>/g, '') + '...',
+      domain: post.client_domain
+    }));
+    
+    res.json(formatted);
+  } catch (error) {
+    console.error('Blog fetch err:', error);
+    res.status(500).json({ error: 'Failed to fetch the generic ecosystem.' });
+  }
+});
+
 // Onboarding Funnel API
 app.post('/api/onboarding/start', async (req, res) => {
   try {

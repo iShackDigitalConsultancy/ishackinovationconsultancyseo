@@ -43,7 +43,18 @@ const initSchema = async () => {
         tier_name VARCHAR(50) PRIMARY KEY,
         mrr_price INTEGER NOT NULL DEFAULT 499,
         max_ai_phase INTEGER NOT NULL DEFAULT 2,
+        max_urls INTEGER NOT NULL DEFAULT 5,
+        max_keywords_per_url INTEGER NOT NULL DEFAULT 3,
         features JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS campaign_urls (
+        id SERIAL PRIMARY KEY,
+        campaign_id INTEGER REFERENCES campaigns(id) ON DELETE CASCADE,
+        url_path VARCHAR(255) NOT NULL,
+        target_keywords JSONB,
+        status VARCHAR(50) DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -68,6 +79,7 @@ const initSchema = async () => {
       CREATE TABLE IF NOT EXISTS agent_tasks (
         id SERIAL PRIMARY KEY,
         campaign_id INTEGER NOT NULL REFERENCES campaigns(id),
+        url_id INTEGER REFERENCES campaign_urls(id) ON DELETE CASCADE,
         assigned_agent VARCHAR(100) NOT NULL,
         task_type VARCHAR(100) NOT NULL,
         payload JSONB,
@@ -89,6 +101,14 @@ const initSchema = async () => {
       CREATE TABLE IF NOT EXISTS promo_codes (
         id SERIAL PRIMARY KEY,
         code VARCHAR(50) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS campaign_blogs (
+        id SERIAL PRIMARY KEY,
+        campaign_id INTEGER NOT NULL REFERENCES campaigns(id),
+        title VARCHAR(255) NOT NULL,
+        html_content TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -207,6 +227,19 @@ const initSchema = async () => {
     try {
       await client.query("ALTER TABLE campaigns ADD COLUMN target_territory VARCHAR(10) DEFAULT 'us'");
     } catch(e) {}
+    
+    try {
+      await client.query("ALTER TABLE packages ADD COLUMN max_urls INTEGER NOT NULL DEFAULT 5");
+    } catch(e) {}
+
+    try {
+      await client.query("ALTER TABLE packages ADD COLUMN max_keywords_per_url INTEGER NOT NULL DEFAULT 3");
+    } catch(e) {}
+
+    try {
+      await client.query("ALTER TABLE agent_tasks ADD COLUMN url_id INTEGER REFERENCES campaign_urls(id) ON DELETE CASCADE");
+    } catch(e) {}
+
     
     // Auto-migrate any dormant campaigns locked into the wrong initial phase
     try {

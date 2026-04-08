@@ -28,7 +28,29 @@ class BaseAgent {
     }
   }
 
-  async think(prompt, payload = {}) {
+  async think(prompt, payload = {}, engine = 'openai') {
+    if (engine === 'ollama') {
+      try {
+        const response = await fetch('http://localhost:11434/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'llama3', // Standardizing on llama3 for high-volume local reasoning
+            system: this.systemPrompt,
+            prompt: `Context Payload: ${JSON.stringify(payload)}\n\nCommand: ${prompt}`,
+            stream: false
+          })
+        });
+        if (!response.ok) throw new Error(`Ollama responded with ${response.status}`);
+        const data = await response.json();
+        return data.response;
+      } catch (e) {
+        console.error(`[${this.name}] Ollama AI Execution Failed. Is it running?`, e);
+        return `Failed to process command via Ollama.`;
+      }
+    }
+
+    // Default to OpenAI (for complex reasoning or AutoSeo/Guru agents)
     if (!this.ai) {
       return `[SIMULATION RESPONSE from ${this.name}]: I acknowledge the prompt. Executing strategy.`;
     }

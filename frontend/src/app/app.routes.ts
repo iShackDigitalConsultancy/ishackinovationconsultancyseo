@@ -8,6 +8,7 @@ import { WhiteLabelSeo } from './white-label-seo/white-label-seo';
 import { AiSeoSoftware } from './ai-seo-software/ai-seo-software';
 import { TermsComponent } from './terms/terms';
 import { OnboardingFunnel } from './onboarding/onboarding';
+import { BlogComponent } from './blog/blog';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'admin/:tab', component: AdminDashboard },
   { path: 'white-label-seo', component: WhiteLabelSeo },
   { path: 'ai-seo-software', component: AiSeoSoftware },
+  { path: 'blog', component: BlogComponent },
   { path: 'terms', component: TermsComponent },
   { path: 'onboarding', component: OnboardingFunnel },
   { path: '**', redirectTo: '' }

@@ -14,7 +14,7 @@ class ImplementationAgent extends BaseAgent {
     try {
       const prompt = `Using the following Keyword Map, generate a highly optimized Homepage Title Tag, Meta Description, and primary H1. Keep within standard pixel width limits. Output strictly as JSON.`;
       
-      const result = await this.think(prompt, payload);
+      const result = await this.think(prompt, payload, 'ollama');
       const cleanRes = result.replace(/```json\n?|\n?```/g, '');
       
       await this.logThought(campaignId, 'Onsite implementation tags drafted successfully.', 'Submitting for approval.');

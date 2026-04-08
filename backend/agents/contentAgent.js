@@ -37,12 +37,18 @@ class ContentAgent extends BaseAgent {
         Format: { "title": "...", "html_content": "..." }
       `;
       
-      const result = await this.think(prompt);
+      const result = await this.think(prompt, { keyword: targetKeyword }, 'ollama');
       let cleanRes = result.replace(/^```json\n?/g, '').replace(/\n?```$/g, '').trim();
       
       const payload = JSON.parse(cleanRes);
 
       await this.logThought(campaignId, 'UX Content HTML rendered flawlessly in memory.', 'Verifying WP Authentication Hooks');
+
+      // Natively save to our internal campaign_blogs repository
+      await db.query(
+        'INSERT INTO campaign_blogs (campaign_id, title, html_content) VALUES ($1, $2, $3)', 
+        [campaignId, payload.title, payload.html_content]
+      );
 
       // Attempt WordPress Integration
       const { rows } = await db.query('SELECT wp_url, wp_username, wp_password, wp_publish_status FROM campaigns WHERE id = $1', [campaignId]);
@@ -54,7 +60,7 @@ class ContentAgent extends BaseAgent {
           await this.logThought(campaignId, `Article successfully injected to site via WP JSON. URL: ${wpRes.postLink}`, 'Action Complete');
           
       } else {
-          await this.logThought(campaignId, `No valid WP credentials mapped to campaign. Draft saved locally only.`, 'Payload Serialized Locally');
+          await this.logThought(campaignId, `No valid WP credentials mapped to campaign. Draft saved natively to Public Blog Repository.`, 'Payload Serialized Locally');
       }
 
     } catch (e) {
