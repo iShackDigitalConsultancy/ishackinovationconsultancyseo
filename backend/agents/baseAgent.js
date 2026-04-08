@@ -45,12 +45,12 @@ class BaseAgent {
         const data = await response.json();
         return data.response;
       } catch (e) {
-        console.error(`[${this.name}] Ollama AI Execution Failed. Is it running?`, e);
-        return `Failed to process command via Ollama.`;
+        console.warn(`[${this.name}] Ollama unavailable or dropped connection. Falling back to OpenAI...`);
+        // We will purposely let it slip down to the OpenAI execution block below.
       }
     }
 
-    // Default to OpenAI (for complex reasoning or AutoSeo/Guru agents)
+    // Default to OpenAI (for complex reasoning, AutoSeo/Guru agents, or Ollama fallback)
     if (!this.ai) {
       return `[SIMULATION RESPONSE from ${this.name}]: I acknowledge the prompt. Executing strategy.`;
     }
