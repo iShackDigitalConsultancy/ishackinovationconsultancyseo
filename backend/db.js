@@ -246,6 +246,17 @@ const initSchema = async () => {
       await client.query("UPDATE campaigns SET status = 'active' WHERE status = 'new'");
     } catch(e) {}
 
+    // Auto-seed required Superadmins into production
+    try {
+      const pHash = '$2b$10$O9r8UmFaY.TYjXruVawWFulRq1JocoZSCrw28QoD9SMs2PMe.j1Me'; // admin123
+      const seedQuery = 'INSERT INTO agencies (agency_name, email, password_hash, role) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role';
+      await client.query(seedQuery, ['Wayne B.', 'wayneb@ishackventures.com', pHash, 'superadmin']);
+      await client.query(seedQuery, ['Vera Sharp', 'veras@ishack.co.za', pHash, 'superadmin']);
+      await client.query(seedQuery, ['Admin', 'admin@ishack.co.za', pHash, 'superadmin']);
+    } catch(e) {
+      console.error('Superadmin seed error:', e.message);
+    }
+
     console.log('PostgreSQL Database schema initialized');
   } catch(err) {
     console.error('Error creating PostgreSQL tables:', err);
